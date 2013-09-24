@@ -1,0 +1,148 @@
+<head>
+
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+<script>
+
+function _log(text){
+    console.log(text);
+    $(".log").append("<div>"+text+"</div>");
+
+}
+
+Robot = function(){
+    
+    var self = this;
+    self.path = []; // The path of the robot
+    self.pause = false;
+    self.bump = false;
+
+
+    self.run = function(){
+        self.count=0;
+        var event=null;
+        setInterval(function(){
+            if (self.pause === false){
+                event = null;
+                self.count++;
+                if (self.bump===true){
+                    // Decide direction
+                    var delta_h="0";
+                    var delta_x = self.count;
+                    var event = "b"+delta_h+delta_x;
+                    
+                }
+                if (event){
+                    self.path.push(event);
+                    _log("New direction: "+event);
+                }
+
+                
+            }
+
+        }, 500);
+
+    };
+
+
+    self.setPause = function(val){
+        self.pause = val;
+    };
+
+    self.updateMap = function(){
+
+    };
+}
+
+
+
+Maze = function(){
+
+    self = this;
+    self.SIZE = 50;
+    self.CHIP = 5;
+    self.board = new Array();
+    
+    self.init = function() {
+        var canvas = document.getElementById("canvas");
+        canvas.width = self.CHIP*(self.SIZE+8);
+        canvas.height = self.CHIP*(self.SIZE+8);
+        if (canvas.getContext) {
+            context = canvas.getContext("2d");
+            context.fillStyle = "rgb(150,150,150)";
+            context.fillRect(self.CHIP*2, self.CHIP*2, self.CHIP*(self.SIZE+4), self.CHIP*(self.SIZE+4));
+        }
+        drawStack = new Array();
+        for(i=0; i< self.SIZE; i++) {
+            self.board[i] = new Array();
+            for(j=0; j<self.SIZE; j++) {
+                self.board[i][j] = 0;
+                context.fillStyle = "rgb(0,0,0)";
+                context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
+            }
+        }
+    };
+
+    self.update = function(step){
+
+    };
+
+    self.draw = function(i, j) {
+        // Draws a white square at i,j
+        // (0,0) is upper left
+        context.fillStyle = "rgb(255,255,255)";
+        context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
+    }
+
+    self.board1 = function(){
+        var board = new Array();
+        for(i=0; i< self.SIZE; i++) {
+            board[i] = new Array();
+            for(j=0; j<self.SIZE; j++) {
+                board[i][j] = 0;
+            }
+        }
+        return board;
+    }
+
+};
+
+
+
+$(document).ready(function(){
+    robot = new Robot();
+    maze = new Maze();
+    maze.init();
+});
+
+</script>
+
+<style>
+.left {
+    float:left;
+}
+.right {
+    float:right;
+}
+
+canvas {
+    height:400px;
+    width:400px;
+}
+</style>
+
+
+</head>
+
+<body>
+<button onclick="robot.run(); $(this).hide();">Start&raquo;</button>
+<button onclick="robot.setPause(true);">Pause</button>
+<div>
+    <div class="left">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div class="right">
+        <div class="log"></div>
+    </div>
+</div>
+</body>
