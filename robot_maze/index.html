@@ -16,31 +16,64 @@ Robot = function(){
     self.path = []; // The path of the robot
     self.pause = false;
     self.bump = false;
+    self.last_bump_counter = 0;
+    self.DT = 250;
 
+
+    self.i = 25;
+    self.j = 33;
+    self.h = 0;
 
     self.run = function(){
         self.count=0;
         var event=null;
+
+        // Plot inital location of roobt
+        maze.add_dot(self.i,self.j);
+
         setInterval(function(){
             if (self.pause === false){
                 event = null;
                 self.count++;
+                
+                self.bump = self.checkBump();
+
+
                 if (self.bump===true){
-                    // Decide direction
-                    var delta_h="0";
-                    var delta_x = self.count;
-                    var event = "b"+delta_h+delta_x;
+
+                    // Compute path length
+                    self.path_length = self.count - self.last_bump_counter;
+                    self.last_bump_counter = self.count; 
                     
-                }
-                if (event){
+                    // Decide direction
+                    delta_h = self.getHeadingChange('bump');
+                    self.h = (self.h+delta_h)%360;
+
+                    var event = "b"+delta_h+"-"+self.path_length;
+                    self.path.push(event);
+                    _log(event);
+
+
+                } else if (event){
                     self.path.push(event);
                     _log("New direction: "+event);
-                }
+                } 
 
+                // Update location
+                var delta_x = Math.round(Math.sin(self.h*Math.PI/180));
+                var delta_y = -Math.round(Math.cos(self.h*Math.PI/180));
+                
+                maze.add_dot(self.i, self.j, maze.TRACK_COLOR);
+                self.i = self.i + delta_x;
+                self.j = self.j + delta_y;
+
+                // Plot location
+                maze.add_dot(self.i, self.j);
+                _log(self.i+", "+self.j);
                 
             }
 
-        }, 500);
+        }, self.DT);
 
     };
 
@@ -50,6 +83,39 @@ Robot = function(){
     };
 
     self.updateMap = function(){
+
+    };
+
+    self.checkBump = function(){
+        // Try to continue on existing path
+        var bump = false;
+
+        var delta_x = Math.round(Math.sin(self.h*Math.PI/180));
+        var delta_y = -Math.round(Math.cos(self.h*Math.PI/180));
+
+        var i = self.i + delta_x;
+        var j = self.j + delta_y;
+        
+
+
+        // Check for boundary
+        if (i===-1 || j===-1 || i===maze.SIZE || j===maze.SIZE ){
+            bump = true;
+        } else if (maze.board[i][j] === 1){
+            bump = true;
+        }
+        return bump;
+
+
+    };
+
+    self.getHeadingChange = function(eventType){
+        var out;
+        if (eventType === 'bump'){
+            // Turn right
+            out = 90;
+        }
+        return out;
 
     };
 }
@@ -62,23 +128,31 @@ Maze = function(){
     self.SIZE = 50;
     self.CHIP = 5;
     self.board = new Array();
-    
+    self.context = null;
+
+    self.BACKGROUND_COLOR = "rgb(50,50,50)";
+    self.WALL_COLOR = "rgb(255,0,0)";
+    self.DOT_COLOR = "rgb(0,255,0)";
+    self.TRACK_COLOR = "rgb(100,100,255)";
+    self.BORDER_COLOR = "rgb(150,150,150)";
+
+
     self.init = function() {
         var canvas = document.getElementById("canvas");
         canvas.width = self.CHIP*(self.SIZE+8);
         canvas.height = self.CHIP*(self.SIZE+8);
         if (canvas.getContext) {
-            context = canvas.getContext("2d");
-            context.fillStyle = "rgb(150,150,150)";
-            context.fillRect(self.CHIP*2, self.CHIP*2, self.CHIP*(self.SIZE+4), self.CHIP*(self.SIZE+4));
+            self.context = canvas.getContext("2d");
+            self.context.fillStyle = self.BORDER_COLOR;
+            self.context.fillRect(self.CHIP*2, self.CHIP*2, self.CHIP*(self.SIZE+4), self.CHIP*(self.SIZE+4));
         }
         drawStack = new Array();
         for(i=0; i< self.SIZE; i++) {
             self.board[i] = new Array();
             for(j=0; j<self.SIZE; j++) {
                 self.board[i][j] = 0;
-                context.fillStyle = "rgb(0,0,0)";
-                context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
+                self.context.fillStyle = self.BACKGROUND_COLOR;
+                self.context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
             }
         }
     };
@@ -87,32 +161,92 @@ Maze = function(){
 
     };
 
-    self.draw = function(i, j) {
+
+    self.load_board_1 = function(){
+        self.add_u(20,30,9,9,'down')
+    };
+
+    self.add_dot = function(i, j, color) {
+        if (typeof(color) === 'undefined') color = self.DOT_COLOR;
         // Draws a white square at i,j
         // (0,0) is upper left
-        context.fillStyle = "rgb(255,255,255)";
-        context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
+        self.context.fillStyle = color;
+        self.context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
     }
 
-    self.board1 = function(){
-        var board = new Array();
-        for(i=0; i< self.SIZE; i++) {
-            board[i] = new Array();
-            for(j=0; j<self.SIZE; j++) {
-                board[i][j] = 0;
-            }
+    self.add_u = function(I,J,width, height, orientation){
+        /*
+        PARAMS
+        I, J - the coordinates of the upper left corner of the U
+        width - width of the U
+        height - height of the arms of the U
+        orientation - 'up','left', 'right', 'down'
+        */
+
+        switch(orientation) {
+            case 'up':
+                self.add_wall(I,J,height,'v');
+                self.add_wall(I+width+1,J,height,'v');
+                self.add_wall(I+1,J+height-1,width,'h');
+                break;
+            case 'down':
+                self.add_wall(I,J,height,'v');
+                self.add_wall(I+width+1,J,height,'v');
+                self.add_wall(I+1,J,width,'h');
+                break;
+            case 'left':
+                self.add_wall(I,J,height,'h');
+                self.add_wall(I,J+width+1,height,'h');
+                self.add_wall(I,J+1,width,'v');
+                break;
+            case 'right':
+                self.add_wall(I,J,height,'h');
+                self.add_wall(I,J+width+1,height,'h');
+                self.add_wall(I+height-1,J+1,width,'v');
+                break;
         }
-        return board;
+
     }
+
+    self.add_wall = function(I,J,length, orientation){
+        /*
+         Add a wall at with it's top or left end at i,j
+
+         PARAMS
+         i, j - the x,y coodinates of the top or left end of the wall
+         length - length of the wall
+         orientation - 'h', 'v' (horizontal or vertical)
+         */
+         if (orientation == 'h'){
+            var j = J;
+            for (i=I; i<I+length; i++){
+                self.board[i][j] = 1;
+                self.context.fillStyle = self.WALL_COLOR;
+                self.context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
+            }
+         } else if (orientation == 'v'){
+            var i = I;
+            for (j=J; j<J+length; j++){
+                self.board[i][j] = 1;
+                self.context.fillStyle = self.WALL_COLOR;
+                self.context.fillRect(self.CHIP*(4+i), self.CHIP*(4+j), self.CHIP, self.CHIP);
+            }
+         } // End if orientation
+    };
 
 };
 
 
 
 $(document).ready(function(){
+    // Hide pause and play buttons
+    $("#pause-btn, #play-btn").hide();
+
     robot = new Robot();
     maze = new Maze();
     maze.init();
+    maze.load_board_1();
+
 });
 
 </script>
@@ -135,8 +269,10 @@ canvas {
 </head>
 
 <body>
-<button onclick="robot.run(); $(this).hide();">Start&raquo;</button>
-<button onclick="robot.setPause(true);">Pause</button>
+<button id="start-btn" onclick="robot.run(); $(this).hide(); $(this).next('button').show();">Start&raquo;</button>
+<button id="pause-btn" onclick="robot.setPause(true); $(this).hide(); $(this).next('button').show();">Pause</button>
+<button id="play-btn" onclick="robot.setPause(false); $(this).hide();$(this).prev('button').show();">Play</button>
+
 <div>
     <div class="left">
         <canvas id="canvas"></canvas>
