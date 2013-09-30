@@ -1,6 +1,7 @@
 <head>
 
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://underscorejs.org/underscore-min.js"></script>
 
 <script>
 
@@ -141,14 +142,17 @@ Robot = function(){
     self.logEvent = function(){
 
         self.path.push(self.lastPath);
-        var text = self.lastPath.eventType+" - "
+        if (self.lastPath.eventType==='bump'){
+            var text = self.lastPath.eventType+" - "
                    +self.lastPath.headingChange+"&deg; - "
                    +self.lastPath.distance+' old h '
                    +self.lastPath.headingOld + "&deg;"
                    +' new h '
                    +self.lastPath.headingNew + "&deg;"; 
 
-        _log(text);
+            _log(text);    
+        }
+        
     };
 
     self.setPause = function(val){
@@ -248,22 +252,17 @@ Robot = function(){
 
     self.getFeatureType = function(){
         var out = "unknown";
-        if (self.path.length < 3) return out;
+        var last5 = self.getLastBumps(5);
+        if (last5.length < 3) return out;
 
-        
-
-        // If path is between 2 and 4 entries, just look for corners.
-        if (self.path.length < 4){ 
-            last3 = self.getLastBumps(3);
-            rs = self.isCorner(last3);
+        // If path is between 2 and 4 entries, just look for corners. 
+        if (last5.length < 4){
+            rs = self.isCorner(self.getLastBumps(3));
             if (rs) out = rs;
             return out;
         }
         
         // Check for a U
-        var last5 = self.getLastBumps(5);
-        var out = out;
-
         rs = self.isCorner( [last5[2], last5[3], last5[4]] );
         if (rs) out = rs;
         if (out){
@@ -287,12 +286,15 @@ Robot = function(){
 
         var count = 0;
         var out = [];
-        while (count < num){
+        while (out.length < num && (endI > count)){
+
             var temp = self.path[endI-count];
-            if (temp.eventType === 'bump') out.push[temp];
+            if (typeof(temp) != 'undefined'){
+                if (temp.eventType === 'bump') out.push(temp);
+            }
             count++;
         }
-        return out;
+        return out.reverse();
     }
 
 
