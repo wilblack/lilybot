@@ -8,8 +8,8 @@ Materials
 
 SD Card - $12
 
-Set-Up
-======
+Set-Up the Raspbeery Pi with BrickPi
+====================================
 
 I followed the instructions here http://www.dexterindustries.com/BrickPi/getting-started/pi-prep/ 
 and downloaded the "wheezy" image and installed Win32DiskImager from http://sourceforge.net/projects/win32diskimager/. 
@@ -27,3 +27,15 @@ info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/set
 
 After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
 You should now be able to ssh in over Wi-Fi.
+
+
+Install and Update Software
+---------------------------
+
+Run 
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+
