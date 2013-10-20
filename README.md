@@ -24,3 +24,6 @@ Plug in an enternet cable and turn the raspberry on. ssh should be enabled by de
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
+
+After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
+You should now be able to ssh in over Wi-Fi.
