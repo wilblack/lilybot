@@ -32,7 +32,7 @@ You should now be able to ssh in over Wi-Fi.
 Install and Update Software
 ---------------------------
 
-Run 
+Run and grab a coffee. This second command takes awhile.
 
 ```
 sudo apt-get update
