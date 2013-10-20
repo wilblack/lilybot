@@ -53,8 +53,8 @@ Now make a project directory and clone some github repos.
 cd ~
 mkdirProjects
 cd Projects 
-clone https://github.com/DexterInd/BrickPi_Python.git
-clone https://github.com/wilblack/lilybot.git
+git clone https://github.com/DexterInd/BrickPi_Python.git
+git clone https://github.com/wilblack/lilybot.git
 ```
 
 
