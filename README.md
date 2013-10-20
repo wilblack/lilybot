@@ -44,7 +44,7 @@ Now install some librabries and helpful stuff
 ```
 sudo apt-get install screen
 sudo apt-get install ipython
-sudo apt-get install pip
+sudo apt-get install python-pip
 
 ```
 
