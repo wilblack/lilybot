@@ -38,4 +38,10 @@ Run and grab a coffee. This second command takes awhile.
 sudo apt-get update
 sudo apt-get upgrade
 ```
+Now install some helpful librabries
+
+```
+sudo apt-get install screen
+sudo apt-get install ipython
+```
 
