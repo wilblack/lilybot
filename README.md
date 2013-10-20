@@ -38,10 +38,23 @@ Run and grab a coffee. This second command takes awhile.
 sudo apt-get update
 sudo apt-get upgrade
 ```
-Now install some helpful librabries
+
+Now install some librabries and helpful stuff
 
 ```
 sudo apt-get install screen
 sudo apt-get install ipython
+
 ```
+
+Now make a project directory and clone some github repos.
+
+```
+cd ~
+mkdirProjects
+cd Projects 
+clone https://github.com/DexterInd/BrickPi_Python.git
+clone https://github.com/wilblack/lilybot.git
+```
+
 
