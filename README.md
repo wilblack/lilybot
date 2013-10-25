@@ -32,7 +32,14 @@ You should now be able to ssh in over Wi-Fi.
 Install and Update Software
 ---------------------------
 
-Run and grab a coffee. This second command takes awhile.
+Change your default log in shell from sh to bash. Run change shell.
+```
+chsh
+```
+and when prompted enter `/bin/bash`.
+
+
+Run the following code and grab some coffee, the second command takes awhile.
 
 ```
 sudo apt-get update
