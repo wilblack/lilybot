@@ -32,7 +32,8 @@ You should now be able to ssh in over Wi-Fi.
 Install and Update Software
 ---------------------------
 
-Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`.
+Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
+Then log out and log back in. 
 
 
 Run the following code and grab some coffee, the second command takes awhile.
