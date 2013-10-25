@@ -62,4 +62,9 @@ git clone https://github.com/DexterInd/BrickPi_Python.git
 git clone https://github.com/wilblack/lilybot.git
 ```
 
+Helpful Links
+-------------
 
+Port Diagram
+
+http://www.dexterindustries.com/BrickPi/getting-started/attaching-lego/
