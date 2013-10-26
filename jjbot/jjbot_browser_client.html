@@ -30,6 +30,7 @@
       height:400px;
       background-color: #000000;
       color:#00DD00;
+      overflow:auto;
     }
 
     .padded {
@@ -225,6 +226,7 @@ function setup2(){
         $newRow = $("<div>");
         $newRow.text(txt);
         $log.append($newRow);
+        $log.scrollTop($log[0].scrollHeight);
     }   
         
 }   
