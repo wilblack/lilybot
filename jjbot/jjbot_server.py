@@ -70,7 +70,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       BrickPi.MotorSpeed[PORT_A] = 0
       BrickPi.MotorSpeed[PORT_D] = 0
     BrickPiUpdateValues();                # BrickPi updates the values for the motors
-    self.log("Values Updated")
+    print "Values Updated"
   def on_close(self):
     print 'connection closed...'
   
