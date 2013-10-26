@@ -4,9 +4,17 @@ lilybot
 These are samples, demos, and libraries for the Mindsotrm EV3
 
 Materials
-=========
+---------
 
+EV3 - $350
+Raspberry Pi - $40
+BrickPi - $45
+NXT Touch Sensors - $40
+NXT Ultra Sonic Sensor - $25
 SD Card - $12
+6 AA with 9V out power suply - $3
+9v Volt adaptors - $3
+
 
 Set-Up the Raspberry Pi with BrickPi
 ====================================
