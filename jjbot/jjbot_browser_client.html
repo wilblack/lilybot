@@ -16,55 +16,75 @@
       width: 100px; 
     }
 
+    #primary {
+      width:50%;
+      float:left;
+    }
+
+    #secondary{
+      width:49%;
+      float:right;
+    }
+
+    #log {
+      height:400px;
+      background-color: #000000;
+      color:#00DD00;
+    }
+
+    .padded {
+      padding:5px;
+    }
   </style>
 
 </head>
 <body>
-</br></br>
-</br>
-
-<p>            
-<!-- Creating press buttons  on the webpage-->                               
-<input id="touch" type="button" value="Accelerate" onclick="accelerate(); " />
-</p>
-
-<p>                                        
-<input id="touch" type="button" value="Steer Left" onclick="steer_left(); " />
-</p>
-
-<p>                                        
-<input id="touch" type="button" value="Stop" onclick="stop(); " />
-</p>
-
-<p>                                        
-<input id="touch" type="button" value="Steer Right" onclick="steer_right(); " />
-</p>
-
-<p>                                        
-<input id="touch" type="button" value="Reverse" onclick="reverse(); " />
-</p>
-
-</br></br></br></br>
-
-<div id="send">
-
-</br></br></br></br></br></br></br></br></br></br></br></br>
-<p>  Enter the hostname/ip address to make the websocket connection </p>
-    <input type="text" id="data" size="100"/><br>
-    <input id="clickMe" type="button" value="clickme" onclick="setup2()" />
-    </br></br>
-<p><span style="font-weight:bold">Instructions for keyboard controls:</span></p>    
-<p>Press Up arrow key - Acceleraate </p>
-<p>Press Down arrow key - Reverse </p>
-<p>Press Right arrow key - Steer Right</p>
-<p>Press Left arrow key - Steer Left</p>
-<p>Press cltr/shift key to Stop</p>
+<div id="content">
+  <div id="primary">
     
+    <div id="send">
+      <p>  Enter the hostname/ip address to make the websocket connection </p>
+      <input type="text" id="hostname" value="192.168.1.140"/>
+      <input id="connect-btn" type="button" value="Connect &raquo;" onclick="setup2()" />
+    </div>
 
-</div>
+    <div id="controls">
+      <div>               
+        <input class="button" type="button" value="-" disabled />                            
+        <input class="button" type="button" value="Accelerate" onclick="accelerate(); " />
+        <input class="button" type="button" value="-" disabled/>
+      </div>
 
-</div>
-<div id="output"></div>
+      <div>                                        
+        <input class="button" type="button" value="Steer Left" onclick="steer_left(); " />
+        <input class="button" type="button" value="Stop" onclick="stop(); " />
+        <input class="button" type="button" value="Steer Right" onclick="steer_right(); " />
+      </div>
+
+      <div>
+        <input class="button" type="button" value="-" disabled />
+        <input class="button" type="button" value="Reverse" onclick="reverse(); " />
+        <input class="button" type="button" value="-" disabled />
+      </div>
+    </div>
+    <div>
+      <p><span style="font-weight:bold">Instructions for keyboard controls:</span></p>    
+      <p>Press Up arrow key - Acceleraate </p>
+      <p>Press Down arrow key - Reverse </p>
+      <p>Press Right arrow key - Steer Right</p>
+      <p>Press Left arrow key - Steer Left</p>
+      <p>Press cltr/shift key to Stop</p>
+    </div>
+  </div>
+
+  <div id="secondary">
+    <div id="log" class="padded">
+    
+    <div id="output"></div>
+  </div> <!-- End .secondary -->
+</div><!-- end content -->
+
+
 
 <script>
 var up;
@@ -79,106 +99,85 @@ function accelerate()       // defines a variable that controls the forward move
     setup2();        // Goes to websocket connection function
 }  
 
-function reverse()
-{
+function reverse(){
     down = "d";
     up = "aaa";left = "aaa";right = "aaa";brakes = "aaa";
     setup2();
 }
 
-function steer_left()
-{
+function steer_left(){
     left = "l";
     up = "aaa";down = "aaa";right = "aaa";brakes = "aaa";
     setup2();
 }
 
-function steer_right()
-{
+function steer_right(){
     right = "r";
     up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
     setup2();
 }
 
-function stop()       // Stops the bot
-{
+function stop(){
     up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
     setup2();
 }        
 
-    function setup2()         // Creates the websocets connection 
-    {
-        var $txt = $("#data");      // assigns the data(hostname/ip address) entered in the text box
-        name = $txt.val();          // Variable name contains the string(hostname/ip address) entered in the text box
-        var host =  "ws://"+name+":9093/ws";      // combines the three string and creates a new string
-        var socket = new WebSocket(host);
-        var $txt = $("#data");
-        var $btnSend = $("#sendtext");
-        $txt.focus();
-        // event handlers for UI
- 
- $btnSend.on('click',function()
-        {
-          var text = $txt.val();
-          if(text == "")
-          {
-           return;
-          }
-          $txt.val("");
-          });  
-          $txt
-          .keypress(function(evt)
-          {
-          if(evt.which == 13)
-          {
-          $btnSend.click();
-          }
-          });
+function setup2(){
+    // Creates the websocets connection{
+    var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
+    name = $txt.val();          // Variable name contains the string(hostname/ip address) entered in the text box
+    var host =  "ws://"+name+":9093/ws";      // combines the three string and creates a new string
+    var socket = new WebSocket(host);
+    var $btnSend = $("#sendtext");
+    $txt.focus();
+    // event handlers for UI
 
-          // event handlers for websocket
-          if(socket){
-          var count =1;
-          socket.onopen = function(){
-          count = 0;
-          //alert("connection opened....");
-          arrows();     // function for detecting keyboard presses
-          buttons();    // function for detecting the button press on webpage
-
+    $btnSend.on('click',function(){
+      var text = $txt.val();
+        if(text == ""){
+         return;
         }
-      
-    
-  function buttons()
-  { 
-    if(up== "u")
-    {
-    socket.send("u");
-    }   
-    
-    if(down== "d")
-    {
-    socket.send("d");
+        $txt.val("");
+      }); 
+      $txt.keypress(function(evt){
+          if(evt.which == 13) $btnSend.click();
+      });
+
+    // event handlers for websocket
+    if(socket){
+        var count =1;
+        socket.onopen = function(){
+            count = 0;
+            //alert("connection opened....");
+            arrows();     // function for detecting keyboard presses
+            buttons();    // function for detecting the button press on webpage
     }
     
-    if(left== "l")
-    {
-    socket.send("l");
+  function buttons() { 
+    if(up== "u") {
+      socket.send("u");
     }   
     
-    if(right== "r")
-    {
-    socket.send("r");
+    if(down== "d") {
+      socket.send("d");
+    }
+    
+    if(left== "l") {
+      socket.send("l");
     }   
     
-    if(brakes == "b")
-    {
-    socket.send("b");
+    if(right== "r") {
+      socket.send("r");
+    }   
+    
+    if(brakes == "b") {
+      socket.send("b");
     }
   }
-  function arrows()
-  {
+
+  function arrows() {
     document.onkeyup = KeyCheck;       
-    function KeyCheck()
-    {
+    function KeyCheck(){
        var KeyID = event.keyCode;
        switch(KeyID)
        {
@@ -201,7 +200,6 @@ function stop()       // Stops the bot
             socket.send("d");
             break;
        }
-
     }
   }
 
@@ -210,8 +208,7 @@ function stop()       // Stops the bot
         showServerResponse(msg.data);
      }
 
-     socket.onclose = function()
-     {
+     socket.onclose = function(){
         //alert("connection closed....");
         showServerResponse("The connection has been closed.");
      }
@@ -223,11 +220,11 @@ function stop()       // Stops the bot
       console.log("invalid socket");
     }
 
-    function showServerResponse(txt)
-    {
-        var p = document.createElement('p');
-        p.innerHTML = txt;
-        document.getElementById('output').appendChild(p); 
+    function showServerResponse(txt){
+        $log = $("#log");
+        $newRow = $("<div>");
+        $newRow.text(txt);
+        $log.append($newRow);
     }   
         
 }   
