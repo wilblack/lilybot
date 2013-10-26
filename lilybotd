@@ -4,13 +4,13 @@
 # description: lilybot daemon
 # processname: lilybot
 
-DAEMON_PATH="/home/pi/Projects/lilybot"
+DAEMON_PATH="/home/pi/Projects/lilybot/jjbot"
 
-DAEMON=jjcar.sh
+DAEMON=start_server.sh
 DAEMONOPTS=""
 
-NAME=jjcar.sh
-DESC="This starts the jjcar web server"
+NAME=start_server
+DESC="This starts the jjbot web server"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -19,7 +19,7 @@ start)
     printf "%-50s" "Starting $NAME..."
     cd $DAEMON_PATH
     #PID=`$DAEMON $DAEMONOPTS > /dev/null 2>&1 & echo $!`
-    PID=`./$DAEMON $DAEMONOPTS > lilybotd.log 2>&1 & echo $!`
+    PID=`./$DAEMON $DAEMONOPTS > $NAME.log 2>&1 & echo $!`
 
     #echo "Saving PID" $PID " to " $PIDFILE
         if [ -z $PID ]; then
