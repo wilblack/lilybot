@@ -7,5 +7,6 @@
 export PYTHONPATH=$PYTHONPATH:/home/pi/Projects/BrickPi_Python
 cd  /home/pi/Projects/BrickPi_Python/Project\ Examples/Browser\ Controlled\ Robot
 sudo chmod 755 RPi_Server_Code.py
+echo "Starting RPi_Server_Code.py"
 python RPi_Server_Code.py
 

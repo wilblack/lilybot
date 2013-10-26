@@ -4,13 +4,13 @@
 # description: lilybot daemon
 # processname: lilybot
 
-DAEMON_PATH="/home/pi/Projects/lilybot/jjcar.sh"
+DAEMON_PATH="/home/pi/Projects/lilybot"
 
-DAEMON=myapp
-DAEMONOPTS="-my opts"
+DAEMON=jjcar.sh
+DAEMONOPTS=""
 
-NAME=myapp
-DESC="My daemon description"
+NAME=jjcar.sh
+DESC="This starts the jjcar web server"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
