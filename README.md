@@ -8,7 +8,7 @@ Materials
 
 SD Card - $12
 
-Set-Up the Raspbeery Pi with BrickPi
+Set-Up the Raspberry Pi with BrickPi
 ====================================
 
 I followed the instructions here http://www.dexterindustries.com/BrickPi/getting-started/pi-prep/ 
