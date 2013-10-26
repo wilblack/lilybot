@@ -46,7 +46,7 @@
     <div id="send">
       <p>  Enter the hostname/ip address to make the websocket connection </p>
       <input type="text" id="hostname" value="192.168.1.140"/>
-      <input id="connect-btn" type="button" value="Connect &raquo;" onclick="setup2()" />
+      <input id="connect-btn" type="button" value="Connect &raquo;" onclick="connectBtnCallback()" />
     </div>
 
     <div id="controls">
@@ -88,51 +88,68 @@
 
 
 <script>
+// These are updates on button clicks
 var up;
 var down;
 var left;
 var right;
 var brakes;
+
 function accelerate()       // defines a variable that controls the forward movement
 {
     up = "u";               // when up == u the bot moves forward 
     down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
-    setup2();        // Goes to websocket connection function
+    socket.send("u");   
 }  
 
 function reverse(){
     down = "d";
     up = "aaa";left = "aaa";right = "aaa";brakes = "aaa";
-    setup2();
+    socket.send("d");  
 }
 
 function steer_left(){
     left = "l";
     up = "aaa";down = "aaa";right = "aaa";brakes = "aaa";
-    setup2();
+    socket.send("l");  
 }
 
 function steer_right(){
     right = "r";
     up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
-    setup2();
+    socket.send("r");
 }
 
 function stop(){
     up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
-    setup2();
+    socket.send("b");
 }        
+
+function connectBtnCallback(){
+  /*
+   * This should establish a new connection
+   */
+
+   setup2()
+
+}
+
+function ws_send(){
+    if(socket){
+
+    }
+
+
+}
 
 function setup2(){
     // Creates the websocets connection{
     var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
-    name = $txt.val();          // Variable name contains the string(hostname/ip address) entered in the text box
+    var name = $txt.val();
     var host =  "ws://"+name+":9093/ws";      // combines the three string and creates a new string
-    var socket = new WebSocket(host);
+    window.socket = new WebSocket(host);
+    
     var $btnSend = $("#sendtext");
-    $txt.focus();
-    // event handlers for UI
-
     $btnSend.on('click',function(){
       var text = $txt.val();
         if(text == ""){
@@ -153,56 +170,7 @@ function setup2(){
             arrows();     // function for detecting keyboard presses
             buttons();    // function for detecting the button press on webpage
     }
-    
-  function buttons() { 
-    if(up== "u") {
-      socket.send("u");
-    }   
-    
-    if(down== "d") {
-      socket.send("d");
-    }
-    
-    if(left== "l") {
-      socket.send("l");
-    }   
-    
-    if(right== "r") {
-      socket.send("r");
-    }   
-    
-    if(brakes == "b") {
-      socket.send("b");
-    }
-  }
 
-  function arrows() {
-    document.onkeyup = KeyCheck;       
-    function KeyCheck(){
-       var KeyID = event.keyCode;
-       switch(KeyID)
-       {
-            case 16:
-            socket.send("b");
-            break; 
-            case 17:
-            socket.send("b");
-            break;
-            case 37:
-            socket.send("l");
-            break;
-            case 38:
-            socket.send("u");
-            break;
-            case 39:
-            socket.send("r");
-            break;
-            case 40:
-            socket.send("d");
-            break;
-       }
-    }
-  }
 
      socket.onmessage = function(msg)
      {
@@ -230,6 +198,59 @@ function setup2(){
     }   
         
 }   
+
+function buttons() { 
+    if(up== "u") {
+      socket.send("u");
+    }   
+    
+    if(down== "d") {
+      socket.send("d");
+    }
+    
+    if(left== "l") {
+      socket.send("l");
+    }   
+    
+    if(right== "r") {
+      socket.send("r");
+    }   
+    
+    if(brakes == "b") {
+      socket.send("b");
+    }
+}
+
+
+function arrows() {
+    document.onkeyup = KeyCheck;       
+    function KeyCheck(){
+       var KeyID = event.keyCode;
+       switch(KeyID)
+       {
+            case 16:
+            socket.send("b");
+            break; 
+            case 17:
+            socket.send("b");
+            break;
+            case 37:
+            socket.send("l");
+            break;
+            case 38:
+            socket.send("u");
+            break;
+            case 39:
+            socket.send("r");
+            break;
+            case 40:
+            socket.send("d");
+            break;
+       }
+    }
+}
+
+
 
 </script>
 </body>
