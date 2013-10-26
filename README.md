@@ -8,7 +8,7 @@ Materials
 
 SD Card - $12
 
-Set-Up the Raspbeery Pi with BrickPi
+Set-Up the Raspberry Pi with BrickPi
 ====================================
 
 I followed the instructions here http://www.dexterindustries.com/BrickPi/getting-started/pi-prep/ 
@@ -32,7 +32,11 @@ You should now be able to ssh in over Wi-Fi.
 Install and Update Software
 ---------------------------
 
-Run and grab a coffee. This second command takes awhile.
+Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
+Then log out and log back in. 
+
+
+Run the following code and grab some coffee, the second command takes awhile.
 
 ```
 sudo apt-get update
@@ -58,4 +62,9 @@ git clone https://github.com/DexterInd/BrickPi_Python.git
 git clone https://github.com/wilblack/lilybot.git
 ```
 
+Helpful Links
+-------------
 
+Port Diagram
+
+http://www.dexterindustries.com/BrickPi/getting-started/attaching-lego/
