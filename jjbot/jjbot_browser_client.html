@@ -85,9 +85,9 @@
     <div id="controls">
       <div class="panel top">
         <div>               
-          <input class="button" type="button" value="-" disabled />                            
+          <input class="button" type="button" value="Left" onclick="nudge_left();" /> 
           <input class="button" type="button" value="Accelerate" onclick="accelerate(); " />
-          <input class="button" type="button" value="-" disabled/>
+          <input class="button" type="button" value="Right" onclick="nudge_right();"/>
         </div>
 
         <div>                                        
@@ -161,6 +161,15 @@ function steer_right(){
     up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
     socket.send("r");
 }
+
+function nudge_left(){
+    socket.send("nl");  
+}
+
+function nudge_right(){
+    socket.send("rl");
+}
+
 
 function stop(){
     up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
@@ -306,6 +315,36 @@ function arrows() {
             case 40:
             socket.send("d");
             break;
+
+            // WoW Style
+            case 32: // x
+            socket.send("b");
+            break; 
+            case 88: // x
+            socket.send("b");
+            break; 
+            case 65: // a
+            socket.send("l");
+            break;
+            case 87: // w
+            socket.send("u");
+            break;
+            case 68: // d
+            socket.send("r");
+            break;
+            case 83: // s
+            socket.send("d");
+            break;
+
+            case 81: // q
+            socket.send("nl");
+            break;
+            case 69: // e
+            socket.send("nr");
+            break;
+
+
+
        }
     }
 }
