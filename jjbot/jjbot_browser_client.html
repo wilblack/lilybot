@@ -36,6 +36,30 @@
     .padded {
       padding:5px;
     }
+
+    .panel.top {
+      margin-bottom:5px;
+    }
+
+    .connection {
+      color:#004400;
+    }
+
+    .open {
+      color:#00EE00;
+    }
+
+    .closing {
+      color:#777777;
+    }
+
+    .closed {
+      color:#000000;
+    }
+
+    .hide {
+      display:none;
+    }
   </style>
 
 </head>
@@ -47,27 +71,45 @@
       <p>  Enter the hostname/ip address to make the websocket connection </p>
       <input type="text" id="hostname" value="192.168.1.140"/>
       <input id="connect-btn" type="button" value="Connect &raquo;" onclick="connectBtnCallback()" />
+      <div id="ready-state">
+        <p>Connection status
+        <span class="hide connecting">CONNECTING</span>
+        <span class="hide open">OPEN</span>
+        <span class="hide closing">CLOSING</span>
+        <span class="hide closed">CLOSED</span>
+        <span class="hide error">ERROR</span>
+        </p>
+      </div>
     </div>
 
     <div id="controls">
-      <div>               
-        <input class="button" type="button" value="-" disabled />                            
-        <input class="button" type="button" value="Accelerate" onclick="accelerate(); " />
-        <input class="button" type="button" value="-" disabled/>
-      </div>
+      <div class="panel top">
+        <div>               
+          <input class="button" type="button" value="-" disabled />                            
+          <input class="button" type="button" value="Accelerate" onclick="accelerate(); " />
+          <input class="button" type="button" value="-" disabled/>
+        </div>
 
-      <div>                                        
-        <input class="button" type="button" value="Steer Left" onclick="steer_left(); " />
-        <input class="button" type="button" value="Stop" onclick="stop(); " />
-        <input class="button" type="button" value="Steer Right" onclick="steer_right(); " />
-      </div>
+        <div>                                        
+          <input class="button" type="button" value="Steer Left" onclick="steer_left(); " />
+          <input class="button" type="button" value="Stop" onclick="stop(); " />
+          <input class="button" type="button" value="Steer Right" onclick="steer_right(); " />
+        </div>
 
-      <div>
-        <input class="button" type="button" value="-" disabled />
-        <input class="button" type="button" value="Reverse" onclick="reverse(); " />
-        <input class="button" type="button" value="-" disabled />
+        <div>
+          <input class="button" type="button" value="-" disabled />
+          <input class="button" type="button" value="Reverse" onclick="reverse(); " />
+          <input class="button" type="button" value="-" disabled />
+        </div>
+
+        <div class="panel">
+          <input class="button" type="button" value="Shutdown" onclick="shutdown();" />
+          <input class="button" type="button" value="Restart" onclick="restart(); " />
+          <input class="button" type="button" value="-" disabled />
+        </div>
       </div>
     </div>
+    
     <div>
       <p><span style="font-weight:bold">Instructions for keyboard controls:</span></p>    
       <p>Press Up arrow key - Acceleraate </p>
@@ -125,6 +167,17 @@ function stop(){
     socket.send("b");
 }        
 
+
+function shutdown(){
+    socket.send("x");
+} 
+
+
+function restart(){
+    socket.send("y");
+} 
+
+
 function connectBtnCallback(){
   /*
    * This should establish a new connection
@@ -134,13 +187,12 @@ function connectBtnCallback(){
 
 }
 
-function ws_send(){
-    if(socket){
-
-    }
-
-
+function showReadyState(state){
+  $el =  $("#ready-state");
+  $el.find("span").hide();
+  $("#ready-state ."+state).show();
 }
+
 
 function setup2(){
     // Creates the websocets connection{
@@ -166,9 +218,10 @@ function setup2(){
         var count =1;
         socket.onopen = function(){
             count = 0;
-            //alert("connection opened....");
+            console.log("connection opened....");
             arrows();     // function for detecting keyboard presses
             buttons();    // function for detecting the button press on webpage
+            showReadyState("open");
     }
 
 
@@ -180,6 +233,13 @@ function setup2(){
      socket.onclose = function(){
         //alert("connection closed....");
         showServerResponse("The connection has been closed.");
+        showReadyState("closed");
+     }
+
+     socket.onerror = function(){
+        //alert("connection closed....");
+        showServerResponse("The was an error.");
+        showReadyState("error");
      }
 
     }
