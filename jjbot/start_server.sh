@@ -5,7 +5,9 @@
 
 
 export PYTHONPATH=$PYTHONPATH:/home/pi/Projects/BrickPi_Python
-cd  ~/Projects/BrickPi_Python/Project\ Examples/Browser\ Controlled\ Robot
-sudo chmod 755 RPi_Server_Code.py
-python RPi_Server_Code.py
+cd  /home/pi/Projects/lilybotd/jjbot
+#sudo chmod 755 RPi_Server_Code.py
+echo "Starting JJ Bot server"
+python jjbot_server.py
+
 
