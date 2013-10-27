@@ -1,7 +1,7 @@
 lilybot
 =======
 
-These are samples, demos, and libraries for the Mindsotrm EV3
+These are samples, demos, and libraries I use with the Mindsotrm EV3 and a Raspberry Pi with a BrickPi.
 
 Materials
 ---------
