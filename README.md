@@ -73,6 +73,5 @@ git clone https://github.com/wilblack/lilybot.git
 Helpful Links
 -------------
 
-Port Diagram
-
-http://www.dexterindustries.com/BrickPi/getting-started/attaching-lego/
+* Port Diagram http://www.dexterindustries.com/BrickPi/getting-started/attaching-lego/
+* Articles on batteirs for the Rapsberry Pi
