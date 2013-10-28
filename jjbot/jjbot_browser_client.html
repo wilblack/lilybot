@@ -33,6 +33,10 @@
       overflow:auto;
     }
 
+    #sensor_values span {
+      width:30px;
+    }
+
     .padded {
       padding:5px;
     }
@@ -80,6 +84,7 @@
         <span class="hide error">ERROR</span>
         </p>
       </div>
+      
     </div>
 
     <div id="controls">
@@ -121,10 +126,16 @@
   </div>
 
   <div id="secondary">
-    <div id="log" class="padded">
-    
-    <div id="output"></div>
-  </div> <!-- End .secondary -->
+    <div id="log" class="padded"></div> <!-- End .secondary -->
+    <div id="sensor-values">
+          <label>Sensor Values</label>
+          <div>PORT_1: <span class="PORT_1"></span></div>
+          <div>PORT_2: <span class="PORT_2"></span></div>
+          <div>PORT_3: <span class="PORT_3"></span></div>
+          <div>PORT_4: <span class="PORT_4"></span></div>
+          </div>
+    </div>
+
 </div><!-- end content -->
 
 
@@ -234,9 +245,13 @@ function setup2(){
     }
 
 
-     socket.onmessage = function(msg)
-     {
-        showServerResponse(msg.data);
+     socket.onmessage = function(msg) {
+        try {
+          var data = JSON.parse(msg.data);
+          if ('sensor_values' in data) updateSensorValues(data.sensor_values)
+        } catch (e) {
+          showServerResponse(msg.data);
+        }
      }
 
      socket.onclose = function(){
@@ -267,6 +282,22 @@ function setup2(){
     }   
         
 }   
+
+function updateSensorValues(sensor_values){
+    /*
+    Input
+    sensor_values - A list of lists with each inner of the from [PORTNAME, VALUE]
+                    PORTNAME in 'PORT_1',..., 'PORT_4'
+
+    */
+    
+    $el = $("#sensor-values");
+    for (var i in sensor_values){
+       var port = sensor_values[i][0]
+       $el.find("."+port).html(sensor_values[i][1]);
+    }
+
+    }   
 
 function buttons() { 
     if(up== "u") {
