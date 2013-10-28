@@ -30,10 +30,35 @@
       height:400px;
       background-color: #000000;
       color:#00DD00;
+      overflow:auto;
     }
 
     .padded {
       padding:5px;
+    }
+
+    .panel.top {
+      margin-bottom:5px;
+    }
+
+    .connection {
+      color:#004400;
+    }
+
+    .open {
+      color:#00EE00;
+    }
+
+    .closing {
+      color:#777777;
+    }
+
+    .closed {
+      color:#000000;
+    }
+
+    .hide {
+      display:none;
     }
   </style>
 
@@ -45,28 +70,46 @@
     <div id="send">
       <p>  Enter the hostname/ip address to make the websocket connection </p>
       <input type="text" id="hostname" value="192.168.1.140"/>
-      <input id="connect-btn" type="button" value="Connect &raquo;" onclick="setup2()" />
+      <input id="connect-btn" type="button" value="Connect &raquo;" onclick="connectBtnCallback()" />
+      <div id="ready-state">
+        <p>Connection status
+        <span class="hide connecting">CONNECTING</span>
+        <span class="hide open">OPEN</span>
+        <span class="hide closing">CLOSING</span>
+        <span class="hide closed">CLOSED</span>
+        <span class="hide error">ERROR</span>
+        </p>
+      </div>
     </div>
 
     <div id="controls">
-      <div>               
-        <input class="button" type="button" value="-" disabled />                            
-        <input class="button" type="button" value="Accelerate" onclick="accelerate(); " />
-        <input class="button" type="button" value="-" disabled/>
-      </div>
+      <div class="panel top">
+        <div>               
+          <input class="button" type="button" value="Left" onclick="nudge_left();" /> 
+          <input class="button" type="button" value="Accelerate" onclick="accelerate(); " />
+          <input class="button" type="button" value="Right" onclick="nudge_right();"/>
+        </div>
 
-      <div>                                        
-        <input class="button" type="button" value="Steer Left" onclick="steer_left(); " />
-        <input class="button" type="button" value="Stop" onclick="stop(); " />
-        <input class="button" type="button" value="Steer Right" onclick="steer_right(); " />
-      </div>
+        <div>                                        
+          <input class="button" type="button" value="Steer Left" onclick="steer_left(); " />
+          <input class="button" type="button" value="Stop" onclick="stop(); " />
+          <input class="button" type="button" value="Steer Right" onclick="steer_right(); " />
+        </div>
 
-      <div>
-        <input class="button" type="button" value="-" disabled />
-        <input class="button" type="button" value="Reverse" onclick="reverse(); " />
-        <input class="button" type="button" value="-" disabled />
+        <div>
+          <input class="button" type="button" value="-" disabled />
+          <input class="button" type="button" value="Reverse" onclick="reverse(); " />
+          <input class="button" type="button" value="-" disabled />
+        </div>
+
+        <div class="panel">
+          <input class="button" type="button" value="Shutdown" onclick="shutdown();" />
+          <input class="button" type="button" value="Restart" onclick="restart(); " />
+          <input class="button" type="button" value="-" disabled />
+        </div>
       </div>
     </div>
+    
     <div>
       <p><span style="font-weight:bold">Instructions for keyboard controls:</span></p>    
       <p>Press Up arrow key - Acceleraate </p>
@@ -87,51 +130,87 @@
 
 
 <script>
+// These are updates on button clicks
 var up;
 var down;
 var left;
 var right;
 var brakes;
+
 function accelerate()       // defines a variable that controls the forward movement
 {
     up = "u";               // when up == u the bot moves forward 
     down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
-    setup2();        // Goes to websocket connection function
+    socket.send("u");   
 }  
 
 function reverse(){
     down = "d";
     up = "aaa";left = "aaa";right = "aaa";brakes = "aaa";
-    setup2();
+    socket.send("d");  
 }
 
 function steer_left(){
     left = "l";
     up = "aaa";down = "aaa";right = "aaa";brakes = "aaa";
-    setup2();
+    socket.send("l");  
 }
 
 function steer_right(){
     right = "r";
     up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
-    setup2();
+    socket.send("r");
 }
+
+function nudge_left(){
+    socket.send("nl");  
+}
+
+function nudge_right(){
+    socket.send("rl");
+}
+
 
 function stop(){
     up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
-    setup2();
+    socket.send("b");
 }        
+
+
+function shutdown(){
+    socket.send("x");
+} 
+
+
+function restart(){
+    socket.send("y");
+} 
+
+
+function connectBtnCallback(){
+  /*
+   * This should establish a new connection
+   */
+
+   setup2()
+
+}
+
+function showReadyState(state){
+  $el =  $("#ready-state");
+  $el.find("span").hide();
+  $("#ready-state ."+state).show();
+}
+
 
 function setup2(){
     // Creates the websocets connection{
     var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
-    name = $txt.val();          // Variable name contains the string(hostname/ip address) entered in the text box
+    var name = $txt.val();
     var host =  "ws://"+name+":9093/ws";      // combines the three string and creates a new string
-    var socket = new WebSocket(host);
+    window.socket = new WebSocket(host);
+    
     var $btnSend = $("#sendtext");
-    $txt.focus();
-    // event handlers for UI
-
     $btnSend.on('click',function(){
       var text = $txt.val();
         if(text == ""){
@@ -148,12 +227,48 @@ function setup2(){
         var count =1;
         socket.onopen = function(){
             count = 0;
-            //alert("connection opened....");
+            console.log("connection opened....");
             arrows();     // function for detecting keyboard presses
             buttons();    // function for detecting the button press on webpage
+            showReadyState("open");
+    }
+
+
+     socket.onmessage = function(msg)
+     {
+        showServerResponse(msg.data);
+     }
+
+     socket.onclose = function(){
+        //alert("connection closed....");
+        showServerResponse("The connection has been closed.");
+        showReadyState("closed");
+     }
+
+     socket.onerror = function(){
+        //alert("connection closed....");
+        showServerResponse("The was an error.");
+        showReadyState("error");
+     }
+
     }
     
-  function buttons() { 
+    else
+    {
+      console.log("invalid socket");
+    }
+
+    function showServerResponse(txt){
+        $log = $("#log");
+        $newRow = $("<div>");
+        $newRow.text(txt);
+        $log.append($newRow);
+        $log.scrollTop($log[0].scrollHeight);
+    }   
+        
+}   
+
+function buttons() { 
     if(up== "u") {
       socket.send("u");
     }   
@@ -173,9 +288,10 @@ function setup2(){
     if(brakes == "b") {
       socket.send("b");
     }
-  }
+}
 
-  function arrows() {
+
+function arrows() {
     document.onkeyup = KeyCheck;       
     function KeyCheck(){
        var KeyID = event.keyCode;
@@ -199,35 +315,41 @@ function setup2(){
             case 40:
             socket.send("d");
             break;
+
+            // WoW Style
+            case 32: // x
+            socket.send("b");
+            break; 
+            case 88: // x
+            socket.send("b");
+            break; 
+            case 65: // a
+            socket.send("l");
+            break;
+            case 87: // w
+            socket.send("u");
+            break;
+            case 68: // d
+            socket.send("r");
+            break;
+            case 83: // s
+            socket.send("d");
+            break;
+
+            case 81: // q
+            socket.send("nl");
+            break;
+            case 69: // e
+            socket.send("nr");
+            break;
+
+
+
        }
     }
-  }
+}
 
-     socket.onmessage = function(msg)
-     {
-        showServerResponse(msg.data);
-     }
 
-     socket.onclose = function(){
-        //alert("connection closed....");
-        showServerResponse("The connection has been closed.");
-     }
-
-    }
-    
-    else
-    {
-      console.log("invalid socket");
-    }
-
-    function showServerResponse(txt){
-        $log = $("#log");
-        $newRow = $("<div>");
-        $newRow.text(txt);
-        $log.append($newRow);
-    }   
-        
-}   
 
 </script>
 </body>
