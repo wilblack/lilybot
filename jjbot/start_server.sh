@@ -4,10 +4,13 @@
 
 
 
-export PYTHONPATH=$PYTHONPATH:/home/pi/Projects/BrickPi_Python
-cd  /home/pi/Projects/lilybotd/jjbot
+export PYTHONPATH=$PYTHONPATH:/home/pi/Projects/BrickPi_Python:/home/pi/Projects/lilybot/utils
+cd  /home/pi/Projects/lilybot/jjbot
 #sudo chmod 755 RPi_Server_Code.py
-echo "Starting JJ Bot server"
+
+NOW=$(date +"%Y-%m-%dT%T %Z")
+echo "[$NOW] Starting JJ Bot server"
+
 python jjbot_server.py
 
 
