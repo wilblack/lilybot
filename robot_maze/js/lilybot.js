@@ -23,7 +23,7 @@ Robot = function(){
     self.last_bump_counter = 0;
     self.DT = 250;
     self.SHORT = 2;
-    self.TIMED_DT = 10;
+    self.TIMED_DT = 5;
     self.LOG_POSITION = false;
 
     // Initial starting coordinates amnd heading
@@ -70,7 +70,6 @@ Robot = function(){
                     if (self.noneCount > self.TIMED_DT){
                         // Set heading
                         self.eventType = 'timed';
-                        self.noneCount = 0;
                     } else {
                         self.noneCount++;
                     }
@@ -102,8 +101,15 @@ Robot = function(){
                     var old_h = self.h;
                     self.h = (self.h+delta_h)%360;
 
-                    var delta_x = 0//Math.round(Math.sin(self.h*Math.PI/180));
-                    var delta_y = 0//-Math.round(Math.cos(self.h*Math.PI/180));
+                    var is_wall = self.checkBump();
+                    if (is_wall){
+                        self.h = old_h;
+                    } else {
+                        self.noneCount = 0;
+                    }
+
+                    var delta_x = Math.round(Math.sin(self.h*Math.PI/180));
+                    var delta_y = -Math.round(Math.cos(self.h*Math.PI/180));
                 } 
 
                 if (self.eventType === 'none'){
@@ -161,23 +167,32 @@ Robot = function(){
 
     };
 
-    self.checkBump = function(){
+    self.checkBump = function(I, J, h){
+        if(typeof(I) === 'undefined'){
+            I = self.i;
+            J = self.j;
+            h = self.h
+
+        }
         // Try to continue on existing path
         var bump = null;
 
-        var delta_x = Math.round(Math.sin(self.h*Math.PI/180));
-        var delta_y = -Math.round(Math.cos(self.h*Math.PI/180));
+        var delta_x = Math.round(Math.sin(h*Math.PI/180));
+        var delta_y = -Math.round(Math.cos(h*Math.PI/180));
 
-        var i = self.i + delta_x;
-        var j = self.j + delta_y;
+        var i = I + delta_x;
+        var j = J + delta_y;
         
+
         // Check for boundary
         if (i===-1 || j===-1 || i===maze.SIZE || j===maze.SIZE ){
             bump = true;
         } else if (maze.board[i][j] === 1){
             bump = true;
         }
+
         if (bump) self.update_map(i,j,'dot');
+
         return bump;
 
 
@@ -222,8 +237,14 @@ Robot = function(){
 
             } else if (featureType === 'unknown') {
                 // Going west, so turn to the left
-                if (self.lastPath.headingNew === 90) {
+                if ( (self.lastPath.headingNew+360)%360 === 90) {
                     out = -90;
+                } else if ( (self.lastPath.headingNew+360)%360 === 0 || (self.lastPath.headingNew+360)%360 === 180 ){
+                    if (Math.random() > 0.5){
+                        out = 90;
+                    } else {
+                        out = -90;
+                    }
                 } else  {
                     out = 90;
                 }
@@ -235,15 +256,23 @@ Robot = function(){
             // if going west, turn north (+90)
             // if going south, turn 
 
-            // if going east trun left, -90
-            // Going west, so turn to the left
-            if (self.lastPath.headingNew === 90) {
+            if ( (self.lastPath.headingNew+360)%360 === 90) {
+                // if going east turn north, +90
                 out = -90;
-            } else if (self.lastPath.headingNew === 0) {
+            } else if ( (self.lastPath.headingNew+360)%360 === 0) {
                 out = 0;
-            } else {
+            } else if ( (self.lastPath.headingNew+360)%360 === 270) {
+                // Going west turn north
                 out = 90;
+            } else {
+                if (Math.random() > 0.5){
+                    out = 90;
+                } else {
+                    out = -90;
+                }
             }
+
+
 
         }
         return out;
@@ -275,8 +304,14 @@ Robot = function(){
         if (out){
             // Check for previous corner
             var previousCorner = self.isCorner( [last5[0], last5[1], last5[2]] )
-            if (previousCorner && out==='left-corner') out = 'left-u';
-            if (previousCorner && out==='right-corner') out = 'right-u';
+            if (previousCorner && out==='left-corner') {
+                out = 'left-u';
+                self.update_map(self.i-1, self.j-1, out);
+            }
+            else if (previousCorner && out==='right-corner') {
+                out = 'right-u';
+                self.update_map(self.i+1, self.j-1, out);
+            }
 
         } 
         _log("featureType: "+out);
@@ -451,6 +486,16 @@ Maze = function(){
             self.add_wall(i,j,2, 'h', 'map');
             self.add_wall(i,j,2,'v','map');
         }
+        else if (featureType == 'left-u'){
+            var width = robot.lastPath['distance'];
+            self.add_u(i,j,width,1,'down', 'map');
+        }
+        
+        else if (featureType == 'rigth-u'){
+            var width = robot.lastPath['distance'];
+            self.add_u(i-width,j,width,1,'down', 'map');
+        }
+
     };
 
     self.add_u = function(I,J,width, height, orientation, canvas){
