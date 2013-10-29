@@ -28,7 +28,7 @@ Config Wi-Fi
 ------------
 
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
-`ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will net to check your router to find out the Pi's IP address.
+`ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
@@ -51,7 +51,7 @@ sudo apt-get update
 sudo apt-get upgrade
 ```
 
-Now install some librabries and helpful stuff
+Now install some librabries and helpful stuff. The first two are optional but I like to have them.
 
 ```
 sudo apt-get install screen
@@ -60,11 +60,11 @@ sudo apt-get install python-pip
 
 ```
 
-Now make a project directory and clone some github repos.
+Now make a project directory and clone some github repos. This will place the gihub clones in `/home/pi/Projects/`.
 
 ```
 cd ~
-mkdirProjects
+mkdir Projects
 cd Projects 
 git clone https://github.com/DexterInd/BrickPi_Python.git
 git clone https://github.com/wilblack/lilybot.git
