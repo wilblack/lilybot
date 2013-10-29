@@ -1,10 +1,17 @@
 lilybot
 =======
 
-These are samples, demos, and libraries I use with the Mindsotrm EV3 and a Raspberry Pi with a BrickPi.
+These are samples, demos, and libraries I use with Lego Mindsotrm EV3, Raspberry Pi and BrickPi. The goal of lilybot
+is to provide an easy to use cloud based software deployment system for hobby/ametuer robotics. Currently lilybot
+is focused on using a Raspberry Pi along with a BrickPi to communicate with Lego Mindsorm sensors and motors (EV3 Sensors 
+are not currenlt supported by brick BrickPi, but EV3 motors do work fine). 
+
 
 Materials
 ---------
+
+Here is a list of materials I have used and how much they costs.
+
 
 * EV3 - $350
 * Raspberry Pi - $40
@@ -16,8 +23,8 @@ Materials
 * 9v Volt adaptors - $3
 
 
-Set-Up the Raspberry Pi with BrickPi
-====================================
+1. Set-Up the Raspberry Pi with BrickPi
+=======================================
 
 I followed the instructions here http://www.dexterindustries.com/BrickPi/getting-started/pi-prep/ 
 and downloaded the "wheezy" image and installed Win32DiskImager from http://sourceforge.net/projects/win32diskimager/. 
@@ -69,6 +76,14 @@ cd Projects
 git clone https://github.com/DexterInd/BrickPi_Python.git
 git clone https://github.com/wilblack/lilybot.git
 ```
+
+
+2. Run jjbot
+============
+
+`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`. T
+
+
 
 Helpful Links
 -------------
