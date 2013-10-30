@@ -1,0 +1,23 @@
+
+.button {
+  width:100%;
+}
+
+#log {
+    height:400px;
+    background-color: #000000;
+    color:#00DD00;
+    overflow:auto;
+}
+
+#sensor_values span {
+    width:30px;
+}
+
+.padded {
+    padding:5px;
+}
+
+.hide {
+    display:none;
+}
