@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Lilybot - JJBot Client</title>  
+  
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+
+  <script src="js/vendor/custom.modernizr.js"></script>
+
+</head>
+<body>
+
+<div id="content">
+
+  <div id="primary">
+    
+    <div class="row">
+        <div class="large-6 columns">
+            <div id="send" class="">
+              <p>  Enter the hostname/ip address to make the websocket connection </p>
+              <div class="row">
+                
+                <div class="large-6 small-6 columns">
+                    <input type="text" id="hostname" value="192.168.1.140"/>
+                </div>
+                
+                <div class="large-3 small-4 columns">                
+                    <button id="connect-btn" class="tiny" onclick="connectBtnCallback()">Connect &raquo;</button>
+                </div>
+                
+                <div id="ready-state" class="large-3 small-2 columns">
+                    <label>Status:</label> 
+                    <span class="label success hide connecting">CONNECTING</span>
+                    <span class="label success hide open">OPEN</span>
+                    <span class="label secondary hide closing">CLOSING</span>
+                    <span class="label secondary hide closed">CLOSED</span>
+                    <span class="label hide error">ERROR</span>
+                  </div>
+
+              </div>
+              
+              
+            </div>
+        </div>
+    </div>
+    
+    <div id="controls" class="panel row">
+            <ul class="small-block-grid-3 large-block-grid-3">
+              <li><button class="button" onclick="nudge_left();" ><i class="fa fa-reply"></i> (q)</button></li> 
+              <li><button class="button" onclick="accelerate(); " ><i class="fa fa-arrow-up"></i> (w)</button></li>
+              <li><button class="button" onclick="nudge_right();">(e) <i class="fa fa-share"></i></button></li>
+
+              <li><button class="button" onclick="steer_left(); " ><i class="fa fa-rotate-left"></i> (a)</button></li>
+              <li><button class="button" onclick="stop(); " ><i class="fa"></i> (s)</button></li>
+              <li><button class="button" onclick="steer_right(); " >(d) <i class="fa fa-rotate-right"></i></button></li>
+
+              <li><button class="button" disabled ><i class="fa"></i></button></li>
+              <li><button class="button" onclick="reverse(); " ><i class="fa fa-arrow-down"></i> (x)</button></li>
+              <li><button class="button" disabled ><i class="fa"></i></button></li>
+            </ul>
+    </div><!--end #controls row -->
+    
+    <div class="row panel">
+        <div class="large-4 small-4 columns">
+          <button class="button small" onclick="shutdown();">Shutdown</button>
+        </div>
+        <div class="large-4 small-4 columns">
+          <button class="button small" onclick="restart();">Restart</button>
+        </div>
+        <div class="large-4 small-4 columns">
+          <button class="button small" disabled ></button>
+        </div>
+    </div>
+  </div><!-- end #primary -->
+
+  <div id="secondary">
+    <div id="log" class="padded"></div> <!-- End .secondary -->
+    <div id="sensor-values">
+          <label>Sensor Values</label>
+          <div>PORT_1: <span class="PORT_1"></span></div>
+          <div>PORT_2: <span class="PORT_2"></span></div>
+          <div>PORT_3: <span class="PORT_3"></span></div>
+          <div>PORT_4: <span class="PORT_4"></span></div>
+          </div>
+    </div>
+
+</div><!-- end content -->
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/main.js"></script>
+  <script src="js/foundation.min.js"></script>
+  <!--
+  
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+  
+  -->
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>
