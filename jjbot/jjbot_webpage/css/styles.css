@@ -3,12 +3,18 @@
   width:100%;
 }
 
+#log-wrapper {
+    background-color: #000000;
+    color:#EE00EE;
+}
+
 #log {
-    height:400px;
+    height:300px;
     background-color: #000000;
     color:#00DD00;
     overflow:auto;
 }
+
 
 #sensor_values span {
     width:30px;
@@ -20,4 +26,12 @@
 
 .hide {
     display:none;
+}
+
+#controls li {
+    padding:0;
+}
+
+#controls li .button {
+    margin:0;
 }

@@ -56,6 +56,14 @@ function restart(){
 } 
 
 
+function lookLeft(){
+  socket.send("ll");
+}
+
+function lookLeft(){
+  socket.send("lr");
+}
+
 function connectBtnCallback(){
   /*
    * This should establish a new connection
