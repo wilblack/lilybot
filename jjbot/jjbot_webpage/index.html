@@ -23,14 +23,14 @@
     <div class="row">
         <div class="large-6 columns">
             <div id="send" class="">
-              <p>  Enter the hostname/ip address to make the websocket connection </p>
+              <p>Enter the local hostname/ip address of your lilybot (hint: on the raspberry pi use <code> ifconfig wlan0 | grep "inet addr"</code> or check your router tables.</p>
               <div class="row">
                 
-                <div class="large-6 small-6 columns">
+                <div class="large-6 small-5 columns">
                     <input type="text" id="hostname" value="192.168.1.140"/>
                 </div>
                 
-                <div class="large-3 small-3 columns">                
+                <div class="large-3 small-4 columns">                
                     <button id="connect-btn" class="tiny" onclick="connectBtnCallback()">Connect &raquo;</button>
                 </div>
                 
@@ -65,35 +65,35 @@
               <li><button class="button" onclick="lookRight();"><i class="fa"></i>Look right</button></li>
             </ul>
     </div><!--end #controls row -->
-    
-    <div class="row panel">
-        <div class="large-4 small-4 columns">
-          <button class="button small" onclick="shutdown();">Shutdown</button>
-        </div>
-        <div class="large-4 small-4 columns">
-          <button class="button small" onclick="restart();">Restart</button>
-        </div>
-        <div class="large-4 small-4 columns">
-          <button class="button small" disabled ></button>
-        </div>
-    </div>
-  </div><!-- end #primary -->
+</div> <!-- end primary -->
+<div id="secondary">
 
-  <div id="secondary">
-    <div id="log-wrapper">
-      <div id="sensor-values">
-            <div class="small-6 columns">
-              <div>PORT_1: <span class="PORT_1"></span></div>
-              <div>PORT_2: <span class="PORT_2"></span></div>
-            </div>
-            <div class="small-6 columns">
-              <div>PORT_3: <span class="PORT_3"></span></div>
-              <div>PORT_4: <span class="PORT_4"></span></div>
-            </div>
-      </div>
-      <div id="log" class="padded"></div> <!-- End .secondary -->
+  <div id="log-wrapper">
+    <div id="sensor-values">
+          <div class="small-6 columns">
+            <div><small>PORT_1: <span class="PORT_1"></span></small></div>
+            <div><small>PORT_2: <span class="PORT_2"></span></small></div>
+          </div>
+          <div class="small-6 columns">
+            <div><small>PORT_3: <span class="PORT_3"></span></small></div>
+            <div><small>PORT_4: <span class="PORT_4"></span></small></div>
+          </div>
     </div>
+    <div id="log" class="padded"></div> <!-- End .secondary -->
   </div>
+
+  <div id="footer" class="row panel">
+      <div class="large-4 small-4 columns">
+        <button class="button small" onclick="shutdown();">Shutdown</button>
+      </div>
+      <div class="large-4 small-4 columns">
+        <button class="button small" onclick="restart();">Restart</button>
+      </div>
+      <div class="large-4 small-4 columns">
+        <button class="button small" disabled ></button>
+      </div>
+  </div>
+  </div><!-- end #primary -->
 
 </div><!-- end content -->
 
@@ -143,6 +143,10 @@
   
   <script>
     $(document).foundation();
+
+    $(document).ready(function(){
+        resize();
+    });
   </script>
 </body>
 </html>
