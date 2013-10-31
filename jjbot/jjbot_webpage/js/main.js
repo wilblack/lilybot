@@ -39,6 +39,7 @@ function nudge_right(){
 }
 
 
+
 function stop(){
     up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
     socket.send("b");
