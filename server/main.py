@@ -30,20 +30,19 @@ class MainHandler(tornado.web.RequestHandler):
       self.write(loader.load("templates/index.html").generate())
 
 
-
 class WSHandler(tornado.websocket.WebSocketHandler):
   
     def open(self):
       print 'connection opened...'
-      self.log('connection opened...')
+      self.log('Hello, good to see you again.')
 
-      sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 5*1000)
-      sensors.start()
+      #sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 5*1000)
+      #sensors.start()
 
 
     def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
       print 'received:', message        # prints the recived from the webpage 
-      
+      self.log(message)
 
     def on_close(self):
       print 'connection closed...'
@@ -52,7 +51,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def log(self, message):
       now = dt.now().strftime(LOG_DTFORMAT)
-      message = "[%s] %s" %(now, message)
+      message = "[%s] ardyh: %s" %(now, message)
       print message
       self.write_message(message)
 

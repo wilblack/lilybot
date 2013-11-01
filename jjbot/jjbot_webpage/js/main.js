@@ -247,6 +247,86 @@ function arrows() {
 }
 
 
+
+Ardyh = function(){
+    /*
+    Object to handle websocket connections and message passing and logging. 
+
+    */
+    var self = this;
+    this.DOMAIN = "173.255.213.55:9093"
+
+
+
+
+
+    this.setup = function(){
+    // Creates the websocets connection{
+
+    this.host =  "ws://"+ this.DOMAIN +"/ws";      // combines the three string and creates a new string
+      this.socket = new WebSocket(this.host);
+              
+      // event handlers for websocket
+      if(self.socket){
+            self.socket.onopen = function(){
+                console.log("connection opened....");
+                arrows();     // function for detecting keyboard presses
+                buttons();    // function for detecting the button press on webpage
+                self.showReadyState("open");
+            }
+
+            self.socket.onmessage = function(msg) {
+                try {
+                  var data = JSON.parse(msg.data);
+                  if ('sensor_values' in data) updateSensorValues(data.sensor_values)
+                } catch (e) {
+                  _log(msg.data);
+                }
+            }
+
+            self.socket.onclose = function(){
+                //alert("connection closed....");
+                _log("The connection has been closed.");
+                self.showReadyState("closed");
+             }
+
+            self.socket.onerror = function(){
+                //alert("connection closed....");
+                _log("The was an error.");
+                self.showReadyState("error");
+             }
+        } else {
+            self._log("invalid socket");
+        }
+        
+    } // End setup()
+
+    _log = function (txt){
+        $log = $("#log");
+        $newRow = $("<div>");
+        $newRow.text(txt);
+        $log.append($newRow);
+        $log.scrollTop($log[0].scrollHeight);
+    };
+
+    showReadyState = function(state){
+       $el =  $("#ready-state");
+       $el.find("span").hide();
+       $("#ready-state ."+state).show();
+    };
+
+}; // End Ardyh
+
+$(document).ready(function(){
+    ardyh = new Ardyh();
+    ardyh.setup();
+});
+
+
+
+
+
+
 function resize(){
     var H = $(window).height();
     var primaryH = $("#primary").height();
