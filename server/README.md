@@ -1,4 +1,12 @@
+This is the ardyh.io websocket server. 
+
+Dependencies
+============
+
+tornado - `pip install tornado` 
+
 Start the Server
+================
 
 1. Got to `lilybot/server`
 2. Run `python main.js`
