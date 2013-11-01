@@ -75,6 +75,14 @@ mkdir Projects
 cd Projects 
 git clone https://github.com/DexterInd/BrickPi_Python.git
 git clone https://github.com/wilblack/lilybot.git
+
+```
+
+Install some Python pip packages
+
+```
+sudo pip install tornado
+sudo pip install ws4py
 ```
 
 
