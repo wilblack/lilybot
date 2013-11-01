@@ -22,6 +22,9 @@
 import subprocess
 from datetime import datetime as dt
 
+from ws4py.client.tornadoclient import TornadoWebSocketClient
+from tornado import ioloop
+
 
 from BrickPi import *   #import BrickPi.py file to use BrickPi operations
 import threading
@@ -33,7 +36,7 @@ import tornado.template
 
 LOG_DTFORMAT = "%m-%d %H:%M:%S"
 
-
+ARDYH_URI = 'ws://173.255.213.55:9093/ws'
 
 
 def restart():
@@ -60,9 +63,11 @@ c=0
 class WSHandler(tornado.websocket.WebSocketHandler):
   
   def open(self):
-    print 'connection opened...'
-    self.log('connection opened...')
-
+    
+    msg = "Hello, I'm lilybot%s" %s("WTF")
+    print msg
+    
+    self.log(meg)
     sensors = tornado.ioloop.PeriodicCallback(self.get_sensors_values, 500)
     sensors.start()
 
@@ -163,6 +168,26 @@ application = tornado.web.Application([
 ])
 
 
+
+
+class Ardyh(TornadoWebSocketClient):
+    """
+    Web Socket client to connect to ardyh on start up.
+    """
+    def opened(self):
+      self.send("Hello. I 'm a lilybot")
+
+    def received_message(self, m):
+         print m
+         if len(m) == 175:
+             self.close(reason='Bye bye')
+
+    def closed(self, code, reason=None):
+         ioloop.IOLoop.instance().stop()
+
+
+
+
 class myThread (threading.Thread):
     def __init__(self, threadID, name, counter):
         threading.Thread.__init__(self)
@@ -188,6 +213,11 @@ if __name__ == "__main__":
   thread1 = myThread(1, "Thread-1", 1)
   thread1.setDaemon(True)
   thread1.start()  
-  application.listen(9093)          #starts the websockets connection
-  tornado.ioloop.IOLoop.instance().start()
+  application.listen(9093)
   
+  ardyh = Ardyh(ARDYH_URI, protocols=['http-only', 'chat'])
+  ardyh.connect()
+
+       #starts the websockets connection
+  tornado.ioloop.IOLoop.instance().start()
+
