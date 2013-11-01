@@ -56,6 +56,14 @@ function restart(){
 } 
 
 
+function lookLeft(){
+  socket.send("ll");
+}
+
+function lookLeft(){
+  socket.send("lr");
+}
+
 function connectBtnCallback(){
   /*
    * This should establish a new connection
@@ -236,4 +244,18 @@ function arrows() {
 
        }
     }
+}
+
+
+function resize(){
+    var H = $(window).height();
+    var primaryH = $("#primary").height();
+    var footerH = $("#footer").height();    
+    var secondaryH = H - primaryH - footerH;
+
+    console.log("window height "+H);
+    console.log("primary height "+primaryH);
+    console.log("secondary height "+secondaryH);
+
+    $("#secondary").height(secondaryH);
 }

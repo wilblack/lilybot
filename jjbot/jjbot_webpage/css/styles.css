@@ -1,14 +1,34 @@
+p {
+    line-height:1.1;
+    font-size:.9;
+}
+
+.panel {
+    padding:1.0em;
+    margin-bottom:0px;
+}
 
 .button {
   width:100%;
 }
 
+.button.small{
+    margin:0;
+}
+
+#log-wrapper {
+    background-color: #000000;
+    color:#EE00EE;
+    height:100%;
+}
+
 #log {
-    height:400px;
     background-color: #000000;
     color:#00DD00;
     overflow:auto;
+    font-size:0.9em;
 }
+
 
 #sensor_values span {
     width:30px;
@@ -20,4 +40,12 @@
 
 .hide {
     display:none;
+}
+
+#controls li {
+    padding:0;
+}
+
+#controls li .button {
+    margin:0;
 }

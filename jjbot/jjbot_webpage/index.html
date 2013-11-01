@@ -23,10 +23,10 @@
     <div class="row">
         <div class="large-6 columns">
             <div id="send" class="">
-              <p>  Enter the hostname/ip address to make the websocket connection </p>
+              <p>Enter the local hostname/ip address of your lilybot (hint: on the raspberry pi use <code> ifconfig wlan0 | grep "inet addr"</code> or check your router tables.</p>
               <div class="row">
                 
-                <div class="large-6 small-6 columns">
+                <div class="large-6 small-5 columns">
                     <input type="text" id="hostname" value="192.168.1.140"/>
                 </div>
                 
@@ -34,7 +34,7 @@
                     <button id="connect-btn" class="tiny" onclick="connectBtnCallback()">Connect &raquo;</button>
                 </div>
                 
-                <div id="ready-state" class="large-3 small-2 columns">
+                <div id="ready-state" class="large-3 small-3 columns">
                     <label>Status:</label> 
                     <span class="label success hide connecting">CONNECTING</span>
                     <span class="label success hide open">OPEN</span>
@@ -60,35 +60,40 @@
               <li><button class="button" onclick="stop(); " ><i class="fa"></i> (s)</button></li>
               <li><button class="button" onclick="steer_right(); " >(d) <i class="fa fa-rotate-right"></i></button></li>
 
-              <li><button class="button" disabled ><i class="fa"></i></button></li>
-              <li><button class="button" onclick="reverse(); " ><i class="fa fa-arrow-down"></i> (x)</button></li>
-              <li><button class="button" disabled ><i class="fa"></i></button></li>
+              <li><button class="button" onclick="lookLeft();"><i class="fa"></i>Look Left</button></li>
+              <li><button class="button" onclick="reverse();" ><i class="fa fa-arrow-down"></i> (x)</button></li>
+              <li><button class="button" onclick="lookRight();"><i class="fa"></i>Look right</button></li>
             </ul>
     </div><!--end #controls row -->
-    
-    <div class="row panel">
-        <div class="large-4 small-4 columns">
-          <button class="button small" onclick="shutdown();">Shutdown</button>
-        </div>
-        <div class="large-4 small-4 columns">
-          <button class="button small" onclick="restart();">Restart</button>
-        </div>
-        <div class="large-4 small-4 columns">
-          <button class="button small" disabled ></button>
-        </div>
-    </div>
-  </div><!-- end #primary -->
+</div> <!-- end primary -->
+<div id="secondary">
 
-  <div id="secondary">
-    <div id="log" class="padded"></div> <!-- End .secondary -->
+  <div id="log-wrapper">
     <div id="sensor-values">
-          <label>Sensor Values</label>
-          <div>PORT_1: <span class="PORT_1"></span></div>
-          <div>PORT_2: <span class="PORT_2"></span></div>
-          <div>PORT_3: <span class="PORT_3"></span></div>
-          <div>PORT_4: <span class="PORT_4"></span></div>
+          <div class="small-6 columns">
+            <div><small>PORT_1: <span class="PORT_1"></span></small></div>
+            <div><small>PORT_2: <span class="PORT_2"></span></small></div>
+          </div>
+          <div class="small-6 columns">
+            <div><small>PORT_3: <span class="PORT_3"></span></small></div>
+            <div><small>PORT_4: <span class="PORT_4"></span></small></div>
           </div>
     </div>
+    <div id="log" class="padded"></div> <!-- End .secondary -->
+  </div>
+
+  <div id="footer" class="row panel">
+      <div class="large-4 small-4 columns">
+        <button class="button small" onclick="shutdown();">Shutdown</button>
+      </div>
+      <div class="large-4 small-4 columns">
+        <button class="button small" onclick="restart();">Restart</button>
+      </div>
+      <div class="large-4 small-4 columns">
+        <button class="button small" disabled ></button>
+      </div>
+  </div>
+  </div><!-- end #primary -->
 
 </div><!-- end content -->
 
@@ -138,6 +143,10 @@
   
   <script>
     $(document).foundation();
+
+    $(document).ready(function(){
+        resize();
+    });
   </script>
 </body>
 </html>
