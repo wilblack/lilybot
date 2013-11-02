@@ -88,7 +88,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       self.write_message(message)
 
 
-
     def loopCallback(self):
       now = dt.now().strftime(LOG_DTFORMAT)
       message = "[%s]" %(now)

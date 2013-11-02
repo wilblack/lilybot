@@ -60,7 +60,7 @@ function lookLeft(){
   ardyh.socket.send("ll");
 }
 
-function lookLeft(){
+function lookRight(){
   ardyh.socket.send("lr");
 }
 
@@ -318,22 +318,32 @@ Ardyh = function(){
 $(document).ready(function(){
     ardyh = new Ardyh();
     ardyh.setup();
+
+    resize();
+    $(window).resize(function(){
+        resize();
+    })
 });
-
-
-
 
 
 
 function resize(){
     var H = $(window).height();
+    $("#controls .button").height(.12*H);
+
     var primaryH = $("#primary").height();
     var footerH = $("#footer").height();    
-    var secondaryH = H - primaryH - footerH;
+    
+    var secondaryH = H - primaryH;
 
     console.log("window height "+H);
     console.log("primary height "+primaryH);
     console.log("secondary height "+secondaryH);
 
     $("#secondary").height(secondaryH);
+
+
+    // Update controls button size.
+    
+
 }
