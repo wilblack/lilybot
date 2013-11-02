@@ -278,28 +278,28 @@ Ardyh = function(){
                   var data = JSON.parse(msg.data);
                   if ('sensor_values' in data) updateSensorValues(data.sensor_values)
                 } catch (e) {
-                  _log(msg.data);
+                  self._log(msg.data);
                 }
             }
 
             self.socket.onclose = function(){
                 //alert("connection closed....");
-                _log("The connection has been closed.");
+                self._log("The connection has been closed.");
                 self.showReadyState("closed");
              }
 
             self.socket.onerror = function(){
                 //alert("connection closed....");
-                _log("The was an error.");
+                self._log("The was an error.");
                 self.showReadyState("error");
              }
         } else {
-            self._log("invalid socket");
+            self.self._log("invalid socket");
         }
 
         } // End setup()
 
-    _log = function (txt){
+    this._log = function (txt){
         $log = $("#log");
         $newRow = $("<div>");
         $newRow.text(txt);
@@ -307,7 +307,7 @@ Ardyh = function(){
         $log.scrollTop($log[0].scrollHeight);
     };
 
-    showReadyState = function(state){
+    this.showReadyState = function(state){
        $el =  $("#ready-state");
        $el.find("span").hide();
        $("#ready-state ."+state).show();

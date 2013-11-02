@@ -18,21 +18,22 @@ p {
 
 #log-wrapper {
     background-color: #000000;
-    color:#EE00EE;
+    
     height:100%;
 }
 
 #log {
     background-color: #000000;
     color:#00DD00;
-    overflow:auto;
+    overflow:scroll;
     font-size:0.9em;
+    height:95%;
 }
 
-
-#sensor_values span {
-    width:30px;
+#sensor-values {
+    color:#EE00EE;
 }
+
 
 .padded {
     padding:5px;
