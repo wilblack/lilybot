@@ -9,59 +9,59 @@ function accelerate()       // defines a variable that controls the forward move
 {
     up = "u";               // when up == u the bot moves forward 
     down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
-    socket.send("u");   
+    ardyh.socket.send("u");   
 }  
 
 function reverse(){
     down = "d";
     up = "aaa";left = "aaa";right = "aaa";brakes = "aaa";
-    socket.send("d");  
+    ardyh.socket.send("d");  
 }
 
 function steer_left(){
     left = "l";
     up = "aaa";down = "aaa";right = "aaa";brakes = "aaa";
-    socket.send("l");  
+    ardyh.socket.send("l");  
 }
 
 function steer_right(){
     right = "r";
     up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
-    socket.send("r");
+    ardyh.socket.send("r");
 }
 
 function nudge_left(){
-    socket.send("nl");  
+    ardyh.socket.send("nl");  
 }
 
 function nudge_right(){
-    socket.send("nr");
+    ardyh.socket.send("nr");
 }
 
 
 
 function stop(){
     up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
-    socket.send("b");
+    ardyh.socket.send("b");
 }        
 
 
 function shutdown(){
-    socket.send("x");
+    ardyh.socket.send("x");
 } 
 
 
 function restart(){
-    socket.send("y");
+    ardyh.socket.send("y");
 } 
 
 
 function lookLeft(){
-  socket.send("ll");
+  ardyh.socket.send("ll");
 }
 
 function lookLeft(){
-  socket.send("lr");
+  ardyh.socket.send("lr");
 }
 
 function connectBtnCallback(){
@@ -167,23 +167,23 @@ function updateSensorValues(sensor_values){
 
 function buttons() { 
     if(up== "u") {
-      socket.send("u");
+      ardyh.socket.send("u");
     }   
     
     if(down== "d") {
-      socket.send("d");
+      ardyh.socket.send("d");
     }
     
     if(left== "l") {
-      socket.send("l");
+      ardyh.socket.send("l");
     }   
     
     if(right== "r") {
-      socket.send("r");
+      ardyh.socket.send("r");
     }   
     
     if(brakes == "b") {
-      socket.send("b");
+      ardyh.socket.send("b");
     }
 }
 
@@ -195,49 +195,49 @@ function arrows() {
        switch(KeyID)
        {
             case 16:
-            socket.send("b");
+            ardyh.socket.send("b");
             break; 
             case 17:
-            socket.send("b");
+            ardyh.socket.send("b");
             break;
             case 37:
-            socket.send("l");
+            ardyh.socket.send("l");
             break;
             case 38:
-            socket.send("u");
+            ardyh.socket.send("u");
             break;
             case 39:
-            socket.send("r");
+            ardyh.socket.send("r");
             break;
             case 40:
-            socket.send("d");
+            ardyh.socket.send("d");
             break;
 
             // WoW Style
             case 32: // x
-            socket.send("b");
+            ardyh.socket.send("b");
             break; 
             case 88: // x
-            socket.send("d");
+            ardyh.socket.send("d");
             break; 
             case 65: // a
-            socket.send("l");
+            ardyh.socket.send("l");
             break;
             case 87: // w
-            socket.send("u");
+            ardyh.socket.send("u");
             break;
             case 68: // d
-            socket.send("r");
+            ardyh.socket.send("r");
             break;
             case 83: // s
-            socket.send("b");
+            ardyh.socket.send("b");
             break;
 
             case 81: // q
-            socket.send("nl");
+            ardyh.socket.send("nl");
             break;
             case 69: // e
-            socket.send("nr");
+            ardyh.socket.send("nr");
             break;
 
 
@@ -258,16 +258,14 @@ Ardyh = function(){
 
 
 
-
-
     this.setup = function(){
     // Creates the websocets connection{
 
-    this.host =  "ws://"+ this.DOMAIN +"/ws";      // combines the three string and creates a new string
-      this.socket = new WebSocket(this.host);
+        this.host =  "ws://"+ this.DOMAIN +"/ws";      // combines the three string and creates a new string
+        this.socket = new WebSocket(this.host);
               
-      // event handlers for websocket
-      if(self.socket){
+        // event handlers for websocket
+        if(self.socket){
             self.socket.onopen = function(){
                 console.log("connection opened....");
                 arrows();     // function for detecting keyboard presses
@@ -298,8 +296,8 @@ Ardyh = function(){
         } else {
             self._log("invalid socket");
         }
-        
-    } // End setup()
+
+        } // End setup()
 
     _log = function (txt){
         $log = $("#log");
