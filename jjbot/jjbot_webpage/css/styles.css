@@ -16,22 +16,29 @@ p {
     margin:0;
 }
 
+
 #log-wrapper {
     background-color: #000000;
-    color:#EE00EE;
-    height:100%;
+    height:67%;
 }
 
 #log {
     background-color: #000000;
     color:#00DD00;
-    overflow:auto;
+    overflow-y:scroll;
     font-size:0.9em;
+    height:100%;
+    width:99%;
 }
 
+#sensor-values {
+    background-color: #000000;
+    color:#EE00EE;
+    height:13%;
+}
 
-#sensor_values span {
-    width:30px;
+#footer {
+    height:20%;
 }
 
 .padded {
