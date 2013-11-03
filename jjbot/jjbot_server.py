@@ -18,7 +18,8 @@
 # Wil Black, wilblack21@gmail.com 
 # Oct. 26, 2013
 #
-
+import json
+from uuid import getnode as get_mac
 import subprocess
 from datetime import datetime as dt
 
@@ -34,7 +35,7 @@ import tornado.websocket
 import tornado.template
 
 
-LOG_DTFORMAT = "%m-%d %H:%M:%S"
+LOG_DTFORMAT = "%H:%M:%S"
 
 ARDYH_URI = 'ws://173.255.213.55:9093/ws'
 
@@ -142,11 +143,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
       BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
     elif c == '5' :
-      self.log("Stopped")
+      self.log("Old Stopped")
       BrickPi.MotorSpeed[PORT_A] = 0
 
       BrickPi.MotorSpeed[PORT_D] = 0
-    BrickPiUpdateValues();                # BrickPi updates the values for the motors
+    BrickPiUpdateValues()                # BrickPi updates the values for the motors
     print "Values Updated"
   
 
@@ -168,23 +169,147 @@ application = tornado.web.Application([
 ])
 
 
-
-
 class Ardyh(TornadoWebSocketClient):
     """
     Web Socket client to connect to ardyh on start up.
     """
-    def opened(self):
-      self.send("Hello. I 'm a lilybot")
 
-    def received_message(self, m):
-         print m
-         if len(m) == 175:
-             self.close(reason='Bye bye')
+    def __init__(self, uri, protocols):
+        rs = super(Ardyh, self).__init__(uri, protocols)
+        self.bot = JJBot()
+        self.LOOK_SPEED = 80
+        self.LOOK_DT = 0.5
+
+        return rs
+
+
+    def opened(self):
+        mac = self.get_mac_address()
+        msg = "%s: Hello. I 'm a lilybot" %(mac)
+
+        sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
+        sensors.start()
+
+        self.send(msg)
+
+    def received_message(self, message):
+        
+        print "Ardyh Received message...%s" %message
+
+        message = unicode(message)
+
+        if message == 'u' :
+            self.log("Running Forward")
+            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        
+        elif message == 'd' :
+            self.log("Running Reverse")
+            BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
+        
+        elif message == 'r' :
+            self.log("Turning Right")
+            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
+        
+        elif message == 'l' :
+            self.log("Turning Left")
+            BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        
+        elif message == 'b' :
+            self.log("New Stopped")
+            BrickPi.MotorSpeed[PORT_A] = 0
+            BrickPi.MotorSpeed[PORT_D] = 0
+
+        # Wil's added capabilites
+        elif message == "nl":
+            self.log("Nudge Left")
+            BrickPi.MotorSpeed[PORT_A] = 0  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+            time.sleep(.5)
+            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+          
+        elif message == "nr":
+            self.log("Nudge Right")
+            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = 0  #Set the speed of MotorA (-255 to 255)
+            time.sleep(.5)
+            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+
+
+        elif message == "ll":
+            self.log("Look Left")
+            BrickPi.MotorSpeed[PORT_C] = -1*self.LOOK_SPEED
+            time.sleep(self.LOOK_DT)
+            # BrickPi.MotorSpeed[PORT_C] = -1*self.LOOK_SPEED
+            # time.sleep(self.LOOK_DT)
+            BrickPi.MotorSpeed[PORT_C] = 0
+
+        elif message == "lr":
+            self.log("Look Right")
+            BrickPi.MotorSpeed[PORT_C] = self.LOOK_SPEED
+            time.sleep(self.LOOK_DT)
+            # BrickPi.MotorSpeed[PORT_C] = self.LOOK_SPEED
+            # time.sleep(self.LOOK_DT)
+            BrickPi.MotorSpeed[PORT_C] = 0
+
+
+        elif message == "x":  # Shutdown
+            self.log("Shutting down")
+            shutdown()
+        elif message == "y":  # Shutdown
+            restart()
+        
+        BrickPiUpdateValues()                # BrickPi updates the values for the motors
+        print "Values Updated"
+
 
     def closed(self, code, reason=None):
-         ioloop.IOLoop.instance().stop()
+        ioloop.IOLoop.instance().stop()
 
+
+    def log(self, message):
+        now = dt.now().strftime(LOG_DTFORMAT)
+        message = "[%s] %s" %(now, message)
+        print message
+        self.send(message)
+
+
+    def loopCallback(self):
+        sensor_values = self.bot.get_sensors_values()
+        out = {"sensor_values":sensor_values}
+
+        self.send(json.dumps(out))
+
+
+    def get_mac_address(self):
+        mac = get_mac()
+        return "%012X"%mac
+
+
+
+
+class JJBot():
+
+    def __init__(self):
+        pass
+
+
+    def on_message(self, message):
+        pass
+    
+    def get_sensors_values(self):
+        out = [
+            ['PORT_1', BrickPi.Sensor[PORT_1]],
+            ['PORT_2', BrickPi.Sensor[PORT_2]],
+            ['PORT_3', BrickPi.Sensor[PORT_3]],
+            ['PORT_4', BrickPi.Sensor[PORT_4]],
+          ]
+        return out
 
 
 
@@ -202,22 +327,25 @@ class myThread (threading.Thread):
 
 
 if __name__ == "__main__":
-  BrickPiSetup()  # setup the serial port for communication
-  BrickPi.MotorEnable[PORT_A] = 1 #Enable the Motor A
-  BrickPi.MotorEnable[PORT_D] = 1 #Enable the Motor D
+    BrickPiSetup()  # setup the serial port for communication
+    BrickPi.MotorEnable[PORT_A] = 1 #Enable the Motor A
+    BrickPi.MotorEnable[PORT_B] = 1 #Enable the Motor A
+    BrickPi.MotorEnable[PORT_C] = 1 #Enable the Motor D
+    BrickPi.MotorEnable[PORT_D] = 1 #Enable the Motor D
 
-  BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT   #Set the type of sensor at PORT_1
 
-  BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
-  running = True
-  thread1 = myThread(1, "Thread-1", 1)
-  thread1.setDaemon(True)
-  thread1.start()  
-  application.listen(9093)
-  
-  ardyh = Ardyh(ARDYH_URI, protocols=['http-only', 'chat'])
-  ardyh.connect()
+    BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT   #Set the type of sensor at PORT_1
+
+    BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
+    running = True
+    thread1 = myThread(1, "Thread-1", 1)
+    thread1.setDaemon(True)
+    thread1.start()  
+    application.listen(9093)
+
+    ardyh = Ardyh(ARDYH_URI, protocols=['http-only', 'chat'])
+    ardyh.connect()
 
        #starts the websockets connection
-  tornado.ioloop.IOLoop.instance().start()
+    tornado.ioloop.IOLoop.instance().start()
 
