@@ -3036,7 +3036,7 @@ label.error {
 .js-generated {
   display: block; }
 
-@media only screen and (min-width: 940px) {
+@media only screen and (min-width: 150px) { /* Was originally 940, changed by wil Black 11-3-2013 */
   .top-bar {
     background: #111111;
     *zoom: 1;

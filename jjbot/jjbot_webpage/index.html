@@ -5,7 +5,7 @@
 <head>
 	<meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>Lilybot - JJBot Client</title>  
+  <title>Lilybot - Control Panel</title>  
   
   <link rel="stylesheet" href="css/foundation.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -16,6 +16,29 @@
 </head>
 <body>
 
+<nav class="top-bar">
+    <ul class="title-area">
+    <!-- Title Area -->
+        <li class="name">
+          <h1><a href="#">Lilybot Control Panel</a></h1>
+        </li>
+        <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+        
+        <ul class="right">
+            <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a>
+            </li>
+        </ul>
+    </ul>
+
+    <section class="top-bar-section">
+        <ul class="right">
+            <li onclick="toggleAbout();"><a href="#"><i class="fa fa-question-circle fa-2x"></i></a></li>
+        </ul>
+
+
+    </section>
+
+</nav>
 <div id="content">
 
   <div id="primary">
@@ -23,31 +46,39 @@
     <div class="row">
         <div class="large-6 columns">
             <div id="send" class="">
-              <div class="row">
-                
-               <!--  <p>Enter the local hostname/ip address of your lilybot (hint: on the raspberry pi use <code> ifconfig wlan0 | grep "inet addr"</code> or check your router tables.</p>
-
-                <div class="large-6 small-5 columns">
-                    <input type="text" id="hostname" value="192.168.1.140"/>
+                <div id="about" class="row hide">
+                    <div class="padded panel">
+                        <p>This is your dashboard to your for your lilybots. Load the lilybot client onto your Raspberry Pi. It will automatically connect to the ardyh server. You can control the lilybot using the keypad or using your keyboard. The keys are listed in paranthesis on the keypad.</p>
+                        <p>In the log you can see commands issued from you to your lilybot.</p>
+                        <p class="align-right"><i class="fa fa-times-circle fa-2x" onclick="toggleAbout();"></i></p>
+                    </div>
                 </div>
-                
-                <div class="large-3 small-4 columns">                
-                    <button id="connect-btn" class="tiny" onclick="connectBtnCallback()">Connect &raquo;</button>
-                </div> -->
-                
-                <div id="ready-state" class="large-3 small-3 columns">
-                    <label>Status:</label> 
-                    <span class="label success hide connecting">CONNECTING</span>
-                    <span class="label success hide open">OPEN</span>
-                    <span class="label secondary hide closing">CLOSING</span>
-                    <span class="label secondary hide closed">CLOSED</span>
-                    <span class="label hide error">ERROR</span>
-                  </div>
 
-              </div>
+                <div class="row">
+                    
+                   <!--  <p>Enter the local hostname/ip address of your lilybot (hint: on the raspberry pi use <code> ifconfig wlan0 | grep "inet addr"</code> or check your router tables.</p>
+
+                    <div class="large-6 small-5 columns">
+                        <input type="text" id="hostname" value="192.168.1.140"/>
+                    </div>
+                    
+                    <div class="large-3 small-4 columns">                
+                        <button id="connect-btn" class="tiny" onclick="connectBtnCallback()">Connect &raquo;</button>
+                    </div> -->
+                    
+                    <div id="ready-state" class="large-6 small-6 columns">
+                        <div class="padded">
+                            Connection  
+                            <span class="label success hide connecting">CONNECTING</span>
+                            <span class="label success hide open">OPEN</span>
+                            <span class="label secondary hide closing">CLOSING</span>
+                            <span class="label secondary hide closed">CLOSED</span>
+                            <span class="label hide error">ERROR</span>
+                        </div>
+                    </div>
+                </div>
               
-              
-            </div>
+            </div><! -- End send -->
         </div>
     </div>
     
@@ -81,8 +112,7 @@
     </div>
 
     <div id="log-wrapper">
-
-    <div id="log" class="padded"></div> <!-- End .secondary -->
+        <div id="log" class="padded"></div> <!-- End .secondary -->
     </div>
 
     <div id="footer" class="row panel">

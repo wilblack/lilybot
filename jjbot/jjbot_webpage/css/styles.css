@@ -3,6 +3,10 @@ p {
     font-size:.9;
 }
 
+.align-right {
+    text-align: right;
+}
+
 .panel {
     padding:1.0em;
     margin-bottom:0px;
@@ -29,6 +33,9 @@ p {
     font-size:0.9em;
     height:100%;
     width:99%;
+}
+#ready-state .label{
+    display: inline-block;
 }
 
 #sensor-values {

@@ -45,7 +45,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       self.nav = ArdyhNav(self)
       self.portA_fifo = collections.deque(5*[255], 5)
       self.busy = False # Tells the ardyh to stop sending messages to listener, useful while executing a command
-
+      self.operationa_mode = "user_controlled"
 
     def open(self):
       print 'connection opened...'
@@ -70,22 +70,27 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         """
 
         self.broadcast(message, 'echo')
-        try:
-            message = json.loads(message)
-        except:
-            return
-
-        if "sensor_values" in message.keys():
-            valueA = message['sensor_values'][0][1]
-            self.portA_fifo.appendleft(valueA)
-
-
         
-        if len([1 for val in self.portA_fifo if val < 35 ]) >= 3:
-            print self.busy
-            if not self.busy:
-                self.busy = True
-                self.nav.event('bump')
+
+        if self.operationa_mode == "autonamous":
+            try:
+                message = json.loads(message)
+            except:
+                return
+
+
+            if "sensor_values" in message.keys():
+                valueA = message['sensor_values'][0][1]
+                self.portA_fifo.appendleft(valueA)
+
+
+            
+            if len([1 for val in self.portA_fifo if val < 35 ]) >= 3:
+                print self.busy
+                if not self.busy:
+                    self.busy = True
+                    self.nav.event('bump')
+
 
 
     def on_close(self):

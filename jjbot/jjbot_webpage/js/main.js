@@ -327,6 +327,19 @@ $(document).ready(function(){
 
 
 
+/****************************************************
+View Stuff
+*****************************************************/
+function toggleAbout(){
+    $el = $("#about");
+    if ($el.hasClass("hide") === true){
+        $el.removeClass("hide");
+    } else {
+        $el.addClass("hide");
+    }
+
+}
+
 function resize(){
     var H = $(window).height();
     $("#controls .button").height(.12*H);
