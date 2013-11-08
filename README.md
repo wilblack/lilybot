@@ -21,6 +21,9 @@ Here is a list of materials I have used and how much they costs.
 * SD Card - $12
 * 6 AA with 9V out power suply - $3
 * 9v Volt adaptors - $3
+* 12 rechargable AA  NiMH batteries - $15
+* Rayovac PS3 battery charger - $20
+
 
 
 1. Set-Up the Raspberry Pi with BrickPi
