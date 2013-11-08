@@ -64,6 +64,7 @@ Now install some librabries and helpful stuff. The first two are optional but I 
 sudo apt-get install screen
 sudo apt-get install ipython
 sudo apt-get install python-pip
+sudo apt-get install python-bluetooth
 
 ```
 
@@ -83,6 +84,7 @@ Install some Python pip packages
 ```
 sudo pip install tornado
 sudo pip install ws4py
+sudo pup install pyreadlines
 ```
 
 
