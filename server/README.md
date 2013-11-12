@@ -1,7 +1,8 @@
 This is the ardyh.io websocket server. It acts as a message passing service and as an API to the ardyh AI. 
 
 
-Currently I have a demo site setup at ardyh.solalla.com:9093. Check it out. 
+Currently I have a demo site setup at ardyh.solalla.com:9093. Check it out. The jjbot client app automatically points to 
+ardyh.solalla.com.
 
 The purpose of this server is to pass messages between devices and robots over the Internet. To use it, 
 install the lilybot client on your Raspberry Pi. By default it points to173.255.213.55:9093. The in a broswer or smart phone
