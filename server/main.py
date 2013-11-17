@@ -78,11 +78,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             except:
                 return
 
-
             if "sensor_values" in message.keys():
                 valueA = message['sensor_values'][0][1]
                 self.portA_fifo.appendleft(valueA)
-
 
             
             if len([1 for val in self.portA_fifo if val < 35 ]) >= 3:
