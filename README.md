@@ -16,6 +16,8 @@ Here is a list of materials I have used and how much they costs.
 * EV3 - $350
 * Raspberry Pi - $40
 * BrickPi - $45
+* Raspberry Pi Camera Module - $30
+* Camera Module mount kit - $5
 * NXT Touch Sensors - $40
 * NXT Ultra Sonic Sensor - $25
 * SD Card - $12
@@ -93,10 +95,40 @@ sudo pup install pyreadlines
 ```
 
 
-2. Run jjbot
+2. Install Camera Software
+==========================
+
+Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi
+
+```
+cd ~/
+sudo apt-get install libjpeg8-dev imagemagick libv4l-dev
+sudo ln -s /usr/include/linux/videodev2.h /usr/include/linux/videodev.h
+
+```
+Then make a temp directory to download the MJPEG-Streamer zip file
+
+```
+mkdir ~/temp
+cd ~/temp
+wget http://sourceforge.net/code-snapshots/svn/m/mj/mjpg-streamer/code/mjpg-streamer-code-182.zip
+unzip mjpg-streamer-code-182.zip
+cd mjpg-streamer-code-182/mjpg-streamer
+make mjpg_streamer input_file.so output_http.so
+
+sudo cp mjpg_streamer /usr/local/bin
+sudo cp output_http.so input_file.so /usr/local/lib/
+sudo cp -R www /usr/local/www
+
+```
+
+
+
+
+3. Run jjbot
 ============
 
-`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`. T
+`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`.
 
 
 
