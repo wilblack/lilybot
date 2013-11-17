@@ -57,7 +57,7 @@ class MainHandler(tornado.web.RequestHandler):
   
   def get(self):
     loader = tornado.template.Loader(".")
-    self.write(loader.load("index.html").generate())
+    self.write(loader.load("www/index.html").generate())
 c=0
 
 
@@ -165,6 +165,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 application = tornado.web.Application([
   (r'/ws', WSHandler),
   (r'/', MainHandler),
+  
   (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
 ])
 
@@ -191,6 +192,7 @@ class Ardyh(TornadoWebSocketClient):
         sensors.start()
 
         self.send(msg)
+
 
     def received_message(self, message):
         
@@ -335,14 +337,16 @@ if __name__ == "__main__":
 
 
     BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT   #Set the type of sensor at PORT_1
-
     BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
+    
+    # Start the local webserver to listen for incoming requests.
     running = True
     thread1 = myThread(1, "Thread-1", 1)
     thread1.setDaemon(True)
     thread1.start()  
-    application.listen(9093)
+    application.listen(9010)
 
+    # Start streaming data to ardyh.
     ardyh = Ardyh(ARDYH_URI, protocols=['http-only', 'chat'])
     ardyh.connect()
 
