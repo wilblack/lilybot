@@ -130,7 +130,9 @@ cp -R www ~/Projects/lilybot/jjbot/  # This is what I did but I don't think its 
 
 ```
 
-Now we should be able to  start the camera
+Now we should be able to  start the camera. The code below will start 
+the camera and a webserver on port 8080 that will stream the video. 
+To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:8080`
 
 ```
 mkdir /tmp/stream
