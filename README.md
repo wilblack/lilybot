@@ -100,14 +100,12 @@ sudo pup install pyreadlines
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
 
-First let make sure the camera is enabled. Run `sudo rasp-config` and ebale camera.
-
-
 
 
 Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi 
 to install the software on the RPi. They are summarized below
 
+**NOTE** First make sure the camera is enabled. Run `sudo rasp-config` and enable the camera.
 
 ```
 cd ~/
@@ -129,6 +127,16 @@ sudo cp mjpg_streamer /usr/local/bin
 sudo cp output_http.so input_file.so /usr/local/lib/
 # sudo cp -R www /usr/local/www # This is what the tutorial says, i didn't do it becuase /usr/local/www does not exist.
 cp -R www ~/Projects/lilybot/jjbot/  # This is what I did but I don't think its right.
+
+```
+
+Now we should be able to  start the camera
+
+```
+mkdir /tmp/stream
+raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
+
+LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
 
 ```
 
