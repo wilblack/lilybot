@@ -123,7 +123,8 @@ make mjpg_streamer input_file.so output_http.so
 
 sudo cp mjpg_streamer /usr/local/bin
 sudo cp output_http.so input_file.so /usr/local/lib/
-sudo cp -R www /usr/local/www
+# sudo cp -R www /usr/local/www # This is what the tutorial says, i didn't do it becuase /usr/local/www does not exist.
+cp -R www ~/Projects/lilybot/jjbot/  # This is what I did but I don't think its right.
 
 ```
 
