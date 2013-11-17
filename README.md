@@ -142,6 +142,11 @@ LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n
 
 ```
 
+To stop streaming use
+
+```
+
+```
 
 
 
