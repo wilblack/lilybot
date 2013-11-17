@@ -100,6 +100,10 @@ sudo pup install pyreadlines
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
 
+First let make sure the camera is enabled. Run `sudo rasp-config` and ebale camera.
+
+
+
 
 Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi 
 to install the software on the RPi. They are summarized below
