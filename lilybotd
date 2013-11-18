@@ -13,10 +13,11 @@ NAME=start_server
 DESC="This starts the jjbot web server"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
+PORT=9010
 
 case "$1" in
 start)
-    printf "%-50s" "Starting $NAME on port 9010..."
+    printf "%-50s" "Starting $NAME on port $PORT..."
     cd $DAEMON_PATH
     #PID=`$DAEMON $DAEMONOPTS > /dev/null 2>&1 & echo $!`
     PID=`./$DAEMON $DAEMONOPTS > /dev/null  2>&1 & echo $!`
@@ -28,6 +29,13 @@ start)
             echo $PID > $PIDFILE
             printf "%s\n" "Ok"
         fi
+
+    # printf "Starting camera server on port 8080"
+    # mkdir /tmp/stream
+    # raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0 &
+    # LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www" &
+
+
 ;;
 status)
         printf "%-50s" "Checking $NAME..."
@@ -50,8 +58,8 @@ stop)
             kill -HUP $PID
             printf "%s\n" "Ok"
             rm -f $PIDFILE
-            echo "Releasing port 9010"
-            fuser -k 9010/tcp
+            echo "Releasing port $PORT"
+            fuser -k $PORT/tcp
         else
             printf "%s\n" "pidfile not found"
         fi

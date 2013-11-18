@@ -186,6 +186,12 @@ class Ardyh(TornadoWebSocketClient):
 
     def opened(self):
         mac = self.get_mac_address()
+
+        # Tells ardyh that is a new connection
+
+        out = {"new":"", "camera_port":8080}
+        self.send(json.dumps(out))
+
         msg = "%s: Hello. I 'm a lilybot" %(mac)
 
         sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
