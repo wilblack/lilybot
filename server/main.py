@@ -69,13 +69,24 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         }
         """
 
-        self.broadcast(message, 'echo')
+        message_json = None
+        try:
+            message_json = json.loads(message)
+            # Append IP address to allow camera feed. 
+            if "new" in message_json.keys():
+                port = message_json['camera_port']
+                message_json.update({"camera_url":"http://%s:%s" %(self.request.remote_ip, port) })
+        except:
+            pass
+
         
 
+        self.broadcast(message, 'echo')
+        
         if self.operationa_mode == "autonamous":
-            try:
-                message = json.loads(message)
-            except:
+            if message_json:
+                message = message_json
+            else:
                 return
 
             if "sensor_values" in message.keys():
