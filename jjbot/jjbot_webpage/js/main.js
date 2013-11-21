@@ -80,7 +80,7 @@ function showReadyState(state){
 }
 
 
-function setup2(){
+function OLDsetup2(){
     // Creates the websocets connection{
     var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
     var name = $txt.val();
@@ -110,8 +110,8 @@ function setup2(){
             showReadyState("open");
     }
 
-
      socket.onmessage = function(msg) {
+        
         try {
           var data = JSON.parse(msg.data);
           if ('sensor_values' in data) updateSensorValues(data.sensor_values)
@@ -248,6 +248,21 @@ function arrows() {
 
 
 
+Lilybot = function(){
+    var self = this;
+        
+    this.startCamera = function(){
+        ardyh.socket.send("start-camera-1");
+    };
+
+    this.stopCamera = function(){
+        ardyh.socket.send("stop-camera-1");
+    };
+
+};  // End lilybot
+
+
+
 Ardyh = function(){
     /*
     Object to handle websocket connections and message passing and logging. 
@@ -255,11 +270,14 @@ Ardyh = function(){
     */
     var self = this;
     this.DOMAIN = "173.255.213.55:9093"
-
+    this.camera_url = "http://192.168.1.140:8080"
+    this.lilybot = new Lilybot();
+    this.host = "";
+    this.socket = null;
 
 
     this.setup = function(){
-    // Creates the websocets connection{
+        // Creates the websocets connection{
 
         this.host =  "ws://"+ this.DOMAIN +"/ws";      // combines the three string and creates a new string
         this.socket = new WebSocket(this.host);
@@ -274,9 +292,18 @@ Ardyh = function(){
             }
 
             self.socket.onmessage = function(msg) {
+                /*
+                Listens for
+
+                - sensor_values
+                - new - This should have a camera IP address un the keyword 'camera_url'. 
+                */
+
                 try {
                   var data = JSON.parse(msg.data);
                   if ('sensor_values' in data) updateSensorValues(data.sensor_values)
+                  if ('new' in data) self.newConnection(data);
+
                 } catch (e) {
                   self._log(msg.data);
                 }
@@ -313,23 +340,56 @@ Ardyh = function(){
        $("#ready-state ."+state).show();
     };
 
+    this.newConnection = function(data){
+        /*
+        data should have keywrod 'camera_url'
+        */
+        self.camera_url = data.camera_url;
+    }
+
+    this.startCamera = function(){
+        /* 
+        Powers up the camera and sends the stream to the #camera-1.
+        */
+        this.lilybot.startCamera();
+
+        // This is the camera feed in the broswer. Should be moved to a view
+        self.webcam = new Webcam($("#camera-1"), self.camera_url)
+        self.webcam.createImageLayer();
+        resize();
+    }
+
+    this.stopCamera = function(){
+        /* Shutsdown the camera. */
+        this.lilybot.stopCamera();
+    }
+
 }; // End Ardyh
 
-$(document).ready(function(){
-    ardyh = new Ardyh();
-    ardyh.setup();
 
-    resize();
-    $(window).resize(function(){
-        resize();
-    })
-});
 
+/*******************************************
 
 
 /****************************************************
 View Stuff
 *****************************************************/
+
+
+ControlsView = function($el){
+    var self = this;
+
+    if (typeof($el) === "undefined") this.$el = $(".controls");
+
+    // Add listeners
+    this.$el.find(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
+    this.$el.find(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+
+}
+
+
+
+
 function toggleAbout(){
     $el = $("#about");
     if ($el.hasClass("hide") === true){
@@ -342,6 +402,7 @@ function toggleAbout(){
 
 function resize(){
     var H = $(window).height();
+    var W = $(window).width();
     $("#controls .button").height(.12*H);
 
     var primaryH = $("#primary").height();
@@ -354,9 +415,101 @@ function resize(){
     console.log("secondary height "+secondaryH);
 
     $("#secondary").height(secondaryH);
+    
 
 
-    // Update controls button size.
+    // camera-content stuff.
+    var W = $("#camera-content").outerWidth();
+    aspect_ratio = 640/480;
+
+    $("#camera-1").width(0.7*W);
+    $("#camera-1").height(H - $(".top-bar").height() );
+    
+    $("#log-wrapper").css("top", $(".top-bar").height() + $("#sensor-values").height());
+    $("#log-wrapper, #sensor-values").width(0.7*W);
+
+    var lmt = $("#camera-1").height() - $("#left-panel .controls.top").height() - $("#left-panel .controls.bottom").height()
+    $("#left-panel .controls.bottom").css("margin-top",lmt);
+
+    var rmt = $("#camera-1").height() - $("#right-panel .controls.top").height() - $("#right-panel .controls.bottom").height()
+    $("#right-panel .controls.bottom").css("margin-top",rmt);
     
 
 }
+
+/****************************************************
+Camera Stuff
+*****************************************************/
+
+/* Copyright (C) 2007 Richard Atterer, richardÂ©atterer.net
+ This program is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License, version 2. See the file
+ COPYING for details. */
+
+
+Webcam = function($el, url){
+    var self = this;
+    this.imageNr = 0; // Serial number of current image
+    this.finished = new Array(); // References to img objects which have self.finished downloading
+    this.paused = false;
+
+    this.$el = $el;
+    this.url = url;
+
+    this.createImageLayer = function() {
+        var img = new Image();
+        img.style.position = "absolute";
+        img.style.zIndex = -1;
+        img.onload = self.imageOnload;
+        img.onclick = self.imageOnclick;
+        img.height = $("#camera-1").height();
+        img.src = self.url + "/?action=snapshot&n=" + (++self.imageNr);
+        
+        var webcam = self.$el[0];
+        webcam.insertBefore(img, webcam.firstChild);
+    }
+
+    // Two layers are always present (except at the very beginning), to avoid flicker
+    this.imageOnload = function() {
+        this.style.zIndex = self.imageNr; // Image self.finished, bring to front!
+
+        // Resize the image to fit display
+        var H = $("#camera-1").height();
+        var W = $("#camera-1").width();
+        if (W/H > 1.333333333){
+            $("#camera-1 img").height( $("#camera-1").height() );    
+        } else {
+            $("#camera-1 img").width( $("#camera-1").width() );    
+        }
+        
+        
+
+        while (1 < self.finished.length) {
+              var del = self.finished.shift(); // Delete old image(s) from document
+              del.parentNode.removeChild(del);
+        }
+        self.finished.push(this);
+            if (!self.paused) self.createImageLayer();
+    }
+
+    this.imageOnclick = function() { // Clicking on the image will pause the stream
+        self.paused = !self.paused;
+        if (!self.paused) self.createImageLayer();
+    }
+
+}
+
+
+
+$(document).ready(function(){
+    ardyh = new Ardyh();
+    ardyh.setup();
+
+    controls = new ControlsView();
+
+
+    resize();
+    $(window).resize(function(){
+        resize();
+    });
+});
