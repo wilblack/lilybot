@@ -80,74 +80,74 @@ function showReadyState(state){
 }
 
 
-function OLDsetup2(){
-    // Creates the websocets connection{
-    var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
-    var name = $txt.val();
-    var host =  "ws://"+name+":9093/ws";      // combines the three string and creates a new string
-    window.socket = new WebSocket(host);
+// function OLDsetup2(){
+//     // Creates the websocets connection{
+//     var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
+//     var name = $txt.val();
+//     var host =  "ws://"+name+":9093/ws";      // combines the three string and creates a new string
+//     window.socket = new WebSocket(host);
     
-    var $btnSend = $("#sendtext");
-    $btnSend.on('click',function(){
-      var text = $txt.val();
-        if(text == ""){
-         return;
-        }
-        $txt.val("");
-      }); 
-      $txt.keypress(function(evt){
-          if(evt.which == 13) $btnSend.click();
-      });
+//     var $btnSend = $("#sendtext");
+//     $btnSend.on('click',function(){
+//       var text = $txt.val();
+//         if(text == ""){
+//          return;
+//         }
+//         $txt.val("");
+//       }); 
+//       $txt.keypress(function(evt){
+//           if(evt.which == 13) $btnSend.click();
+//       });
 
-    // event handlers for websocket
-    if(socket){
-        var count =1;
-        socket.onopen = function(){
-            count = 0;
-            console.log("connection opened....");
-            arrows();     // function for detecting keyboard presses
-            buttons();    // function for detecting the button press on webpage
-            showReadyState("open");
-    }
+//     // event handlers for websocket
+//     if(socket){
+//         var count =1;
+//         socket.onopen = function(){
+//             count = 0;
+//             console.log("connection opened....");
+//             arrows();     // function for detecting keyboard presses
+//             buttons();    // function for detecting the button press on webpage
+//             showReadyState("open");
+//     }
 
-     socket.onmessage = function(msg) {
+//      socket.onmessage = function(msg) {
         
-        try {
-          var data = JSON.parse(msg.data);
-          if ('sensor_values' in data) updateSensorValues(data.sensor_values)
-        } catch (e) {
-          showServerResponse(msg.data);
-        }
-     }
+//         try {
+//           var data = JSON.parse(msg.data);
+//           if ('sensor_values' in data) updateSensorValues(data.sensor_values)
+//         } catch (e) {
+//           showServerResponse(msg.data);
+//         }
+//      }
 
-     socket.onclose = function(){
-        //alert("connection closed....");
-        showServerResponse("The connection has been closed.");
-        showReadyState("closed");
-     }
+//      socket.onclose = function(){
+//         //alert("connection closed....");
+//         showServerResponse("The connection has been closed.");
+//         showReadyState("closed");
+//      }
 
-     socket.onerror = function(){
-        //alert("connection closed....");
-        showServerResponse("The was an error.");
-        showReadyState("error");
-     }
+//      socket.onerror = function(){
+//         //alert("connection closed....");
+//         showServerResponse("The was an error.");
+//         showReadyState("error");
+//      }
 
-    }
+//     }
     
-    else
-    {
-      console.log("invalid socket");
-    }
+//     else
+//     {
+//       console.log("invalid socket");
+//     }
 
-    function showServerResponse(txt){
-        $log = $("#log");
-        $newRow = $("<div>");
-        $newRow.text(txt);
-        $log.append($newRow);
-        $log.scrollTop($log[0].scrollHeight);
-    }   
+//     function showServerResponse(txt){
+//         $log = $("#log");
+//         $newRow = $("<div>");
+//         $newRow.text(txt);
+//         $log.append($newRow);
+//         $log.scrollTop($log[0].scrollHeight);
+//     }   
         
-}   
+// }   
 
 function updateSensorValues(sensor_values){
     /*

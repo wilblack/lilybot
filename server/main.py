@@ -126,8 +126,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       else:
         message = "[%s] ardyh: %s" %(now, message)
       
-
-      print "Sending... ", message
       self.write_message(message)
 
 
