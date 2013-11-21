@@ -353,6 +353,8 @@ Ardyh = function(){
         */
         this.lilybot.startCamera();
 
+        $("#camera-1").html("");
+
         // This is the camera feed in the broswer. Should be moved to a view
         self.webcam = new Webcam($("#camera-1"), self.camera_url)
         self.webcam.createImageLayer();
