@@ -80,7 +80,7 @@ function showReadyState(state){
 }
 
 
-function setup2(){
+function OLDsetup2(){
     // Creates the websocets connection{
     var $txt = $("#hostname");      // assigns the hostname(hostname/ip address) entered in the text box
     var name = $txt.val();
@@ -248,6 +248,21 @@ function arrows() {
 
 
 
+Lilybot = function(){
+    var self = this;
+        
+    this.startCamera = function(){
+        ardyh.socket.send("start-camera-1");
+    };
+
+    this.stopCamera = function(){
+        ardyh.socket.send("stop-camera-1");
+    };
+
+};  // End lilybot
+
+
+
 Ardyh = function(){
     /*
     Object to handle websocket connections and message passing and logging. 
@@ -256,6 +271,9 @@ Ardyh = function(){
     var self = this;
     this.DOMAIN = "173.255.213.55:9093"
     this.camera_url = "http://192.168.1.140:8080"
+    this.lilybot = new Lilybot();
+    this.host = "";
+    this.socket = null;
 
 
     this.setup = function(){
@@ -330,28 +348,48 @@ Ardyh = function(){
     }
 
     this.startCamera = function(){
+        /* 
+        Powers up the camera and sends the stream to the #camera-1.
+        */
+        this.lilybot.startCamera();
+
+        // This is the camera feed in the broswer. Should be moved to a view
         self.webcam = new Webcam($("#camera-1"), self.camera_url)
         self.webcam.createImageLayer();
         resize();
     }
 
+    this.stopCamera = function(){
+        /* Shutsdown the camera. */
+        this.lilybot.stopCamera();
+    }
+
 }; // End Ardyh
 
-$(document).ready(function(){
-    ardyh = new Ardyh();
-    ardyh.setup();
 
-    resize();
-    $(window).resize(function(){
-        resize();
-    })
-});
 
+/*******************************************
 
 
 /****************************************************
 View Stuff
 *****************************************************/
+
+
+ControlsView = function($el){
+    var self = this;
+
+    if (typeof($el) === "undefined") this.$el = $(".controls");
+
+    // Add listeners
+    this.$el.find(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
+    this.$el.find(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+
+}
+
+
+
+
 function toggleAbout(){
     $el = $("#about");
     if ($el.hasClass("hide") === true){
@@ -463,3 +501,15 @@ Webcam = function($el, url){
 
 
 
+$(document).ready(function(){
+    ardyh = new Ardyh();
+    ardyh.setup();
+
+    controls = new ControlsView();
+
+
+    resize();
+    $(window).resize(function(){
+        resize();
+    });
+});

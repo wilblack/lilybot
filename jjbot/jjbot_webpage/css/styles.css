@@ -96,6 +96,7 @@ Camera Layout Styling
 
 #camera-1 {
     /* max-width: none; */
+    background:black;
 }
 #camera-1 img {
     height:300px;
