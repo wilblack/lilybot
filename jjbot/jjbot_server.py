@@ -18,7 +18,7 @@
 # Wil Black, wilblack21@gmail.com 
 # Oct. 26, 2013
 #
-import json
+import os, json
 from uuid import getnode as get_mac
 import subprocess
 from datetime import datetime as dt
@@ -86,19 +86,19 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
   def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
-    global c
-    print 'received:', message        # prints the recived from the webpage 
-    c = 0
-    if message == "u":                # checks for the received data and assigns different values to c whicch controls the movement of robot.
-      c = "8";
-    if message == "d":
-      c = "2"
-    if message == "l":
-      c = "6"
-    if message == "r":
-      c = "4"
-    if message == "b":
-      c = "5"
+    # global c
+    # print 'received:', message        # prints the recived from the webpage 
+    # c = 0
+    # if message == "u":                # checks for the received data and assigns different values to c whicch controls the movement of robot.
+    #   c = "8";
+    # if message == "d":
+    #   c = "2"
+    # if message == "l":
+    #   c = "6"
+    # if message == "r":
+    #   c = "4"
+    # if message == "b":
+    #   c = "5"
 
     # Wil's added capabilites
     if message == "nl":
@@ -123,32 +123,30 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     if message == "y":  # Shutdown
       restart()
 
-    print c
-    if c == '8' :
+    if message == 'u' :
       self.log("Running Forward")
       BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
       BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-    elif c == '2' :
+    elif message == 'd' :
       self.log("Running Reverse")
       
       BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
       BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
-    elif c == '4' :
+    elif message == 'r' :
       self.log("Turning Right")
 
       BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
       BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
-    elif c == '6' :
+    elif message == 'l' :
       self.log("Turning Left")
       BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
       BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-    elif c == '5' :
+    elif message == 'b' :
       self.log("Old Stopped")
       BrickPi.MotorSpeed[PORT_A] = 0
-
       BrickPi.MotorSpeed[PORT_D] = 0
+    
     BrickPiUpdateValues()                # BrickPi updates the values for the motors
-    print "Values Updated"
   
 
   def on_close(self):
@@ -202,8 +200,6 @@ class Ardyh(TornadoWebSocketClient):
 
     def received_message(self, message):
         
-        print "Ardyh Received message...%s" %message
-
         message = unicode(message)
 
         if message == 'u' :
@@ -265,6 +261,17 @@ class Ardyh(TornadoWebSocketClient):
             # time.sleep(self.LOOK_DT)
             BrickPi.MotorSpeed[PORT_C] = 0
 
+        elif message == "start-camera-1":  # Shutdown
+            self.log("Starting camera")
+            try:
+                self.bot.startCamera()
+            except Exception, e: 
+                print e
+
+        elif message == "stop-camera-1":  # Stop camera
+            self.log("Stopping Camera")
+            self.bot.stopCamera()
+
 
         elif message == "x":  # Shutdown
             self.log("Shutting down")
@@ -273,7 +280,7 @@ class Ardyh(TornadoWebSocketClient):
             restart()
         
         BrickPiUpdateValues()                # BrickPi updates the values for the motors
-        print "Values Updated"
+
 
 
     def closed(self, code, reason=None):
@@ -304,7 +311,7 @@ class Ardyh(TornadoWebSocketClient):
 class JJBot():
 
     def __init__(self):
-        pass
+        self.source_path = "/tmp/stream/"
 
 
     def on_message(self, message):
@@ -318,6 +325,31 @@ class JJBot():
             ['PORT_4', BrickPi.Sensor[PORT_4]],
           ]
         return out
+
+    def startCamera(self):
+        """
+
+        mkdir /tmp/stream
+        raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
+        LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
+
+        """
+        print "In JJBot.startCamera()"
+        if not os.path.exists(self.source_path):
+            os.mkdir(self.source_path)
+
+        print "Calling raspistill command"
+        command = "raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0"
+        process1 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        
+        print "Calling mjpg_streamer command"
+        command = 'LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"'
+        process2 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+
+
+
+    def stopCamera(self):
+        pass
 
 
 
