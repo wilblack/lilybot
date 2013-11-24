@@ -341,10 +341,12 @@ class JJBot():
         print "Calling raspistill command"
         command = "raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0"
         process1 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        print process1
         
-        print "Calling mjpg_streamer command"
-        command = 'LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"'
-        process2 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+
+        # print "Calling mjpg_streamer command"
+        # command = 'LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"'
+        # process2 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 
 
 
