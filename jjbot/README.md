@@ -21,11 +21,14 @@ python RPi_Server_Code.py
 
 ### Start on Boot
 
-Copy `lilybotd` to the `etc/init.d` and update the rc.d file.
+Copy `lilybotd` and `lilybot_camerad` to the `etc/init.d` and update the rc.d file.
 
 ```
 sudo cp lilybotd /etc/init.d/.
+sudo cp lilybotd_camera /etc/init.d/.
+
 sudo update-rc.d lilybotd defaults
+sudo update-rc.d lilybot_camerad defaults
 ```
 
 
@@ -44,7 +47,6 @@ sudo fuser 9093/tcp
 ### Power
 
 I bought a 6-AA 9V pack. I connected the wires and reversed the colors (red to black). This turnd on the red power light on the Pi but it did not boot. I ordered the same thing from Dexter and it worked, I guess I wasn't supposed to reverse the wires. I think I can hook these up in parallel and receive more juice. Look here http://batteryuniversity.com/learn/article/serial_and_parallel_battery_configurations
-
 
 
 
