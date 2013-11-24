@@ -16,11 +16,16 @@ Here is a list of materials I have used and how much they costs.
 * EV3 - $350
 * Raspberry Pi - $40
 * BrickPi - $45
+* Raspberry Pi Camera Module - $30
+* Camera Module mount kit - $5
 * NXT Touch Sensors - $40
 * NXT Ultra Sonic Sensor - $25
 * SD Card - $12
 * 6 AA with 9V out power suply - $3
 * 9v Volt adaptors - $3
+* 12 rechargable AA  NiMH batteries - $15
+* Rayovac PS3 battery charger - $20
+
 
 
 1. Set-Up the Raspberry Pi with BrickPi
@@ -64,6 +69,9 @@ Now install some librabries and helpful stuff. The first two are optional but I 
 sudo apt-get install screen
 sudo apt-get install ipython
 sudo apt-get install python-pip
+sudo apt-get install bluez
+sudo apt-get install python-bluetooth
+
 
 ```
 
@@ -83,13 +91,69 @@ Install some Python pip packages
 ```
 sudo pip install tornado
 sudo pip install ws4py
+sudo pup install pyreadlines
 ```
 
 
-2. Run jjbot
+2. Install Camera and Camera Software
+=====================================
+
+Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
+
+
+
+Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi 
+to install the software on the RPi. They are summarized below
+
+**NOTE** First make sure the camera is enabled. Run `sudo raspi-config` and enable the camera.
+
+```
+cd ~/
+sudo apt-get install libjpeg8-dev imagemagick libv4l-dev
+sudo ln -s /usr/include/linux/videodev2.h /usr/include/linux/videodev.h
+
+```
+Then make a temp directory to download the MJPEG-Streamer zip file
+
+```
+mkdir ~/temp
+cd ~/temp
+wget http://sourceforge.net/code-snapshots/svn/m/mj/mjpg-streamer/code/mjpg-streamer-code-182.zip
+unzip mjpg-streamer-code-182.zip
+cd mjpg-streamer-code-182/mjpg-streamer
+make mjpg_streamer input_file.so output_http.so
+
+sudo cp mjpg_streamer /usr/local/bin
+sudo cp output_http.so input_file.so /usr/local/lib/
+# sudo cp -R www /usr/local/www # This is what the tutorial says, i didn't do it becuase /usr/local/www does not exist.
+cp -R www ~/Projects/lilybot/jjbot/  # This is what I did but I don't think its right.
+
+```
+
+Now we should be able to  start the camera. The code below will start 
+the camera and a webserver on port 8080 that will stream the video. 
+To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:8080`
+
+```
+mkdir /tmp/stream
+raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
+
+LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
+
+```
+
+To stop streaming use
+
+```
+
+```
+
+
+
+3. Run jjbot
 ============
 
-`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`. T
+`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`.
 
 
 
