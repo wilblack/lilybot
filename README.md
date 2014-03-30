@@ -84,6 +84,7 @@ sudo apt-get upgrade
 Now install some librabries and helpful stuff. The first two are optional but I like to have them.
 
 ```
+sudo apt-get install git-core
 sudo apt-get install screen
 sudo apt-get install ipython
 sudo apt-get install python-pip
