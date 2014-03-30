@@ -31,9 +31,7 @@ Here is a list of materials I have used and how much they costs.
 1. Set-Up the Raspberry Pi with BrickPi
 =======================================
 
-I followed the instructions here http://www.dexterindustries.com/BrickPi/getting-started/pi-prep/ 
-and downloaded the "wheezy" image and installed Win32DiskImager from http://sourceforge.net/projects/win32diskimager/. 
-A zip file of the wheezy image is included in the` lib` folder and is named `2013.07.27_BrickPi_weezy_flavor`.
+I followed the instructions here http://www.raspberrypi.org/quick-start-guide. The guide has you install NOOBS. NOOBS is a start program that let's you install different OS on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted.  You will need an 8GB or bigger SD card to install Raspbian. 
 
 
 Config Wi-Fi
@@ -44,6 +42,26 @@ Plug in an enternet cable and turn the raspberry on. ssh should be enabled by de
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
+
+```
+// Back up the file first
+sudo vi /etc/network/interfaces
+```
+
+Change the file to read, where you enter your own ssid and password. 
+
+```
+allow-hotplug wlan0
+auto wlan0
+ 
+ 
+iface wlan0 inet dhcp
+        wpa-ssid "ssid"
+        wpa-psk "password"
+
+```
+
+
 
 After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
 You should now be able to ssh in over Wi-Fi.
