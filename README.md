@@ -48,7 +48,8 @@ info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/set
 sudo vi /etc/network/interfaces
 ```
 
-Change the file to read, where you enter your own ssid and password. 
+Change the file to read, where you enter your own ssid and password. A tempalate for this file is available in the project root named `interfaces.lilybot`. Just add your SSID and PASSWORD and copy it to `/etc/interfaces/` or manually edit it to look like:
+
 
 ```
 allow-hotplug wlan0
@@ -65,6 +66,32 @@ iface wlan0 inet dhcp
 
 After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
 You should now be able to ssh in over Wi-Fi.
+
+
+Troubleshooting
+---------------
+You may get the follwoing error when connecting to the Raspberry Pi over WiFi if you have already connected over ethernet. 
+
+```
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the RSA key sent by the remote host is
+86:f8:37:41:9e:37:12:4f:f6:4b:65:be:9e:d6:27:b4.
+Please contact your system administrator.
+Add correct host key in /Users/wilblack/.ssh/known_hosts to get rid of this message.
+Offending RSA key in /Users/wilblack/.ssh/known_hosts:4
+RSA host key for 192.168.1.113 has changed and you have requested strict checking.
+Host key verification failed.
+
+```
+
+To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/.ssh/known_hosts` and remove the line whihc points at you Raspberry Pi's IP address.
+
+
 
 
 Install and Update Software
