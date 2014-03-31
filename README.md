@@ -68,8 +68,9 @@ After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP ad
 You should now be able to ssh in over Wi-Fi.
 
 
-Troubleshooting
----------------
+**Troubleshooting**
+
+
 You may get the follwoing error when connecting to the Raspberry Pi over WiFi if you have already connected over ethernet. 
 
 ```
