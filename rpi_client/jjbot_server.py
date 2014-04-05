@@ -390,6 +390,6 @@ if __name__ == "__main__":
     ardyh = Ardyh(ARDYH_URI, protocols=['http-only', 'chat'])
     ardyh.connect()
 
-       #starts the websockets connection
+    #starts the websockets connection
     tornado.ioloop.IOLoop.instance().start()
 
