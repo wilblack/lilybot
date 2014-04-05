@@ -5,13 +5,12 @@
 # Start bluetooth discovery
 # hciconfig hci0 piscan
 
-export PYTHONPATH=$PYTHONPATH:/home/pi/Projects/BrickPi_Python:/home/pi/Projects/lilybot/utils
-cd  /home/pi/Projects/lilybot/jjbot
+cd  /home/pi/projects/lilybot/rpi_client
 #sudo chmod 755 RPi_Server_Code.py
 
 NOW=$(date +"%Y-%m-%dT%T %Z")
-echo "[$NOW] Starting JJ Bot server"
+echo "[$NOW] Starting and arddyh client"
 
-python jjbot_server.py
+python ardyh_client.py
 
 
