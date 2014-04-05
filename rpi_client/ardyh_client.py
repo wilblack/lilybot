@@ -154,7 +154,7 @@ class Ardyh(TornadoWebSocketClient):
         return "%012X"%mac
 
 
-if __name___ == "":
+if __name__ == "__main__":
 
     # Start streaming data to ardyh.
     ardyh = Ardyh(ARDYH_URI, protocols=['http-only', 'chat'])
