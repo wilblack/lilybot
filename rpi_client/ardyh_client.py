@@ -24,8 +24,13 @@ class ArdyhClient(TornadoWebSocketClient):
         
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
-        self.CTENOPHORE = True
-
+        
+        try:
+            print "Loading RPi-LPD8806"
+            from bootstrap import *
+            self.CTENOPHORE = True
+        except:
+            print "[WARNING] RPi-LPD8806 bootstrap module not found"
         try:
             print "Trying to load JJBot"
             self.bot = JJBot()
@@ -97,9 +102,19 @@ class ArdyhClient(TornadoWebSocketClient):
         if VERBOSE: print "this is a ctenophore message"
         
         if message == 'u' :
-            pass
+            anim = Wave(led, Color(255, 0, 0), 4)
+            for i in range(led.lastIndex):
+                anim.step()
+                led.update()
+            led.fillOff()
+
         elif message == 'd' :
-            pass
+            anim = Rainbow(led)
+            for i in range(384):
+                anim.step()
+                led.update()
+            led.fillOff()
+            
         elif message == 'r' :
             pass
 
