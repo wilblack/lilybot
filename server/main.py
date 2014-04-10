@@ -60,13 +60,12 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
         """
-        Messages should come with a unique ID. 
+        Messages should come as a JSON Object string.
 
-        lilybots should use MAC Address
+        name -  a name or MAC address to identify the bot. This does not need to be unique
+        type : ['bot', 'user']
 
-        {"id":"AA:BB:CC:FF:EE"
-        "message":MESSAGE TEXT
-        }
+
         """
 
         message_json = None
@@ -126,8 +125,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       else:
         message = "[%s] ardyh: %s" %(now, message)
       
-      if not message.__class__ == {}.__class__:
-        message = {"message":message}
+      # Update with ardyh timestamp. 
+      if message.__class__ == {}.__class__:
+        message.update({"ardyh_timestamp":"%s" %(now)})
+      else:
+        message = {"message":message, "ardyh_timestamp": "%s" %(now) }
       
       message = json.dumps(message)
       self.write_message(message)
