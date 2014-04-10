@@ -84,7 +84,7 @@ p {
 Camera Layout Styling
 ************************************************************************************/
 
-#camera-content {
+#camera.content {
     max-width:914px;
     margin:auto;
 }
@@ -106,7 +106,7 @@ Camera Layout Styling
     float:left;
 }
 
-#camera-content .controls button {
+#camera.content .controls button {
     margin-bottom:0;
 }
 
@@ -121,13 +121,13 @@ Camera Layout Styling
 
 
 
-#camera-content .transparent {
+#camera.content .transparent {
    
     background-color: rgba(0,0,0,0.3);
 }
 
 
-#camera-content #log-wrapper {
+#camera.content #log-wrapper {
     height:60px;
     z-index: 100000;
     position:fixed;

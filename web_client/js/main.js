@@ -357,7 +357,7 @@ function resize(){
 
 
     // camera-content stuff.
-    var W = $("#camera-content").outerWidth();
+    var W = $("#content").outerWidth();
     aspect_ratio = 640/480;
 
     $("#camera-1").width(0.7*W);
