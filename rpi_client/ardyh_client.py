@@ -4,13 +4,21 @@ This module starts the ardyh client on a Raspberry Pi.
 Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 """
 
-import json
+import json, urllib
 from datetime import datetime as dt
 from uuid import getnode as get_mac
 from ws4py.client.tornadoclient import TornadoWebSocketClient
 from tornado import ioloop
 
 import tornado.ioloop
+
+try:
+    print "Loading RPi-LPD8806"
+    from bootstrap import *
+    CTENOPHORE = True
+except:
+    print "[WARNING] RPi-LPD8806 bootstrap module not found"
+
 
 VERBOSE = True
 
@@ -24,13 +32,8 @@ class ArdyhClient(TornadoWebSocketClient):
         
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
+        self.CTENOPHORE = CTENOPHORE
         
-        try:
-            print "Loading RPi-LPD8806"
-            from bootstrap import *
-            self.CTENOPHORE = True
-        except:
-            print "[WARNING] RPi-LPD8806 bootstrap module not found"
         try:
             print "Trying to load JJBot"
             self.bot = JJBot()
@@ -65,7 +68,12 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def received_message(self, message):
         
+        message = urllib.unquote(message)
+        import pdb; pdb.set_trace()
         message = unicode(message)
+        import pdb; pdb.set_trace()
+        message = json.loads(message)
+        import pdb; pdb.set_trace()
         if VERBOSE: print "Received message: %s" %(message)
 
         if self.JJBOT:
@@ -107,23 +115,28 @@ class ArdyhClient(TornadoWebSocketClient):
                 anim.step()
                 led.update()
             led.fillOff()
+            led.update()
+            self.log("Wave done")
 
-        elif message == 'd' :
+        elif message == 'b' :
             anim = Rainbow(led)
             for i in range(384):
                 anim.step()
                 led.update()
             led.fillOff()
-            
+            led.update()
+            self.log("Rainbow done")
+
         elif message == 'r' :
             pass
 
         elif message == "start-camera-1":  # Shutdown
             self.log("Starting lights")
-            
+
         elif message == "stop-camera-1":  # Stop camera
             self.log("Stopping Lights")
-            
+            led.fillOff()
+            led.update()
 
 
     def receive_message_jjbot(self, message):
