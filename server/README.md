@@ -15,10 +15,22 @@ Dependencies
 
 tornado - `pip install tornado` 
 
+
+The server listens on port 9093 by default
+
 Start the Server
 ================
 
 1. Got to `lilybot/server`
 2. Run `python main.js`
 
-The server will listen on port 9093
+
+Stop Server
+===========
+
+1. Get the process PID `sudo fuser 9093/tcp`
+2. Kill the process `sudo kill PID`
+
+
+
+

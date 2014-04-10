@@ -129,7 +129,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       if not message.__class__ == {}.__class__:
         message = {"message":message}
       
-      message = json.dump(message)
+      message = json.dumps(message)
       self.write_message(message)
 
 
