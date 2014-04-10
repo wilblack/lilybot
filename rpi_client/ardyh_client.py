@@ -32,6 +32,17 @@ VERBOSE = True
 class ArdyhClient(TornadoWebSocketClient):
     """
     Web Socket client to connect to ardyh on start up.
+    
+    Data is passed back and forth using a message object. 
+    the message object is a JSON Object with the following keywords
+
+    - message
+    -- name
+    -- from
+    -- message
+    -- command
+    -- ardyh_timestamp - May not be present
+
     """
 
     def __init__(self, protocols, name=None, uri='ws://173.255.213.55:9093/ws'):
@@ -86,11 +97,10 @@ class ArdyhClient(TornadoWebSocketClient):
         except:
             print sys.exc_info()[0]
 
-        import pdb; pdb.set_trace()
         if self.JJBOT:
             self.receive_message_jjbot(message)
 
-        elif self.name == message.data["name"]:
+        elif self.CTENOPHORE:
             self.receive_message_ctenophore(message)
 
     def send(self, message):
@@ -127,7 +137,8 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def receive_message_ctenophore(self, message):
         if VERBOSE: print "this is a ctenophore message"
-        import pdb; pdb.set_trace()
+        if not "command" in message.keys(): return
+
         if message == 'u' :
             anim = Wave(led, Color(255, 0, 0), 4)
             for i in range(led.lastIndex):
