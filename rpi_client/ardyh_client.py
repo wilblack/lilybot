@@ -4,7 +4,7 @@ This module starts the ardyh client on a Raspberry Pi.
 Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 """
 
-import json, urllib
+import json, urllib, sys
 from datetime import datetime as dt
 from uuid import getnode as get_mac
 from ws4py.client.tornadoclient import TornadoWebSocketClient
@@ -16,8 +16,15 @@ try:
     print "Loading RPi-LPD8806"
     from bootstrap import *
     CTENOPHORE = True
+except SystemExit:
+    print "[WARNING] RPi-LPD8806 bootstrap module not but no LEDS connected. Starting client anyways"
+    print sys.exc_info()[0]
+    CTENOPHORE = True
+
 except:
     print "[WARNING] RPi-LPD8806 bootstrap module not found"
+    print sys.exc_info()[0]
+    CTENOPHORE = True
 
 
 VERBOSE = True
@@ -27,13 +34,16 @@ class ArdyhClient(TornadoWebSocketClient):
     Web Socket client to connect to ardyh on start up.
     """
 
-    def __init__(self, protocols, uri='ws://173.255.213.55:9093/ws'):
+    def __init__(self, protocols, name=None, uri='ws://173.255.213.55:9093/ws'):
         rs = super(ArdyhClient, self).__init__(uri, protocols)
         
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
         self.CTENOPHORE = CTENOPHORE
         
+        # set the name to MAC address if not found.
+        self.name = name or self.get_mac_address()
+
         try:
             print "Trying to load JJBot"
             self.bot = JJBot()
@@ -48,23 +58,25 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def opened(self):
         print "Connection to ardh is open"
-        mac = self.get_mac_address()
+        message = {'name':self.name, 'type':'bot'}
 
-        # Tells ardyh that is a new connection
-        out = {"new":"", "camera_port":8080}
-        self.send(json.dumps(out))
+        self.send(message)
 
-        msg = "%s: Hello. I 'm a lilybot" %(mac)
-        self.send(msg)
+        if self.JJBOT:
+            try:
+                "Trying to start sensors"
+                sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
+                sensors.start()
+            except:
+                "[WARNING] Sensors not started"
 
-        try:
-            "Trying to start sensors"
-            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
-            sensors.start()
-        except:
-            "[WARNING] Sensors not started"
-
+            # Tells ardyh that is a new connection
+            out = {"new":"", "camera_port":8080}
+            self.send(out)
         
+
+
+
 
     def received_message(self, message):
         
@@ -82,6 +94,14 @@ class ArdyhClient(TornadoWebSocketClient):
         elif self.CTENOPHORE:
             self.receive_message_ctenophore(message)
 
+    def send(self, message):
+        message = json.dumps(message)
+        if VERBOSE: print "About to send message:\n\n%s" %(message) 
+        try:
+            super(ArdyhClient, self).send(message)
+        except:
+            print "[ERROR] MEssage not send() failed."
+            print sys.exc_info()[0]
 
     def closed(self, code, reason=None):
         print "Closed down", code, reason
@@ -108,7 +128,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def receive_message_ctenophore(self, message):
         if VERBOSE: print "this is a ctenophore message"
-        
+        import pdb; pdb.set_trace()
         if message == 'u' :
             anim = Wave(led, Color(255, 0, 0), 4)
             for i in range(led.lastIndex):
@@ -222,7 +242,7 @@ class ArdyhClient(TornadoWebSocketClient):
 if __name__ == "__main__":
 
     # Start streaming data to ardyh.
-    ardyh = ArdyhClient(protocols=['http-only', 'chat'])
+    ardyh = ArdyhClient(name="ctenopore", protocols=['http-only', 'chat'])
     ardyh.connect()
 
     #starts the websockets connection

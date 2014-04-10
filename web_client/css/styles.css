@@ -1,3 +1,7 @@
+.full-height {
+    height:100%;
+}
+
 p {
     line-height:1.1;
     font-size:.9;
@@ -24,6 +28,10 @@ p {
 #log-wrapper {
     background-color: #000000;
     height:67%;
+
+    .full-height{
+        height: 100%;
+    }
 }
 
 #log {

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if IE 8]>               <html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 
 <head>
-	<meta charset="utf-8">
+    <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>Lilybot - Control Panel</title>  
+  <title>Ardyh - System Monitor</title>  
   
   <link rel="stylesheet" href="css/foundation.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -20,7 +20,7 @@
     <ul class="title-area">
     <!-- Title Area -->
         <li class="name">
-          <h1><a href="#">Welcome to ardyh.io</a></h1>
+          <h1><a href="#">Ardyh - System Monitor</a></h1>
         </li>
         <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
         
@@ -39,36 +39,40 @@
 
 </nav>
 <div id="content">
+    <div id="left-panel">
+        LEFT PANEL
+    </div> <!-- left-panel -->
 
-  <div id="primary">
-    <div class="row">
-    <h2>ardyh bots</h2>
-    <p>
-    <strong>ardyh bots</strong> or just bots, are smart, interactive devices that live in 
-    the real-world and connect to ardyh.io. So far bots have been Raspberry Pi's 
-    connected to various sensors, motors, and lights that automoaticly connect to aryh 
-    using wi-fi. But bots could be made from other electronics like an Arduino for instance. 
-    
-    A bots is really a package deal. The pacakge consists of hardware and software. bots need
-    bot client code (code that runs on the Raspberry Pi) and a web or mobile client (primarly used for control
-    and configuration).
-    </p>
+
+  <div id="center-panel">
+      <div id="sensor-values" class="transparent">
+        <div class="small-6 columns">
+        <div><small>PORT_1: <span class="PORT_1"></span></small></div>
+        <div><small>PORT_2: <span class="PORT_2"></span></small></div>
+        </div>
+        <div class="small-6 columns">
+        <div><small>PORT_3: <span class="PORT_3"></span></small></div>
+        <div><small>PORT_4: <span class="PORT_4"></span></small></div>
+        </div>
     </div>
-    <div class="row">
-    <a class="button" href="camera.html" target="blank">Lilybot Contoller</a>
-    <a class="button" href="monitor.html" target="blank">System Monitor</a>
+
+    <div id="log-wrapper" class="full-height">
+        <div id="log" class="padded transparent"></div> <!-- End .secondary -->
     </div>
-  </div> <!-- end primary -->
-  
-  <div id="secondary">
   </div>
+
+
+  
+    <div id="right-panel">
+      RIGHT PANEL    
+     </div>
+
 
 </div><!-- end content -->
 
   <script src='js/vendor/jquery.js'></script>  
   <script src="js/main.js"></script>
   <script src="js/foundation.min.js"></script>
-
 
 
 
@@ -113,7 +117,9 @@
     $(document).foundation();
 
     $(document).ready(function(){
+        
         resize();
+
     });
   </script>
 </body>
