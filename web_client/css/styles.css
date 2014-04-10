@@ -1,6 +1,3 @@
-.full-height {
-    height:100%;
-}
 
 p {
     line-height:1.1;
@@ -26,12 +23,11 @@ p {
 
 
 #log-wrapper {
+    z-index: 100000;
+    position:fixed;
     background-color: #000000;
-    height:67%;
-
-    .full-height{
-        height: 100%;
-    }
+    height: 100%;
+    
 }
 
 #log {
@@ -42,6 +38,14 @@ p {
     height:100%;
     width:99%;
 }
+
+#sensor-values {
+    height:38px;
+    position:fixed;
+    z-index: 100000;
+}
+
+
 #ready-state .label{
     display: inline-block;
 }
@@ -71,6 +75,10 @@ p {
 #controls li .button {
     margin:0;
 }
+
+
+
+
 
 /************************************************************************************
 Camera Layout Styling
@@ -112,11 +120,6 @@ Camera Layout Styling
 }
 
 
-#camera-content #sensor-values {
-     height:38px;
-     position:fixed;
-     z-index: 100000;
-}
 
 #camera-content .transparent {
    

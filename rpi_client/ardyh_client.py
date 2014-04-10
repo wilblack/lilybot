@@ -79,15 +79,15 @@ class ArdyhClient(TornadoWebSocketClient):
 
 
     def received_message(self, message):
-        
-        message = urllib.unquote(message)
-        import pdb; pdb.set_trace()
-        message = unicode(message)
-        import pdb; pdb.set_trace()
-        message = json.loads(message)
-        import pdb; pdb.set_trace()
         if VERBOSE: print "Received message: %s" %(message)
+        import pdb; pdb.set_trace()
 
+        try:
+            message = json.loads(message)
+        except:
+            print sys.exc_info()[0]
+        
+        import pdb; pdb.set_trace()
         if self.JJBOT:
             self.receive_message_jjbot(message)
 
