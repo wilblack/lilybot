@@ -13,7 +13,7 @@ go to 173.255.213.55:9093 and you can see if your device connected.
 Dependencies
 ============
 
-tornado - `pip install tornado` 
+Autobahn and twisted `sudo pip install autobahn[twisted]`
 
 
 The server listens on port 9093 by default
