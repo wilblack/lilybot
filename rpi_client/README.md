@@ -1,9 +1,15 @@
 ## Install tornado web server
 See http://www.remwebdevelopment.com/blog/python/simple-websocket-server-in-python-144.html for more info.
 
+
 ```
 sudo pip install tornado
 ```
+
+## Grad the RPi-LPD8806 Repo by Adam Haile.
+
+`git clone https://github.com/adammhaile/RPi-LPD8806`
+
 
 ## Start the Server
 
