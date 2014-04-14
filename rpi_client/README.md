@@ -6,6 +6,8 @@ We will be using Autbahn Python for our WebSocket client https://github.com/tave
 
 
 ```
+sudo apt-get update
+sudo apt-get sudo apt-get install python-dev
 pip install autobahn[twisted]
 ```
 
