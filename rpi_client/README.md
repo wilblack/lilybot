@@ -6,7 +6,7 @@ See http://www.remwebdevelopment.com/blog/python/simple-websocket-server-in-pyth
 sudo pip install tornado
 ```
 
-## Grad the RPi-LPD8806 Repo by Adam Haile.
+## Grab the RPi-LPD8806 Repo by Adam Haile.
 
 `git clone https://github.com/adammhaile/RPi-LPD8806`
 
