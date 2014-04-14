@@ -30,6 +30,7 @@ First I got an error saying that zope.interface was not found so I did a `sudo p
 
 ```
 
+It turned out that zope.interface could not be installed properly becuase I had not installed python-dev tools. So if you get this be sure and do a apt-get update and  then install pythone-dev tools.
 
 
 ## Grab the RPi-LPD8806 Repo by Adam Haile.
