@@ -14,10 +14,10 @@ import tornado.ioloop
 
 try:
     print "Loading RPi-LPD8806"
-    from bootstrap import *
+    from raspledstrip.ledstrip import *
     CTENOPHORE = True
 except SystemExit:
-    print "[WARNING] RPi-LPD8806 bootstrap module not but no LEDS connected. Starting client anyways"
+    print "[WARNING] RPi-LPD8806 bootstrap module found but no LEDS connected. Starting client anyways"
     print sys.exc_info()[0]
     CTENOPHORE = True
 
@@ -51,7 +51,8 @@ class ArdyhClient(TornadoWebSocketClient):
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
         self.CTENOPHORE = CTENOPHORE
-        
+        if self.CTENOPHORE:
+            self.led = LEDStrip(64)
         # set the name to MAC address if not found.
         self.name = name or self.get_mac_address()
 
@@ -135,38 +136,58 @@ class ArdyhClient(TornadoWebSocketClient):
         mac = get_mac()
         return "%012X"%mac
 
+    def hex2rgb(self, hex):
+        return [ord(c) for c in hex[1:].decode("hex")]
+
     def receive_message_ctenophore(self, message):
         if VERBOSE: print "this is a ctenophore message"
-        if not "command" in message.keys(): return
+        if not "command" in message.keys(): 
+            print "command not found in message"
+            return
 
-        if message == 'u' :
-            anim = Wave(led, Color(255, 0, 0), 4)
-            for i in range(led.lastIndex):
-                anim.step()
-                led.update()
-            led.fillOff()
-            led.update()
-            self.log("Wave done")
 
-        elif message == 'b' :
-            anim = Rainbow(led)
-            for i in range(384):
-                anim.step()
-                led.update()
-            led.fillOff()
-            led.update()
-            self.log("Rainbow done")
+        cmd = message['command']
+        kwargs = message.get('kwargs', {})
 
-        elif message == 'r' :
-            pass
 
-        elif message == "start-camera-1":  # Shutdown
-            self.log("Starting lights")
+        if cmd == "setMode":
+            if VERBOSE: print "called setMode()"
 
-        elif message == "stop-camera-1":  # Stop camera
-            self.log("Stopping Lights")
-            led.fillOff()
-            led.update()
+        elif cmd == "setRGB":
+            if VERBOSE: print "called setRGB()"
+            r,g,b = self.hex2rgb(kwargs["color"])
+            self.led.setRGB(kwargs["index"], r, g, b)
+
+        elif cmd == "setOff":
+            if VERBOSE: print "called setOff()"
+
+        elif cmd == "fillRGB":
+            r,g,b = self.hex2rgb(kwargs["color"])
+            if VERBOSE: print "called fillRGB()"
+
+        elif cmd == "fillOff":
+            if VERBOSE: print "called fillOff()"
+
+        elif cmd == "allOff":
+            if VERBOSE: print "called allOff()"
+
+        # elif cmd == "animWave":
+        #     anim = Wave(led, Color(255, 0, 0), 4)
+        #     for i in range(led.lastIndex):
+        #         anim.step()
+        #         led.update()
+        #     led.fillOff()
+        #     led.update()
+        #     self.log("Wave done")
+
+        # elif cmd == "animRainbow":
+        #     anim = Rainbow(led)
+        #     for i in range(384):
+        #         anim.step()
+        #         led.update()
+        #     led.fillOff()
+        #     led.update()
+        #     self.log("Rainbow done")
 
 
     def receive_message_jjbot(self, message):

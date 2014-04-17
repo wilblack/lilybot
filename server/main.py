@@ -20,6 +20,7 @@ import tornado.websocket
 import tornado.template
 
 # Settings
+VERBOSE = True
 PORT = 9093
 LOG_DTFORMAT = "%H:%M:%S"
 IP = "173.255.213.55"
@@ -67,18 +68,18 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
         """
-
+        if VERBOSE: print "recieved message: \n", message
         message_json = None
         try:
-            message_json = json.loads(message)
+            message = json.loads(message)
+            if VERBOSE: print "message_json: \n", message
             # Append IP address to allow camera feed. 
             if "new" in message_json.keys():
                 port = message_json['camera_port']
                 message_json.update({"camera_url":"http://%s:%s" %(self.request.remote_ip, port) })
         except:
+            if VERBOSE: print "Message is not JSON"
             pass
-
-        
 
         self.broadcast(message, 'echo')
         
@@ -118,19 +119,22 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       if mode is None then turns on the ardyh signature
 
       """
+      if VERBOSE: print "Message: \n", message
       if self.busy: return
       now = dt.now().strftime(LOG_DTFORMAT)
-      if mode == 'echo':
-        message = message
-      else:
+      if not mode == 'echo':
         message = "[%s] ardyh: %s" %(now, message)
       
       # Update with ardyh timestamp. 
+      
       if message.__class__ == {}.__class__:
+        if VERBOSE: print "message is a dict"
         message.update({"ardyh_timestamp":"%s" %(now)})
       else:
+        if VERBOSE: print "message is a string"        
         message = {"message":message, "ardyh_timestamp": "%s" %(now) }
       
+
       message = json.dumps(message)
       self.write_message(message)
 
