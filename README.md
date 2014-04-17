@@ -86,10 +86,10 @@ Now install some librabries and helpful stuff. The first two are optional but I 
 ```
 sudo apt-get install git-core
 sudo apt-get install screen
-sudo apt-get install ipython
+sudo apt-get install ipython              # Optional
 sudo apt-get install python-pip
-sudo apt-get install bluez
-sudo apt-get install python-bluetooth
+sudo apt-get install bluez                # Optional
+sudo apt-get install python-bluetooth     # Optional
 
 
 ```
@@ -98,19 +98,26 @@ Now make a project directory and clone some github repos. This will place the gi
 
 ```
 cd ~
-mkdir Projects
-cd Projects 
-git clone https://github.com/DexterInd/BrickPi_Python.git
+mkdir projects 
+cd projects 
 git clone https://github.com/wilblack/lilybot.git
+
+# Install this if using the Brick Pi
+git clone https://github.com/DexterInd/BrickPi_Python.git
+
+# Install this is using LED lights
+git clone https://github.com/adammhaile/RPi-LPD8806
+
 
 ```
 
 Install some Python pip packages
 
+
 ```
-sudo pip install tornado
-sudo pip install ws4py
-sudo pup install pyreadlines
+cd ~/projects/liltybot/
+sudo pip install -r requirements.txt
+
 ```
 
 
