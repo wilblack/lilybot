@@ -113,10 +113,11 @@ git clone https://github.com/adammhaile/RPi-LPD8806
 
 Install some Python pip packages
 
+
 ```
-sudo pip install tornado
-sudo pip install ws4py
-sudo pup install pyreadlines
+cd ~/projects/liltybot/
+sudo pip install -r requirements.txt
+
 ```
 
 
