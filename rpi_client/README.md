@@ -1,9 +1,42 @@
 ## Install tornado web server
 See http://www.remwebdevelopment.com/blog/python/simple-websocket-server-in-python-144.html for more info.
 
+## Install Autobahn Python
+We will be using Autbahn Python for our WebSocket client https://github.com/tavendo/AutobahnPython. We also follow the WAMP sub protocal using bith RPC's and Pub/Sub. 
+
+
 ```
-sudo pip install tornado
+sudo apt-get update
+sudo apt-get sudo apt-get install python-dev
+sudo pip install autobahn[twisted]
 ```
+
+###Troubleshooting
+
+First I got an error saying that zope.interface was not found so I did a `sudo pip install zope.interface` and got the following warning.
+
+```
+    ********************************************************************************
+    WARNING:
+    
+            An optional code optimization (C extension) could not be compiled.
+    
+            Optimizations for this package will not be available!
+    ()
+    command 'gcc' failed with exit status 1
+    ********************************************************************************
+    Skipping installation of /usr/local/lib/python2.7/dist-packages/zope/__init__.py (namespace package)
+    Installing /usr/local/lib/python2.7/dist-packages/zope.interface-4.1.1-nspkg.pth
+
+```
+
+It turned out that zope.interface could not be installed properly becuase I had not installed python-dev tools. So if you get this be sure and do a apt-get update and  then install pythone-dev tools.
+
+
+## Grab the RPi-LPD8806 Repo by Adam Haile.
+
+`git clone https://github.com/adammhaile/RPi-LPD8806`
+
 
 ## Start the Server
 
