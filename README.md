@@ -28,14 +28,14 @@ Here is a list of materials I have used and how much they costs.
 
 
 
-1. Set-Up the Raspberry Pi with BrickPi
-=======================================
+## Set-Up the Raspberry Pi with BrickPi
+
 
 I followed the instructions here http://www.raspberrypi.org/quick-start-guide. The guide has you install NOOBS. NOOBS is a start program that let's you install different OS on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted.  You will need an 8GB or bigger SD card to install Raspbian. 
 
 
-Config Wi-Fi
-------------
+### Config Wi-Fi
+
 
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
@@ -67,8 +67,8 @@ After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP ad
 You should now be able to ssh in over Wi-Fi.
 
 
-Install and Update Software
----------------------------
+## Install and Update Software
+
 
 Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
 Then log out and log back in. 
@@ -120,9 +120,19 @@ sudo pip install -r requirements.txt
 
 ```
 
+### Install LPD8806 Software.  
+Intall this if you are going to run the LPD LED light strips from adafruit.com. See https://github.com/adammhaile/RPi-LPD8806.git
 
-2. Install Camera and Camera Software
-=====================================
+```
+git clone https://github.com/adammhaile/RPi-LPD8806.git
+cd RPi-LPD8806
+python setup.py install
+```
+
+
+
+## Install Camera and Camera Software
+
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
 
