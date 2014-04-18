@@ -126,7 +126,7 @@ Intall this if you are going to run the LPD LED light strips from adafruit.com. 
 ```
 git clone https://github.com/adammhaile/RPi-LPD8806.git
 cd RPi-LPD8806
-python setup.py install
+sudo python setup.py install
 ```
 
 
