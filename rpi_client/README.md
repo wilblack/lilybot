@@ -1,7 +1,18 @@
 ## Install tornado web server
 See http://www.remwebdevelopment.com/blog/python/simple-websocket-server-in-python-144.html for more info.
 
-## Install Autobahn Python
+
+## Install LPD8806 Software.  
+See https://github.com/adammhaile/RPi-LPD8806.git
+
+```
+git clone https://github.com/adammhaile/RPi-LPD8806.git
+cd RPi-LPD8806
+python setup.py install
+```
+
+
+## Install Autobahn Python (BETA)
 We will be using Autbahn Python for our WebSocket client https://github.com/tavendo/AutobahnPython. We also follow the WAMP sub protocal using bith RPC's and Pub/Sub. 
 
 
