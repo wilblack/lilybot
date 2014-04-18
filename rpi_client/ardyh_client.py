@@ -4,7 +4,9 @@ This module starts the ardyh client on a Raspberry Pi.
 Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 """
 
-import json, urllib, sys
+import json, urllib, sys, ast
+from time import sleep
+
 from datetime import datetime as dt
 from uuid import getnode as get_mac
 from ws4py.client.tornadoclient import TornadoWebSocketClient
@@ -52,7 +54,18 @@ class ArdyhClient(TornadoWebSocketClient):
         self.LOG_DTFORMAT = "%H:%M:%S"
         self.CTENOPHORE = CTENOPHORE
         if self.CTENOPHORE:
-            self.led = LEDStrip(64)
+            self.NLEDS = 64
+            self.led = LEDStrip(self.NLEDS)
+            self.led.all_off()
+
+            if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
+            for i in range(0, self.NLEDS):
+                self.led.setRGB(i, 0,0,255)
+                self.led.setRGB(self.NLEDS - i, 0, 255, 0)
+                self.led.update()
+                sleep(0.05)
+                self.led.all_off()
+
         # set the name to MAC address if not found.
         self.name = name or self.get_mac_address()
 
@@ -94,7 +107,7 @@ class ArdyhClient(TornadoWebSocketClient):
         if VERBOSE: print "Received message: %s" %(message)
 
         try:
-            message = json.loads(message.data)
+            message = ast.literal_eval(message.data)
         except:
             print sys.exc_info()[0]
 
@@ -110,7 +123,7 @@ class ArdyhClient(TornadoWebSocketClient):
         try:
             super(ArdyhClient, self).send(message)
         except:
-            print "[ERROR] MEssage not send() failed."
+            print "[ERROR] Message not send() failed."
             print sys.exc_info()[0]
 
     def closed(self, code, reason=None):
@@ -148,15 +161,18 @@ class ArdyhClient(TornadoWebSocketClient):
 
         cmd = message['command']
         kwargs = message.get('kwargs', {})
-
+        if VERBOSE: print "command: %s\n" %(cmd), kwargs
 
         if cmd == "setMode":
             if VERBOSE: print "called setMode()"
 
         elif cmd == "setRGB":
-            if VERBOSE: print "called setRGB()"
+            
             r,g,b = self.hex2rgb(kwargs["color"])
+            if VERBOSE: print "calling setRGB(%s,%s,%s,%s)" %(kwargs["index"], r, g, b)
             self.led.setRGB(kwargs["index"], r, g, b)
+            self.led.update()
+
 
         elif cmd == "setOff":
             if VERBOSE: print "called setOff()"
