@@ -63,30 +63,7 @@ sudo chmod 755 RPi_Server_Code.py
 python RPi_Server_Code.py
 ```
 
-### Start on Boot
 
-Copy `lilybotd` and `lilybot_camerad` to the `etc/init.d` and update the rc.d file.
-
-```
-sudo cp lilybotd /etc/init.d/.
-sudo cp lilybotd_camera /etc/init.d/.
-
-sudo update-rc.d lilybotd defaults
-sudo update-rc.d lilybot_camerad defaults
-```
-
-
-Once the deamon starts it appears to tie up the port. You can see what ports are currently being used with
-
-```
-sudo netstat -lptu
-sudo netstat -tulpn
-```
-
-You can find the processes that are listening on port 9093 with
-```
-sudo fuser 9093/tcp
-```
 
 ### Power
 

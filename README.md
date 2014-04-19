@@ -186,10 +186,28 @@ To stop streaming use
 
 
 
-3. Run jjbot
-============
+## Start on ardyh client on boot
 
-`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`.
+Copy `lilybotd` and `lilybot_camerad` to the `etc/init.d` and update the rc.d file.
+
+
+```
+sudo cp rpi_client/ardyh_clientd /etc/init.d/.
+sudo cp rpi_client/lilybotd_camera /etc/init.d/.
+
+sudo update-rc.d ardyh_clientd defaults
+sudo update-rc.d lilybot_camerad defaults
+```
+
+
+Once the deamon starts it ties up the port. You can see what ports are currently being used with
+
+```
+sudo netstat -lptu
+sudo netstat -tulpn
+```
+
+
 
 
 
