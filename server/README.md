@@ -52,7 +52,9 @@ Bot should send an initial handshake JSON object.
 **bot_roles** - a list of roles in the set {"router", "bot", "controller"}. The router role is for non tinternet connected use. the controller role is for user interfaces usually  with a web or mobile app.
               
  
-A typical cammand will have the following JSON structure.
+#### Commands
+
+A typical command will have the following JSON structure.
 
 ```
   {"command":"",
