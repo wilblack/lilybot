@@ -1,16 +1,16 @@
 #!/bin/bash
-# lilybot daemon
+# ardyh_client daemon
 # chkconfig: 345 20 80
-# description: lilybot daemon
-# processname: lilybot
+# description: ardyh_client daemon
+# processname: ardyh_client
 
-DAEMON_PATH="/home/pi/Projects/lilybot/jjbot"
+DAEMON_PATH="/home/pi/projects/lilybot/rpi_client"
 
-DAEMON=start_server.sh
+DAEMON=start_ardyh_client.sh
 DAEMONOPTS=""
 
-NAME=start_server
-DESC="This starts the jjbot web server"
+NAME=ardyh_client
+DESC="This starts the ardyh_client"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 PORT=9010

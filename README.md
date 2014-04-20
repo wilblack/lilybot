@@ -187,6 +187,12 @@ To stop streaming use
 
 
 ## Start on ardyh client on boot
+First edit `rpi_client/ardyh_clientd` so that `DAEMON_PATH` points at the rpi_client/ directory.
+
+```
+DAEMON_PATH="/home/pi/projects/lilybot/rpi_client" 
+```
+
 
 Copy `lilybotd` and `lilybot_camerad` to the `etc/init.d` and update the rc.d file.
 
