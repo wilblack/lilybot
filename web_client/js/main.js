@@ -206,7 +206,8 @@ Ardyh = function(){
     this.lilybot = new Lilybot();
     this.host = "";
     this.socket = null;
-
+    this.nlogs = 0;
+    this.max_nlogs = 1000;
 
     this.setup = function(){
         // Creates the websocets connection{
@@ -230,14 +231,14 @@ Ardyh = function(){
                 - sensor_values
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
-
+                self._log(msg.data);
                 try {
                   var data = JSON.parse(msg.data);
                   if ('sensor_values' in data) updateSensorValues(data.sensor_values)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
-                  self._log(msg.data);
+                    self.log("Could not parse message")
                 }
             }
 
@@ -259,11 +260,16 @@ Ardyh = function(){
         } // End setup()
 
     this._log = function (txt){
+
         $log = $("#log");
         $newRow = $("<div>");
         $newRow.text(txt);
         $log.append($newRow);
         $log.scrollTop($log[0].scrollHeight);
+        self.nlogs++;
+        if (self.nlogs > self.max_nlogs){
+            $log.eq(0).detach();
+        }
     };
 
     this.showReadyState = function(state){
@@ -301,6 +307,22 @@ Ardyh = function(){
         this.lilybot.stopCamera();
     }
 
+    this.shutdown = function(){
+        console.log("Not implemented");
+                
+    }
+
+    this.restart = function(){
+        console.log("Not implemented");
+                
+    }
+
+    this.pauseLog = function(){
+        console.log("Not implemented");
+                
+    }
+
+
 }; // End Ardyh
 
 
@@ -319,10 +341,12 @@ ControlsView = function($el){
     if (typeof($el) === "undefined") this.$el = $(".controls");
 
     // Add listeners
-    this.$el.find(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
-    this.$el.find(".refreshCameraBtn").click(function(e){ ardyh.refreshCamera(); });
-    this.$el.find(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
-
+    $(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
+    $(".refreshCameraBtn").click(function(e){ ardyh.refreshCamera(); });
+    $(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+    $(".restartBtn").click(function(e){ ardyh.restart(); });
+    $(".shutdownBtn").click(function(e){ ardyh.shutdown(); });
+    $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
 }
 
 

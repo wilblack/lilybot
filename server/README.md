@@ -33,4 +33,48 @@ Stop Server
 
 
 
+## Connecting a Bot to ardyh
+
+### Initial handshake
+
+Bot should send an initial handshake JSON object.
+
+```
+{message: 
+  {"bot_name":"",
+   "bot_roles":[], 
+}
+
+```
+
+**bot_name** - a unique identfiyer for the bot
+
+**bot_roles** - a list of roles in the set {"router", "bot", "controller"}. The router role is for non tinternet connected use. the controller role is for user interfaces usually  with a web or mobile app.
+              
+ 
+#### Commands
+
+A typical command will have the following JSON structure.
+
+```
+  {"command":"",
+   "kwargs":{},
+   }
+
+```
+
+**command** -  a string with the command name. This uses is a RPC model 
+
+**kwargs** - an object whose keyword/values are arguements to the command.
+
+
+A bot needs to register there commands.
+
+
+
+
+
+
+
+
 
