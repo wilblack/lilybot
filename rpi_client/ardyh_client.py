@@ -12,7 +12,11 @@ from uuid import getnode as get_mac
 from ws4py.client.tornadoclient import TornadoWebSocketClient
 from tornado import ioloop
 
+import tornado
+import tornado.web
 import tornado.ioloop
+
+import settings
 
 try:
     print "Loading RPi-LPD8806"
@@ -28,8 +32,17 @@ except:
     print sys.exc_info()[0]
     CTENOPHORE = True
 
-
 VERBOSE = True
+
+
+class MainHandler(tornado.web.RequestHandler):
+  
+  def get(self):
+    loader = tornado.template.Loader(".")
+    tv = settings.settings
+    self.write(loader.load("www/index.html").generate(settings=tv))
+
+
 
 class ArdyhClient(TornadoWebSocketClient):
     """
@@ -98,10 +111,6 @@ class ArdyhClient(TornadoWebSocketClient):
             # Tells ardyh that is a new connection
             out = {"new":"", "camera_port":8080}
             self.send(out)
-        
-
-
-
 
     def received_message(self, message):
         if VERBOSE: print "Received message: %s" %(message)
@@ -286,7 +295,20 @@ class ArdyhClient(TornadoWebSocketClient):
         
         BrickPiUpdateValues()                # BrickPi updates the values for the motors
 
+
+application = tornado.web.Application([
+ #(r'/ws', WSHandler),
+  (r'/', MainHandler),
+  
+  (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./www/static"}),
+])
+
+
 if __name__ == "__main__":
+    # Start the web application
+    HTTP_PORT = 9010
+    print "Starting web application on port %s" %(HTTP_PORT)
+    application.listen(HTTP_PORT)
 
     # Start streaming data to ardyh.
     ardyh = ArdyhClient(name="ctenopore", protocols=['http-only', 'chat'])
