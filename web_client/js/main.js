@@ -181,14 +181,46 @@ function arrows() {
 
 
 Lilybot = function(){
+    /*
+    This object handles all commands for the raspberry pi lilybot
+    */
     var self = this;
         
     this.startCamera = function(){
-        ardyh.socket.send("start-camera-1");
+        message = {
+            command:"start-camera-1",
+            kwargs:{}
+        }
+        this.send(message);
     };
 
-    this.stopCamera = function(){
-        ardyh.socket.send("stop-camera-1");
+    this.startCamera = function(){
+        message = {
+            command:"stop-camera-1",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.shutdown = function(){
+        message = {
+            command:"shutdown",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.restart = function(){
+        message = {
+            command:"restart",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.send = function(message){
+        var out = JSON.stringify(message);
+        ardyh.socket.send(out);
     };
 
 };  // End lilybot
@@ -308,12 +340,12 @@ Ardyh = function(){
     }
 
     this.shutdown = function(){
-        console.log("Not implemented");
+        this.lilybot.shutdown();
                 
     }
 
     this.restart = function(){
-        console.log("Not implemented");
+        this.lilybot.restart();
                 
     }
 

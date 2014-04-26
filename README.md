@@ -251,6 +251,9 @@ sudo update-rc.d lilybot_camerad defaults
 ```
 
 
+You may need to do a `chmod 775` to make these executable. You can then start and staop the deamon with `sudo /etc/init.d/ardyh_cleint start`
+
+
 Once the deamon starts it ties up the port. You can see what ports are currently being used with
 
 ```
