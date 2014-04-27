@@ -6,3 +6,15 @@ settings= {
     "default_network_name":"ardyhnet_01",
     "default_network_pwd":"ardyhnet_01"
 }
+
+
+
+
+
+
+CTENOPHORE = True
+NLEDS = 64
+
+JJBOT = False
+
+VERBOSE = True

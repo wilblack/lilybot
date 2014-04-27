@@ -16,3 +16,7 @@ def shutdown():
 def get_mac_address():
     mac = get_mac()
     return "%012X"%mac
+
+
+def hex2rgb(self, hex):
+    return [ord(c) for c in hex[1:].decode("hex")]

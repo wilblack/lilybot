@@ -16,25 +16,10 @@ import tornado
 import tornado.web
 import tornado.ioloop
 
-from settings import settings
+from settings import *
 from utils import get_mac_address, shutdown, restart
+from router import Router
 
-
-try:
-    print "Loading RPi-LPD8806"
-    from raspledstrip.ledstrip import *
-    CTENOPHORE = True
-except SystemExit:
-    print "[WARNING] RPi-LPD8806 bootstrap module found but no LEDS connected. Starting client anyways"
-    print sys.exc_info()[0]
-    CTENOPHORE = True
-
-except:
-    print "[WARNING] RPi-LPD8806 bootstrap module not found"
-    print sys.exc_info()[0]
-    CTENOPHORE = True
-
-VERBOSE = True
 
 
 # class MainHandler(tornado.web.RequestHandler):
@@ -71,18 +56,7 @@ class ArdyhClient(TornadoWebSocketClient):
         self.CTENOPHORE = CTENOPHORE
         self.core_commands = ['shutdown', 'restart']
 
-        if self.CTENOPHORE:
-            self.NLEDS = 64
-            self.led = LEDStrip(self.NLEDS)
-            self.led.all_off()
-
-            if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
-            for i in range(0, self.NLEDS):
-                self.led.setRGB(i, 0,0,255)
-                self.led.setRGB(self.NLEDS - i, 0, 255, 0)
-                self.led.update()
-                sleep(0.05)
-                self.led.all_off()
+        
 
         # set the name to MAC address if not found.
         self.bot_name = settings['bot_name']
@@ -99,6 +73,12 @@ class ArdyhClient(TornadoWebSocketClient):
             print "[WARNING] JJBot module not found not."
             self.JJBOT = False
         return rs
+
+        # Initialize router
+        config = {"JJBOT":self.JJBOT,
+                  "CTENOPHORE":self.CTENOPHORE
+                  }
+        self.router = Router(config)
 
 
     def opened(self):
@@ -123,29 +103,8 @@ class ArdyhClient(TornadoWebSocketClient):
             self.send(out)
 
     def received_message(self, message):
-        if VERBOSE: print "Received message: %s" %(message)
+        self.router.received_message(message)
 
-        try:
-            message = ast.literal_eval(message.data)
-        except:
-            print sys.exc_info()[0]
-
-        if not "command" in message.keys(): 
-            print "command not found in message"
-            return
-
-        cmd = message['command']
-        kwargs = message.get('kwargs', {})
-        if VERBOSE: print "command: %s\n" %(cmd), kwargs
-
-        if cmd in self.core_commands:
-            self.receive_core_command(cmd, kwargs)
-
-        elif self.JJBOT:
-            self.receive_message_jjbot(cmd, kwargs)
-
-        elif self.CTENOPHORE:
-            self.receive_message_ctenophore(cmd, kwargs)
 
     def send(self, message):
         message = json.dumps(message)
@@ -160,6 +119,9 @@ class ArdyhClient(TornadoWebSocketClient):
         print "Closed down", code, reason
         ioloop.IOLoop.instance().stop()
 
+    def refresh_connection(){
+
+    }
 
     def log(self, message):
         now = dt.now().strftime(self.LOG_DTFORMAT)
@@ -183,141 +145,9 @@ class ArdyhClient(TornadoWebSocketClient):
 
 
     def receive_core_command(self, cmd, kwargs):
-        if VERBOSE: print "this is a core command"
-        if cmd == "shutdown":
-            shutdown()
-
-        elif cmd == "restart":
-            restart()
-
-
-
-    def receive_message_ctenophore(self, cmd, kwargs):
-        if VERBOSE: print "this is a ctenophore message"
         
 
-        if cmd == "setMode":
-            if VERBOSE: print "called setMode()"
-
-        elif cmd == "setRGB":
-            
-            r,g,b = self.hex2rgb(kwargs["color"])
-            if VERBOSE: print "calling setRGB(%s,%s,%s,%s)" %(kwargs["index"], r, g, b)
-            self.led.setRGB(kwargs["index"], r, g, b)
-            self.led.update()
-
-
-        elif cmd == "setOff":
-            if VERBOSE: print "called setOff()"
-
-        elif cmd == "fillRGB":
-            r,g,b = self.hex2rgb(kwargs["color"])
-            if VERBOSE: print "called fillRGB()"
-
-        elif cmd == "fillOff":
-            if VERBOSE: print "called fillOff()"
-
-        elif cmd == "allOff":
-            if VERBOSE: print "called allOff()"
-
-        # elif cmd == "animWave":
-        #     anim = Wave(led, Color(255, 0, 0), 4)
-        #     for i in range(led.lastIndex):
-        #         anim.step()
-        #         led.update()
-        #     led.fillOff()
-        #     led.update()
-        #     self.log("Wave done")
-
-        # elif cmd == "animRainbow":
-        #     anim = Rainbow(led)
-        #     for i in range(384):
-        #         anim.step()
-        #         led.update()
-        #     led.fillOff()
-        #     led.update()
-        #     self.log("Rainbow done")
-
-
-    def receive_message_jjbot(self, message):
-        if message == 'u' :
-            self.log("Running Forward")
-            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
         
-        elif message == 'd' :
-            self.log("Running Reverse")
-            BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
-        
-        elif message == 'r' :
-            self.log("Turning Right")
-            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
-        
-        elif message == 'l' :
-            self.log("Turning Left")
-            BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-        
-        elif message == 'b' :
-            self.log("New Stopped")
-            BrickPi.MotorSpeed[PORT_A] = 0
-            BrickPi.MotorSpeed[PORT_D] = 0
-
-        # Wil's added capabilites
-        elif message == "nl":
-            self.log("Nudge Left")
-            BrickPi.MotorSpeed[PORT_A] = 0  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-            time.sleep(.5)
-            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-          
-        elif message == "nr":
-            self.log("Nudge Right")
-            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = 0  #Set the speed of MotorA (-255 to 255)
-            time.sleep(.5)
-            BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-
-
-        elif message == "ll":
-            self.log("Look Left")
-            BrickPi.MotorSpeed[PORT_C] = -1*self.LOOK_SPEED
-            time.sleep(self.LOOK_DT)
-            # BrickPi.MotorSpeed[PORT_C] = -1*self.LOOK_SPEED
-            # time.sleep(self.LOOK_DT)
-            BrickPi.MotorSpeed[PORT_C] = 0
-
-        elif message == "lr":
-            self.log("Look Right")
-            BrickPi.MotorSpeed[PORT_C] = self.LOOK_SPEED
-            time.sleep(self.LOOK_DT)
-            # BrickPi.MotorSpeed[PORT_C] = self.LOOK_SPEED
-            # time.sleep(self.LOOK_DT)
-            BrickPi.MotorSpeed[PORT_C] = 0
-
-        elif message == "start-camera-1":  # Shutdown
-            self.log("Starting camera")
-            try:
-                self.bot.startCamera()
-            except Exception, e: 
-                print e
-
-        elif message == "stop-camera-1":  # Stop camera
-            self.log("Stopping Camera")
-            self.bot.stopCamera()
-
-
-        elif message == "x":  # Shutdown
-            self.log("Shutting down")
-            shutdown()
-        elif message == "y":  # Shutdown
-            restart()
-        
-        BrickPiUpdateValues()                # BrickPi updates the values for the motors
 
 
 # application = tornado.web.Application([
