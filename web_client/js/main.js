@@ -187,7 +187,7 @@ Lilybot = function(){
     var self = this;
         
     this.startCamera = function(){
-        message = {
+        var message = {
             command:"start-camera-1",
             kwargs:{}
         }
@@ -195,7 +195,7 @@ Lilybot = function(){
     };
 
     this.startCamera = function(){
-        message = {
+        var message = {
             command:"stop-camera-1",
             kwargs:{}
         }
@@ -203,7 +203,7 @@ Lilybot = function(){
     };
 
     this.shutdown = function(){
-        message = {
+        var message = {
             command:"shutdown",
             kwargs:{}
         }
@@ -211,12 +211,29 @@ Lilybot = function(){
     };
 
     this.restart = function(){
-        message = {
+        var message = {
             command:"restart",
             kwargs:{}
         }
         this.send(message);
     };
+
+    this.target = function(index){
+        var message = {
+            command:"target",
+            kwargs:{index:index}
+        }
+        this.send(message);
+    };
+
+    this.clearTarget = function(){
+        var message = {
+            command:"clearTarget",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
 
     this.send = function(message){
         var out = JSON.stringify(message);
@@ -315,15 +332,14 @@ Ardyh = function(){
         data should have keywrod 'camera_url'
         */
         self.camera_url = data.camera_url;
-    }
+    };
 
     this.startCamera = function(){
         /* 
         Powers up the camera and sends the stream to the #camera-1.
         */
         this.lilybot.startCamera();
-
-    }
+    };
 
     this.refreshCamera = function(){
         $("#camera-1").html("");
@@ -332,27 +348,34 @@ Ardyh = function(){
         self.webcam = new Webcam($("#camera-1"), self.camera_url)
         self.webcam.createImageLayer();
         resize();
-    }
+    };
 
     this.stopCamera = function(){
         /* Shutsdown the camera. */
         this.lilybot.stopCamera();
-    }
+    };
 
     this.shutdown = function(){
         this.lilybot.shutdown();
-                
-    }
+    };
 
     this.restart = function(){
         this.lilybot.restart();
-                
-    }
+    };
+
+    this.target = function(index){
+        this.lilybot.target(index);
+    };
+
+    this.clearTarget = function(){
+        this.lilybot.clearTarget();
+    };
+
 
     this.pauseLog = function(){
         console.log("Not implemented");
                 
-    }
+    };
 
 
 }; // End Ardyh
@@ -379,6 +402,20 @@ ControlsView = function($el){
     $(".restartBtn").click(function(e){ ardyh.restart(); });
     $(".shutdownBtn").click(function(e){ ardyh.shutdown(); });
     $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
+    
+
+    $(".targetBtn").click(function(e){ 
+        target_index = $("[name=target_index]").val();
+        ardyh.target(target_index); 
+        $(".targetBtn").hide();
+        $(".clearTargetBtn").show();
+    });
+
+    $(".clearTargetBtn").click(function(e){ 
+        ardyh.clearTarget();
+        $(".clearTargetBtn").hide();
+        $(".targetBtn").show();
+    });
 }
 
 

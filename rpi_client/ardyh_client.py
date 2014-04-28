@@ -22,16 +22,6 @@ from bot_roles.core import Core
 from utils import get_mac_address
 
 
-
-# class MainHandler(tornado.web.RequestHandler):
-  
-#   def get(self):
-#     loader = tornado.template.Loader(".")
-#     tv = settings.settings
-#     self.write(loader.load("../../web_client/monitor.html").generate(settings=tv))
-
-
-
 class ArdyhClient(TornadoWebSocketClient):
     """
     Web Socket client to connect to ardyh on start up.
@@ -106,21 +96,7 @@ class ArdyhClient(TornadoWebSocketClient):
             self.send(json.dumps(out))
 
 
-
-
-# application = tornado.web.Application([
-#  #(r'/ws', WSHandler),
-#   (r'/', MainHandler),
-  
-#   (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./www/static"}),
-# ])
-
-
 if __name__ == "__main__":
-    # # Start the web application
-    # HTTP_PORT = 9010
-    # print "Starting web application on port %s" %(HTTP_PORT)
-    # application.listen(HTTP_PORT)
 
     # Start streaming data to ardyh.
     ardyh = ArdyhClient(protocols=['http-only', 'chat'])

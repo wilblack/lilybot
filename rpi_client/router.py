@@ -44,7 +44,6 @@ class Router(object):
         kwargs = message.get('kwargs', {})
         if VERBOSE: print "command: %s\n" %(cmd), kwargs
 
-        import pdb; pdb.set_trace()
         if cmd in self.core.commands:
             getattr(self.core, cmd)(kwargs)
 

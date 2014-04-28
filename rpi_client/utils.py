@@ -18,6 +18,6 @@ def get_mac_address():
     return "%012X"%mac
 
 
-def hex2rgb(self, hex):
+def hex2rgb(hex):
     return [ord(c) for c in hex[1:].decode("hex")]
 
