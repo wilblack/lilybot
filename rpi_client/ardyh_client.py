@@ -5,7 +5,7 @@ Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 """
 
 import json, urllib, sys, ast
-from time import sleep
+
 
 from datetime import datetime as dt
 
@@ -17,8 +17,9 @@ import tornado.web
 import tornado.ioloop
 
 from settings import *
-from utils import get_mac_address, shutdown, restart
 from router import Router
+from bot_roles.core import Core
+from utils import get_mac_address
 
 
 
@@ -54,53 +55,24 @@ class ArdyhClient(TornadoWebSocketClient):
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
         self.CTENOPHORE = CTENOPHORE
-        self.core_commands = ['shutdown', 'restart']
-
         
 
         # set the name to MAC address if not found.
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
-        self.mac = get_mac_address()
 
-        try:
-            print "Trying to load JJBot"
-            self.bot = JJBot()
-            self.LOOK_SPEED = 80
-            self.LOOK_DT = 0.5
-            self.JJBOT = True
-        except:
-            print "[WARNING] JJBot module not found not."
-            self.JJBOT = False
-        return rs
-
-        # Initialize router
-        config = {"JJBOT":self.JJBOT,
-                  "CTENOPHORE":self.CTENOPHORE
-                  }
-        self.router = Router(config)
-
+        self.core = Core()
+        self.router = Router()
 
     def opened(self):
         print "Connection to ardh is open"
         message = {'bot_name':self.bot_name, 
                    'bot_roles':self.bot_roles,
-                   'mac':self.mac,
+                   'mac':get_mac_address(),
                    'handshake':True}
 
         self.send(message)
 
-        if self.JJBOT:
-            try:
-                "Trying to start sensors"
-                sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
-                sensors.start()
-            except:
-                "[WARNING] Sensors not started"
-
-            # Tells ardyh that is a new connection
-            out = {"new":"", "camera_port":8080}
-            self.send(out)
 
     def received_message(self, message):
         self.router.received_message(message)
@@ -108,7 +80,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def send(self, message):
         message = json.dumps(message)
-        if VERBOSE: print "About to send message:\n\n%s" %(message) 
+        if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
         except:
@@ -119,9 +91,6 @@ class ArdyhClient(TornadoWebSocketClient):
         print "Closed down", code, reason
         ioloop.IOLoop.instance().stop()
 
-    def refresh_connection(){
-
-    }
 
     def log(self, message):
         now = dt.now().strftime(self.LOG_DTFORMAT)
@@ -137,17 +106,6 @@ class ArdyhClient(TornadoWebSocketClient):
             self.send(json.dumps(out))
 
 
-    
-
-    def hex2rgb(self, hex):
-        return [ord(c) for c in hex[1:].decode("hex")]
-
-
-
-    def receive_core_command(self, cmd, kwargs):
-        
-
-        
 
 
 # application = tornado.web.Application([

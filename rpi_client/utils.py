@@ -20,3 +20,4 @@ def get_mac_address():
 
 def hex2rgb(self, hex):
     return [ord(c) for c in hex[1:].decode("hex")]
+
