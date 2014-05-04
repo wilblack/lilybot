@@ -5,8 +5,21 @@ Tornado Websockts server used the pass for lilybots.
 Wil Black, wilblack21@gmail.com 
 Oct. 26, 2013
 
+
+
+## Messages
+
+- message
+    -- name
+    -- from
+    -- message
+    -- command
+    -- channel
+    -- ardyh_timestamp - May not be present
+
+
 """
-import json
+import json, ast
 import time 
 import collections
 
@@ -25,6 +38,10 @@ PORT = 9093
 LOG_DTFORMAT = "%H:%M:%S"
 IP = "173.255.213.55"
 
+
+
+
+
 class MainHandler(tornado.web.RequestHandler):
   
     def get(self):
@@ -40,19 +57,26 @@ listeners = []
 class WSHandler(tornado.websocket.WebSocketHandler):
     
     def __init__(self, uri, protocols):
-      super(WSHandler, self).__init__(uri, protocols)
+        super(WSHandler, self).__init__(uri, protocols)
 
-
-      self.nav = ArdyhNav(self)
-      self.portA_fifo = collections.deque(5*[255], 5)
-      self.busy = False # Tells the ardyh to stop sending messages to listener, useful while executing a command
-      self.operationa_mode = "user_controlled"
+        self.nav = ArdyhNav(self)
+        self.portA_fifo = collections.deque(5*[255], 5)
+        self.busy = False # Tells the ardyh to stop sending messages to listener, useful while executing a command
+        self.operationa_mode = "user_controlled"
 
     def open(self):
-      print 'connection opened...'
-      self.log('Hello, good to see you again.')
-      listeners.append(self)
-      self.broadcast("New connection: %s" %(self.request.remote_ip))
+        print 'connection opened...'
+        self.log('Hello, good to see you again.')
+
+        try:
+            bot_name = self.request.uri.split("?")[1]
+        except:
+            bot_name = ""
+
+        self.connected_to = bot_name
+        listeners.append( {"bot_name":bot_name, "socket":self} )
+
+        #self.broadcast("New connection: %s" %(self.request.remote_ip))
 
 
       #sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 5*1000)
@@ -69,49 +93,47 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
         """
         if VERBOSE: print "recieved message: \n", message
-        message_json = None
+        
         try:
-            message = json.loads(message)
-            if VERBOSE: print "message_json: \n", message
-            # Append IP address to allow camera feed. 
-            if "new" in message_json.keys():
-                port = message_json['camera_port']
-                message_json.update({"camera_url":"http://%s:%s" %(self.request.remote_ip, port) })
+            message = ast.literal_eval(message)
         except:
             if VERBOSE: print "Message is not JSON"
-            pass
+            return
 
-        self.broadcast(message, 'echo')
+        self.broadcast(message)
         
-        if self.operationa_mode == "autonamous":
-            if message_json:
-                message = message_json
-            else:
-                return
-
-            if "sensor_values" in message.keys():
-                valueA = message['sensor_values'][0][1]
-                self.portA_fifo.appendleft(valueA)
-
-            
-            if len([1 for val in self.portA_fifo if val < 35 ]) >= 3:
-                print self.busy
-                if not self.busy:
-                    self.busy = True
-                    self.nav.event('bump')
-
-
+        
 
     def on_close(self):
-      print 'connection closed...'
-      listeners.remove(self)
-      self.broadcast("Closed %s" %(self.request.remote_ip))
+        print 'connection closed...'
+        
+        bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
+        listeners.remove(bot)
+
+
+        #self.broadcast("Closed %s" %(bot['bot_name']))
 
 
     def broadcast(self, message, mode=None):
-        for l in listeners:
-            l.log(message, mode)
+        if 'channel' in message.keys():
+            channel = message['channel']
 
+        
+
+        for sub in self.get_subscribers(channel):
+            message = json.dumps(message)
+            sub['socket'].write_message(message)
+
+        
+    def get_subscribers(self, channel):
+        """
+        The only subscriber is rpi2
+        """
+
+        if channel:
+            return [bot for bot in listeners if bot['bot_name'] in ["io.ardyh.rp2", ""] ]
+        else:
+            return listeners
 
 
     def log(self, message, mode=None):
@@ -135,8 +157,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         message = {"message":message, "ardyh_timestamp": "%s" %(now) }
       
 
-      message = json.dumps(message)
-      self.write_message(message)
+      
 
 
     def loopCallback(self):

@@ -40,6 +40,7 @@ class ArdyhClient(TornadoWebSocketClient):
     - message
     -- name
     -- from
+    -- channel 
     -- message
     -- command
     -- ardyh_timestamp - May not be present
