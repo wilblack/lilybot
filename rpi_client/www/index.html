@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Lilybot Client</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="js/jquery.min.js"></script>
+    </head>
+
+    <body>
+        Hello I'm a lilybot.
+        <form>
+            <div>
+                <label>Bot Name</label>
+                <input type="text" name="bot_name" value="{{ settings['bot_name'] }}"/>
+            </div>
+
+            <div>
+                <label>Roles</label>
+                <select name="bot_roles">
+                    <option value="bot">Bot Only</option>
+                    <option value="router">Router Only</option>
+                    <option value="bot|router">Bot and Router</option>
+                </select> 
+            </div>
+
+            <div>
+                <label>Network Name</label>
+                <input type="text" name="network_name" value="{{ settings['network_name'] }}"/>
+            </div>
+
+            <div>
+                <label>Network Password</label>
+                <input type="text" name="network_pwd" value="{{ settings['network_pwd'] }}"/>
+            </div>
+
+        </form>
+    </body>
+</html>

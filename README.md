@@ -28,24 +28,56 @@ Here is a list of materials I have used and how much they costs.
 
 
 
-## Set-Up the Raspberry Pi with BrickPi
-
+## Set-Up the ardyh_client on a Raspberry Pi
 
 I followed the instructions here http://www.raspberrypi.org/quick-start-guide. The guide has you install NOOBS. NOOBS is a start program that let's you install different OS on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted.  You will need an 8GB or bigger SD card to install Raspbian. 
 
+### Change Keyboard Country Code
+
+By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should chnage this to your country code. For me in the US of A its "us".
+
+To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
+
+```
+XKBLAYOUT=”us”
+
+```
 
 ### Config Wi-Fi
 
 
+#### With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
+
+
+#### With console cable
+Follow this guide to set up the console cable
+https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
+
+
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
 
+
+You can use the interfaces template in the root directory named `interfaces.lilbot` 
+
+Plug in the wifi dongle
+
+
 ```
 // Back up the file first
+sudo cp /etc/network/interfaces /etc/network/interfaces.bkp
+
+
+sudo cp interfaces.lilybot /etc/network/interfaces
+
+
 sudo vi /etc/network/interfaces
+
+// After editing the file restart
+sudo shutdown -r now
 ```
 
 Change the file to read, where you enter your own ssid and password. 
@@ -131,7 +163,7 @@ sudo python setup.py install
 
 
 
-## Install Camera and Camera Software
+### Install Camera and Camera Software
 
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
@@ -186,7 +218,20 @@ To stop streaming use
 
 
 
-## Start on ardyh client on boot
+
+## Start on ardyh client 
+The ardyh client will start two applications. The first application is a web server running on port 9010 to set local settings for the bot. It is available at <IP_ADDRESS>:9010. 
+
+The second is a websocket client that is confugred to connect to the ardyh server at `ws://173.255.213.55:9093/ws`
+
+### Manually start rpi_client
+```
+cd rpi_clinet
+./start_ardyh_client.sh
+```
+
+
+### Set up client to start on boot
 First edit `rpi_client/ardyh_clientd` so that `DAEMON_PATH` points at the rpi_client/ directory.
 
 ```
@@ -204,6 +249,9 @@ sudo cp rpi_client/lilybotd_camera /etc/init.d/.
 sudo update-rc.d ardyh_clientd defaults
 sudo update-rc.d lilybot_camerad defaults
 ```
+
+
+You may need to do a `chmod 775` to make these executable. You can then start and staop the deamon with `sudo /etc/init.d/ardyh_cleint start`
 
 
 Once the deamon starts it ties up the port. You can see what ports are currently being used with
