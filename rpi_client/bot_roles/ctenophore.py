@@ -1,5 +1,6 @@
 import sys
 from time import sleep
+from math import floor
 
 from settings import *
 from utils import hex2rgb
@@ -35,7 +36,7 @@ class Ctenophore(object):
             self.led.setRGB(i, 0,0,255)
             self.led.setRGB(self.NLEDS - i, 0, 255, 0)
             self.led.update()
-            sleep(0.02)
+            sleep(0.01)
             self.led.all_off()
 
     def setMode(self, kwargs):
@@ -89,20 +90,20 @@ class Ctenophore(object):
         self.ALL_STOP = False
         self.all_off()
 
-         # elif cmd == "animWave":
-        #     anim = Wave(led, Color(255, 0, 0), 4)
-        #     for i in range(led.lastIndex):
-        #         anim.step()
-        #         led.update()
-        #     led.fillOff()
-        #     led.update()
-        #     self.log("Wave done")
+    def sensor_callback(self, sensor_values):
+        print "in sensor_callback()"
+        self.led.all_off()
+        val = sensor_values[0][1]
+        index = self.NLEDS - val
+        
+        percent = int(floor(100*float(index)/self.NLEDS))
 
-        # elif cmd == "animRainbow":
-        #     anim = Rainbow(led)
-        #     for i in range(384):
-        #         anim.step()
-        #         led.update()
-        #     led.fillOff()
-        #     led.update()
-        #     self.log("Rainbow done")
+        print "val: %s index: %s, percent: %s" %(val, index, percent)
+        
+        if index >= 0 and index <15:
+            self.led.fillRGB(0, 255, 0, 0, index)
+        elif index >=15 and index < 30:    
+            self.led.fillRGB(0, 0, 255, 0, index)
+        else:
+            self.led.fillRGB(255, 0, 0, 0, index)
+        self.led.update()

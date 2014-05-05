@@ -34,14 +34,20 @@ class Router(object):
             message = ast.literal_eval(message.data)
         except:
             # If that fails use the good old json.loads()
-            message = json.loads(message.data)
+            print "[Router.recieved_message()] Could not load message.data"
+            message = json.loads(message)
 
         if not "command" in message.keys(): 
             print "command not found in message"
-            return
+            if 'sensor_values' in message['message'].keys():
+                getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_values'])
+                return
+            else:
+                return
 
         cmd = message['command']
         kwargs = message.get('kwargs', {})
+
         if VERBOSE: print "command: %s\n" %(cmd), kwargs
 
         if cmd in self.core.commands:
@@ -52,3 +58,5 @@ class Router(object):
 
         elif self.CTENOPHORE and cmd in self.ctenophore.commands:
             getattr(self.ctenophore, cmd)(kwargs)
+
+        

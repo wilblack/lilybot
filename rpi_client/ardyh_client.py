@@ -146,22 +146,22 @@ class ArdyhClient(TornadoWebSocketClient):
           ]
         return out
 
+if "jjbot" in settings["bot_packages"]:
+    class myThread (threading.Thread):
+        """
+        I think this just tells the BrickPi to update the values, their is no networking involved.
 
-class myThread (threading.Thread):
-    """
-    I think this just tells the BrickPi to update the values, their is no networking involved.
-
-    """
-    def __init__(self, threadID, name, counter):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.counter = counter
-    def run(self):
-        print "Starting thread %s" %(self.threadID)
-        while sensor_thread_running:
-            result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
-            time.sleep(.2)              # sleep for 200 ms
+        """
+        def __init__(self, threadID, name, counter):
+            threading.Thread.__init__(self)
+            self.threadID = threadID
+            self.name = name
+            self.counter = counter
+        def run(self):
+            print "Starting thread %s" %(self.threadID)
+            while sensor_thread_running:
+                result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
+                time.sleep(.2)              # sleep for 200 ms
 
 
 
