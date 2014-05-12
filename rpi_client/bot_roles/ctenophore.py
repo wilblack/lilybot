@@ -29,7 +29,7 @@ class Ctenophore(object):
         self.ALL_STOP = False
         self.led = LEDStrip(self.NLEDS)
         self.led.all_off()
-
+        self.history = [255, 255, 255]
         if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
         
         for i in range(0, self.NLEDS):
@@ -90,20 +90,43 @@ class Ctenophore(object):
         self.ALL_STOP = False
         self.all_off()
 
+    def is_pissed(self, test):
+        """
+        Returns true if any values in self.history are less than the test
+        value.
+        """
+        rs = [1 for val in self.history if self.history<test]
+
+        return rs or False
+
+
+
+
+
     def sensor_callback(self, sensor_values):
         print "in sensor_callback()"
+        STAGE1 = 15
+        STAGE2 = 30
         self.led.all_off()
         val = sensor_values[0][1]
+        self.history.append(val);
+        self.history.pop(0)
+
         index = self.NLEDS - val
         
         percent = int(floor(100*float(index)/self.NLEDS))
 
         print "val: %s index: %s, percent: %s" %(val, index, percent)
         
-        if index >= 0 and index <15:
-            self.led.fillRGB(0, 255, 0, 0, index)
-        elif index >=15 and index < 30:    
-            self.led.fillRGB(0, 0, 255, 0, index)
+        if index >= 0 and index < STAGE1 and sum(self.history) < len(self.history) * STAGE1:
+            # Stage 1
+            if not self.is_pissed(STAGE1):
+                self.led.fillRGB(0, 255, 0, 0, index)
+        elif index >=STAGE1 and index < STAGE2:
+            # Stage 2
+            if not self.is_pissed(STAGE2):
+                self.led.fillRGB(0, 0, 255, 0, index)
         else:
+            # Pissed
             self.led.fillRGB(255, 0, 0, 0, index)
         self.led.update()
