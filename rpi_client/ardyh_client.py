@@ -21,8 +21,8 @@ from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
 
-
-
+UPDATE_SENSOR_DT = 0.2
+LOOP_CALLBACK_DT = 0.4
 
 if "jjbot" in settings["bot_packages"]:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
@@ -80,7 +80,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
         if "jjbot" in settings["bot_packages"]:
 
-            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
+            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT*1000)
             sensors.start()
 
 
@@ -161,7 +161,7 @@ if "jjbot" in settings["bot_packages"]:
             print "Starting thread %s" %(self.threadID)
             while sensor_thread_running:
                 result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
-                time.sleep(.2)              # sleep for 200 ms
+                time.sleep(UPDATE_SENSOR_DT)              # sleep for 200 ms
 
 
 
