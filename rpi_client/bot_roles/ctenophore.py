@@ -95,8 +95,14 @@ class Ctenophore(object):
         Returns true if any values in self.history are less than the test
         value.
         """
-        rs = [1 for val in self.history if self.history<test]
+        rs = [1 for val in self.history if val<test]
 
+        print test
+        print self.history
+        if rs: 
+            print "PISSED"
+        else:
+            print "NOT PISSED"
         return rs or False
 
 
@@ -108,15 +114,24 @@ class Ctenophore(object):
         STAGE1 = 15
         STAGE2 = 30
         self.led.all_off()
-        val = sensor_values[0][1]
-        self.history.append(val);
+                
+        val1 = sensor_values[0][1]
+        val2 = sensor_values[2][1]
+
+        print val2
+        if val2 < 200:
+            self.led.fillRGB(155,155, 0, 0, self.NLEDS)
+            self.led.update()
+
+
+        self.history.append(val1);
         self.history.pop(0)
 
-        index = self.NLEDS - val
+        index = self.NLEDS - val1
         
         percent = int(floor(100*float(index)/self.NLEDS))
 
-        print "val: %s index: %s, percent: %s" %(val, index, percent)
+        print "val1: %s index: %s, percent: %s" %(val1, index, percent)
         
         if index >= 0 and index < STAGE1 and sum(self.history) < len(self.history) * STAGE1:
             # Stage 1
