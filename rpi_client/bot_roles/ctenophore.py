@@ -1,6 +1,7 @@
-from settings import *
+import sys
 from time import sleep
 
+from settings import *
 from utils import hex2rgb
 
 try:
