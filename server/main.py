@@ -19,7 +19,7 @@ Oct. 26, 2013
 
 
 """
-import json, ast
+import sys, json, ast
 import time 
 import collections
 
@@ -40,6 +40,7 @@ IP = "173.255.213.55"
 
 
 
+listeners = []
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -52,7 +53,27 @@ class MainHandler(tornado.web.RequestHandler):
       self.write(loader.load("templates/index.html").generate())
 
 
-listeners = []
+class TwineHandler(tornado.web.RequestHandler):
+
+    def get(self, action):
+        print "Got message ", action
+        for bot in listeners:
+            if action == "top":
+              index = 5
+            elif action == "bottom":
+              index = 15
+            elif action == "front":
+              index = 25
+            elif action == "back":
+              index = 35
+            elif action == "shake":
+              index = 45
+
+            message = json.dumps({'command':'target', 
+                                  'kwargs': {'index':index}
+                                  })
+            bot['socket'].write_message(message)
+
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     
@@ -96,11 +117,18 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         
         try:
             message = ast.literal_eval(message)
-        except:
-            if VERBOSE: print "Message is not JSON"
-            return
+        except ValueError, e:
+            try:
+                message = json.loads(message)
+            except:
+                print sys.exc_info()[0]
+                if VERBOSE: print "Message is not JSON"
+                return
 
-        self.broadcast(message)
+        if 'handshake' in message.keys():
+            pass
+        else:
+            self.broadcast(message)
         
         
 
@@ -117,8 +145,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def broadcast(self, message, mode=None):
         if 'channel' in message.keys():
             channel = message['channel']
-
-        
 
         for sub in self.get_subscribers(channel):
             message = json.dumps(message)
@@ -201,6 +227,7 @@ class ArdyhNav():
 application = tornado.web.Application([
       (r'/ws', WSHandler),
       (r'/', MainHandler),
+      (r'/twine/(.*)', TwineHandler),
       (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
     ])
 

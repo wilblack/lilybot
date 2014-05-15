@@ -10,7 +10,9 @@
         var self = this;
 
         this.DOMAIN = "173.255.213.55:9093"
-
+        this.nlogs= 0;
+        this.max_nlogs = 20;
+        
         this.setup = function(){
         // Creates the websocets connection{
 
@@ -56,11 +58,16 @@
         } // End setup()
     
         _log = function (txt){
+
             $log = $("#log");
             $newRow = $("<div>");
             $newRow.text(txt);
             $log.append($newRow);
             $log.scrollTop($log[0].scrollHeight);
+            self.nlogs++;
+            if (self.nlogs > self.max_nlogs){
+                $log.eq(0).detach();
+            }
         };
 
         showReadyState = function(state){
@@ -78,6 +85,29 @@
 
 </script>
 
+<style type="text/css">
+    
+
+#log-wrapper {
+    z-index: 100000;
+    position:fixed;
+    background-color: #000000;
+    height: 100%;
+    
+}
+
+#log {
+    background-color: #000000;
+    color:#00DD00;
+    overflow-y:scroll;
+    font-size:0.9em;
+    height:70%;
+    width:99%;
+}
+
+
+</style>
+
 </head>
 
 <body>
@@ -93,7 +123,9 @@
         <span class="label secondary hide closed">CLOSED</span>
         <span class="label hide error">ERROR</span>
       </div>
-
-    <div id="log"></div>
+    
+    <div id="log-wrapper">
+        <div id="log"></div>
+    </div>
 
 </body>
