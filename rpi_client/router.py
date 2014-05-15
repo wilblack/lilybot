@@ -59,4 +59,7 @@ class Router(object):
         elif self.CTENOPHORE and cmd in self.ctenophore.commands:
             getattr(self.ctenophore, cmd)(kwargs)
 
+        else:
+            print "%s not recognized as a valid command" % (cmd)
+
         
