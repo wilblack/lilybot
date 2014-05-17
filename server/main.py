@@ -57,6 +57,8 @@ class TwineHandler(tornado.web.RequestHandler):
 
     def get(self, action):
         print "Got message ", action
+        
+
         for bot in listeners:
             if action == "bottom":
               message = json.dumps({'command':'allOff', 
@@ -78,6 +80,7 @@ class TwineHandler(tornado.web.RequestHandler):
                                     'kwargs': {'color':color}
                                     })
             bot['socket'].write_message(message)
+        self.write("Received action %s" %(action))
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
