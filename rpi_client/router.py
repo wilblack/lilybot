@@ -26,8 +26,7 @@ class Router(object):
             self.jjbot = JJBot()
 
     def received_message(self, message):
-        if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
-
+        #if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
         # Try to JSON deconde it
         try:
             # Using literal_eval to ahndle the unicoded keyword porblem.
@@ -38,7 +37,6 @@ class Router(object):
             message = json.loads(message)
 
         if not "command" in message.keys(): 
-            print "command not found in message"
             if 'sensor_values' in message['message'].keys():
                 getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_values'])
                 return
@@ -48,7 +46,7 @@ class Router(object):
         cmd = message['command']
         kwargs = message.get('kwargs', {})
 
-        if VERBOSE: print "command: %s\n" %(cmd), kwargs
+        # if VERBOSE: print "command: %s\n" %(cmd), kwargs
 
         if cmd in self.core.commands:
             getattr(self.core, cmd)(kwargs)

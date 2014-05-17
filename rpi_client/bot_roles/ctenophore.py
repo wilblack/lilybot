@@ -1,4 +1,7 @@
-import sys
+import sys, time
+import threading, Queue
+
+from random import randint
 from time import sleep
 from math import floor
 
@@ -16,6 +19,36 @@ except:
     print "[WARNING] RPi-LPD8806 bootstrap module not found"
     print sys.exc_info()[0]
 
+PULSE_DT = 10
+
+
+
+class PassiveThread (threading.Thread):
+    """
+    
+    """
+    def __init__(self, name, ctenophore, output_queue):
+        super(PassiveThread, self).__init__()
+        
+        self.name = name
+        self.ctenophore = ctenophore
+        self.output_queue  = output_queue
+        self.stoprequest = threading.Event()
+
+    def run(self):
+        print "Starting thread %s" %(self.name)
+        while not self.stoprequest.isSet():
+            #self.ctenophore.fillRGB({"color":"#22FF33"})
+            color = ('#%06X' % randint(0,256**3-1))
+            self.ctenophore.pulse({"color":color})
+
+            PULSE_DT = randint(12, 24)
+            time.sleep(PULSE_DT)              # sleep for 200 ms
+
+
+    def join(self, timeout=None):
+        self.stoprequest.set() # Turns off the thread if it already started
+        super(WorkerThread, self).join(timeout)
 
 
 class Ctenophore(object):
@@ -39,18 +72,30 @@ class Ctenophore(object):
             sleep(0.01)
             self.led.all_off()
 
+
+        # Create a single input and a single output queue for all threads.
+        input_queue = Queue.Queue()
+        output_queue = Queue.Queue()
+        # Start passive thread
+        self.passiveThread = PassiveThread("Passive Thread", self, output_queue)
+        #self.passiveThread.setDaemon(True)
+        self.passiveThread.start()
+
+        
+
+
     def setMode(self, kwargs):
         pass
 
     def setRGB(self, kwargs):
         r, g, b = hex2rgb(kwargs["color"])
-        if VERBOSE: print "calling setRGB(%s,%s,%s,%s)" %(kwargs["index"], r, g, b)
-
         self.led.setRGB(kwargs["index"], r, g, b)
         self.led.update()
 
     def setOff(self, kwargs):
-            if VERBOSE: print "called setOff()"
+        self.led.setOff(kwargs['index'])
+        self.led.update()
+
 
     def fillRGB(self, kwargs):
         self.led.all_off()
@@ -60,14 +105,16 @@ class Ctenophore(object):
         self.led.fillRGB(r, g, b, start, end)
         self.led.update()
 
+
     def fillOff(self, kwargs):
             if VERBOSE: print "called fillOff()"
+
 
     def allOff(self, kwargs):
             self.led.all_off()
 
+
     def target(self, kwargs):
-        print "[Ctenophore.taget]"
         self.led.all_off()
         nrepeat = 4
         dt = 0.2
@@ -88,6 +135,19 @@ class Ctenophore(object):
                 sleep(dt)
         
             self.led.all_off()
+
+    def pulse(self, kwargs):
+        DT = 0.005
+        color = kwargs['color']
+        direction = kwargs.get('direction', None)
+
+        for i in range(self.NLEDS):
+            self.setRGB({"color":color, "index":i})
+            time.sleep(DT)
+
+        for i in range(self.NLEDS):
+            self.setOff({"index":i})
+            time.sleep(DT)
 
 
     def clearTarget(self, kwargs):
@@ -110,11 +170,7 @@ class Ctenophore(object):
         return rs or False
 
 
-
-
-
     def sensor_callback(self, sensor_values):
-        print "in sensor_callback()"
         STAGE1 = 15
         STAGE2 = 30
         self.led.all_off()
@@ -122,7 +178,7 @@ class Ctenophore(object):
         val1 = sensor_values[0][1]
         val2 = sensor_values[2][1]
 
-        print val2
+
         if val2 < 200:
             self.led.fillRGB(155,155, 0, 0, self.NLEDS)
             self.led.update()
@@ -135,7 +191,7 @@ class Ctenophore(object):
         
         percent = int(floor(100*float(index)/self.NLEDS))
 
-        print "val1: %s index: %s, percent: %s" %(val1, index, percent)
+        
         
         if index >= 0 and index < STAGE1 and sum(self.history) < len(self.history) * STAGE1:
             # Stage 1
