@@ -58,20 +58,25 @@ class TwineHandler(tornado.web.RequestHandler):
     def get(self, action):
         print "Got message ", action
         for bot in listeners:
-            if action == "top":
-              index = 5
-            elif action == "bottom":
-              index = 15
-            elif action == "front":
-              index = 25
-            elif action == "back":
-              index = 35
-            elif action == "shake":
-              index = 45
-
-            message = json.dumps({'command':'target', 
-                                  'kwargs': {'index':index}
-                                  })
+            if action == "bottom":
+              message = json.dumps({'command':'allOff', 
+                                  'kwargs': {}})
+            else:
+              if action == "top":
+                color = "#FF00FF"
+              elif action == "back":
+                color = "#0000FF"
+              elif action == "front":
+                color = "#00FFFF"
+              elif action == "left":
+                color = "#00FF00"
+              elif action == "right":
+                color = "#FF0000"
+              elif action == "shake":
+                color = "#FFFFFF"
+              message = json.dumps({'command':'fillRGB', 
+                                    'kwargs': {'color':color}
+                                    })
             bot['socket'].write_message(message)
 
 
