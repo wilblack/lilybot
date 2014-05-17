@@ -22,7 +22,7 @@ class Ctenophore(object):
     
     def __init__(self):
 
-        self.commands = ['setRGB', 'target', 'allOff' ]
+        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff' ]
 
         # Initialize Lights, this does not belong here.
         self.NLEDS = NLEDS
@@ -53,8 +53,12 @@ class Ctenophore(object):
             if VERBOSE: print "called setOff()"
 
     def fillRGB(self, kwargs):
-            r, g, b = self.hex2rgb(kwargs["color"])
-            if VERBOSE: print "called fillRGB()"
+        self.led.all_off()
+        r, g, b = hex2rgb(kwargs["color"])
+        start = kwargs.get("start", 0)
+        end = kwargs.get("end", self.NLEDS)
+        self.led.fillRGB(r, g, b, start, end)
+        self.led.update()
 
     def fillOff(self, kwargs):
             if VERBOSE: print "called fillOff()"
