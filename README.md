@@ -138,7 +138,7 @@ sudo ifup wlan0
 ```
 
 If succesful you can check the RPi's IP address on your router or do a ifconfig. The IP address will have changed. 
-You should now be able to ssh in over Wi-Fi.
+You should now be able to ssh in over Wi-Fi. Note you may need to reboot before you can access the Internet.
 
 
 ## 4. Install and Update Software
@@ -148,8 +148,7 @@ Then log out and log back in.
 
 
 
-Run the following code and grab some coffee, the second command takes awhile.
-
+Run the following code and grab some coffee, the second command takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
 wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
@@ -157,49 +156,10 @@ chmod 755 apt-get-installer.sh
 ./apt-get-installer.sh
 ```
 
-Now make a project directory and clone some github repos. I use `/home/pi/projects/`. You'll need this loczation later
-
-```
-cd ~
-mkdir projects 
-cd projects 
-git clone https://github.com/wilblack/lilybot.git
-
-# Install this if using the Brick Pi
-git clone https://github.com/DexterInd/BrickPi_Python.git
-
-# Install this is using LED lights
-git clone https://github.com/adammhaile/RPi-LPD8806
-
-
-```
-
-Install some Python pip packages
-
-
-```
-cd ~/projects/liltybot/
-sudo pip install -r requirements.txt
-
-```
-
-### Install LPD8806 Software.  
-Intall this if you are going to run the LPD LED light strips from adafruit.com. See https://github.com/adammhaile/RPi-LPD8806.git
-
-```
-git clone https://github.com/adammhaile/RPi-LPD8806.git
-cd RPi-LPD8806
-sudo python setup.py install
-```
-
-
-
 ### Install Camera and Camera Software
 
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
-
-
 
 Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi 
 to install the software on the RPi. They are summarized below
