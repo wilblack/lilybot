@@ -44,7 +44,7 @@ On first boot select the Raspbian operating system and click "i". This will take
 
 * SD Formatter 4.0 - https://www.sdcard.org/downloads/formatter_4/
 
-<a href="step2"></a>
+<div id="step2"></div>
 ## 2. Initial Configuration
 
 * Keyboard Country Code
