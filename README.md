@@ -27,40 +27,33 @@ A lilbary to interface with the GrovePi and its sensors.
 
 # Getting Started
 
-## 1.Install Raspbian
-We will set up a new Raspberry Pi model B with the Rasbian distrubtion. 
+## 1. Install the Raspbian Operating System
+We will set up a new Raspberry Pi model B with the Rasbian distribution. I followed the instructions here http://www.raspberrypi.org/quick-start-guide. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
 
+## 2. Initial Configuration
 
+*Keyboard Country Code
+  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
 
-## Set-Up the ardyh_client on a Raspberry Pi
-
-I followed the instructions here http://www.raspberrypi.org/quick-start-guide. The guide has you install NOOBS. NOOBS is a start program that let's you install different OS on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted.  You will need an 8GB or bigger SD card to install Raspbian. 
-
-### Change Keyboard Country Code
-
-By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should chnage this to your country code. For me in the US of A its "us".
-
-To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
+  To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
 
 ```
 XKBLAYOUT=”us”
 
 ```
 
-### Config Wi-Fi
+*Config Wi-Fi
 
-
-#### With Ethernet Cable
+  * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
 
-#### With console cable
+  * With console cable
 Follow this guide to set up the console cable
 https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
 
-
-
+* Wi-Fi
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
 
