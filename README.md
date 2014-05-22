@@ -153,10 +153,11 @@ Run the following code and grab some coffee, the second command takes awhile. Th
 ```
 wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
 chmod 755 apt-get-installer.sh
-./apt-get-installer.sh
+./installer.sh
 ```
 
-### Install Camera and Camera Software
+
+### Install Camera and Camera Software (Optional)
 
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
@@ -222,7 +223,7 @@ cd rpi_clinet
 ```
 
 
-### Set up client to start on boot
+### Set up client to start on boot (Depracted, the installer.sh script does this now)
 First edit `rpi_client/ardyh_clientd` so that `DAEMON_PATH` points at the rpi_client/ directory.
 
 ```
