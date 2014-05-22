@@ -1,3 +1,4 @@
+DEPRACATED 5/21/2014
 #!/bin/sh
 
 LILYBOT_PATH=/home/pi/projects/lilybot/
