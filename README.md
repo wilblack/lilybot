@@ -1,30 +1,34 @@
-lilybot
-=======
+#lilybot
 
-These are samples, demos, and libraries I use with Lego Mindsotrm EV3, Raspberry Pi and BrickPi. The goal of lilybot
-is to provide an easy to use cloud based software deployment system for hobby/ametuer robotics. Currently lilybot
-is focused on using a Raspberry Pi along with a BrickPi to communicate with Lego Mindsorm sensors and motors (EV3 Sensors 
-are not currenlt supported by brick BrickPi, but EV3 motors do work fine). 
+The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics, primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
+
+The software components of lilybot consist of three main functions.
+
+1. The Raspberry Pi client
+  This application runs on the Raspberry Pi and automatically connects to the web server ardyh. Over this connection it can stream data and listen and responds to commands from other lilybots. Use `rpi_client/settings.py` what hardware is attached to the Raspberry and set other settings. Once running you can view the webpage at RASPBERRY_PI_IPADDRESS:9093.
+
+2. The ~ardyh~ real-time socket web server
+  This server attacks as a pub/sub server for lilybot clients. The rpi_client will automatically try to establish a web socket connection to a server running this application at `ws://173.255.213.55:9093/ws`. You can use this server or run your own instance.
+
+3. Web application clients. 
 
 
-Materials
----------
+## Hardware Packages
 
-Here is a list of materials I have used and how much they costs.
+### JJbot
+A Libaray to control Lego Mindsorm sensors and motors (EV3 Sensors 
+are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connected to a BrickPi.  
 
+### Ctenophore
+An LED Strip controller. This exposes a web api to control these https://www.adafruit.com/products/306
 
-* EV3 - $350
-* Raspberry Pi - $40
-* BrickPi - $45
-* Raspberry Pi Camera Module - $30
-* Camera Module mount kit - $5
-* NXT Touch Sensors - $40
-* NXT Ultra Sonic Sensor - $25
-* SD Card - $12
-* 6 AA with 9V out power suply - $3
-* 9v Volt adaptors - $3
-* 12 rechargable AA  NiMH batteries - $15
-* Rayovac PS3 battery charger - $20
+### GrovePi
+A lilbary to interface with the GrovePi and its sensors.
+
+# Getting Started
+
+## 1.Install Raspbian
+We will set up a new Raspberry Pi model B with the Rasbian distrubtion. 
 
 
 
