@@ -9,9 +9,18 @@ sudo apt-get install python-pip -y
 sudo apt-get install bluez -y
 sudo apt-get install python-bluetooth -y
 
+echo "\n\n*****************************\n"
+echo "Creating /home/projects/"
+echo "\n*****************************\n"
+
 cd /home/pi
 mkdir projects
 cd projects 
+
+echo "\n\n*****************************\n"
+echo "Cloning git repos /home/projects/"
+echo "\n*****************************\n"
+
 git clone https://github.com/wilblack/lilybot.git
 
 # Install this if using the Brick Pi
@@ -23,3 +32,9 @@ git clone https://github.com/adammhaile/RPi-LPD8806
 # Install GroverPi
 git clone https://github.com/DexterInd/GrovePi
 
+echo "\n\n*****************************\n"
+echo "Installing lilybot pip requirements"
+echo "\n*****************************\n"
+
+cd /home/pi/projects/liltybot/
+sudo pip install -r requirements.txt
