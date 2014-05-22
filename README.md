@@ -25,10 +25,17 @@ An LED Strip controller. This exposes a web api to control these https://www.ada
 ### GrovePi
 A lilbary to interface with the GrovePi and its sensors.
 
+
 # Getting Started
 
 ## 1. Install the Raspbian Operating System
+If you already have a Raspberry Pi up and running you can skip to [step 2](Initial Configuration). 
 We will set up a new Raspberry Pi model B with the Rasbian distribution. I followed the instructions here http://www.raspberrypi.org/help/noobs-setup/. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
+
+Once you have NOOBS installed on the SD Card, connect the wi-fi dongle, enthernet cable, (monitor and keyboard if you have one) and finally boot up by connecting the power.
+
+On first boot select the Raspbian operating system and click "i". This will take a while. 
+
 
 
 ### Links
@@ -39,7 +46,7 @@ We will set up a new Raspberry Pi model B with the Rasbian distribution. I follo
 
 ## 2. Initial Configuration
 
-*Keyboard Country Code
+* Keyboard Country Code
   By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
 
   To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
@@ -49,7 +56,7 @@ XKBLAYOUT=”us”
 
 ```
 
-*Config Wi-Fi
+* Configure Wi-Fi
 
   * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
@@ -61,6 +68,10 @@ Follow this guide to set up the console cable
 https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
 
 * Wi-Fi
+I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
+http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
+
+
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
 
@@ -74,9 +85,7 @@ Plug in the wifi dongle
 // Back up the file first
 sudo cp /etc/network/interfaces /etc/network/interfaces.bkp
 
-
 sudo cp interfaces.lilybot /etc/network/interfaces
-
 
 sudo vi /etc/network/interfaces
 
@@ -96,7 +105,6 @@ iface wlan0 inet dhcp
         wpa-psk "password"
 
 ```
-
 
 
 After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
