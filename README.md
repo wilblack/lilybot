@@ -70,6 +70,17 @@ Finsh and reboot. Once you reboot we will change your keyboard country code to w
 
 * Configure Wi-Fi
 
+I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
+http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
+
+Check here for a list of compatible wi-fi dongles http://elinux.org/RPi_USB_Wi-Fi_Adapters
+
+In the terminal see if your wi-fi dongle is detected with ifconfig.
+```
+sudo ifconfig
+```
+
+
   * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
@@ -79,9 +90,7 @@ Plug in an enternet cable and turn the raspberry on. ssh should be enabled by de
 Follow this guide to set up the console cable
 https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
 
-* Wi-Fi
-I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
-http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
+
 
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
@@ -108,23 +117,31 @@ sudo shutdown -r now
 Change the file to read, where you enter your own ssid and password. 
 
 ```
-allow-hotplug wlan0
-auto wlan0
- 
- 
-iface wlan0 inet dhcp
-        wpa-ssid "ssid"
-        wpa-psk "password"
+auto lo
 
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto wlan0
+allow-hotplug wlan0
+
+iface wlan0 inet dhcp
+    wpa-ssid "YOUR_SSID"
+    wpa-psk "YOUR_PASSKEY"
 ```
 
 
-After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
+After you edit the `interfaces` file, restart the wlan0 adapter. 
+```
+sudo ifdown wlan0
+sudo ifup wlan0
+```
+
+If succesful you can check the RPi's IP address on your router or do a ifconfig. The IP address will have changed. 
 You should now be able to ssh in over Wi-Fi.
 
 
 ## Install and Update Software
-
 
 Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
 Then log out and log back in. 
