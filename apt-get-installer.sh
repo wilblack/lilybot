@@ -1,4 +1,7 @@
 #!/bin/sh
+
+LILYBOT_PATH=/home/pi/projects/lilybot/
+
 sudo apt-get update -y
 sudo apt-get upgrade -y
 
@@ -36,5 +39,19 @@ echo "\n\n*****************************\n"
 echo "Installing lilybot pip requirements"
 echo "\n*****************************\n"
 
-cd /home/pi/projects/liltybot/
+cd $LILYBOT_PATH
 sudo pip install -r requirements.txt
+
+echo "\n\n*****************************\n"
+echo "Setting ardyh_client to start on boot."
+echo "\n*****************************\n"
+
+sudo cp rpi_client/ardyh_clientd /etc/init.d/.
+sudo update-rc.d ardyh_clientd defaults
+
+
+
+
+
+
+
