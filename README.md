@@ -68,7 +68,7 @@ Finsh and reboot. Once you reboot we will change your keyboard country code to w
     ```
 
 
-* Configure Wi-Fi
+## 3. Configure Wi-Fi
 
 I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
 http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
@@ -141,33 +141,23 @@ If succesful you can check the RPi's IP address on your router or do a ifconfig.
 You should now be able to ssh in over Wi-Fi.
 
 
-## Install and Update Software
+## 4. Install and Update Software
 
 Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
 Then log out and log back in. 
 
 
+
 Run the following code and grab some coffee, the second command takes awhile.
 
-```
-sudo apt-get update
-sudo apt-get upgrade
-```
-
-Now install some librabries and helpful stuff. The first two are optional but I like to have them.
 
 ```
-sudo apt-get install git-core
-sudo apt-get install screen
-sudo apt-get install ipython              # Optional
-sudo apt-get install python-pip
-sudo apt-get install bluez                # Optional
-sudo apt-get install python-bluetooth     # Optional
-
-
+wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
+chmod 755 apt-get-installer.sh
+./apt-get-installer.sh
 ```
 
-Now make a project directory and clone some github repos. This will place the gihub clones in `/home/pi/Projects/`.
+Now make a project directory and clone some github repos. I use `/home/pi/projects/`. You'll need this loczation later
 
 ```
 cd ~
