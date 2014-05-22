@@ -4,13 +4,14 @@
 # description: lilybot daemon
 # processname: lilybot
 
-DAEMON_PATH="/home/pi/Projects/lilybot/jjbot"
+# Edit this to the appropriate path. No trailing slash
+DAEMON_PATH="/home/pi/projects/lilybot/rpi_client"
 
-DAEMON=start_server.sh
+DAEMON=start_ardyh_client.sh
 DAEMONOPTS=""
 
 NAME=start_server
-DESC="This starts the jjbot web server"
+DESC="This starts the ardyh cleint"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 PORT=9010

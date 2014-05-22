@@ -1,72 +1,53 @@
-lilybot
-=======
+#lilybot
 
-These are samples, demos, and libraries I use with Lego Mindsotrm EV3, Raspberry Pi and BrickPi. The goal of lilybot
-is to provide an easy to use cloud based software deployment system for hobby/ametuer robotics. Currently lilybot
-is focused on using a Raspberry Pi along with a BrickPi to communicate with Lego Mindsorm sensors and motors (EV3 Sensors 
-are not currenlt supported by brick BrickPi, but EV3 motors do work fine). 
+The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics, primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
 
+The software components of lilybot consist of three main functions.
 
-Materials
----------
+1. The Raspberry Pi client
+  This application runs on the Raspberry Pi and automatically connects to the web server ardyh. Over this connection it can stream data and listen and responds to commands from other lilybots. Use `rpi_client/settings.py` what hardware is attached to the Raspberry and set other settings. Once running you can view the webpage at RASPBERRY_PI_IPADDRESS:9093.
 
-Here is a list of materials I have used and how much they costs.
+2. The ~ardyh~ real-time socket web server
+  This server attacks as a pub/sub server for lilybot clients. The rpi_client will automatically try to establish a web socket connection to a server running this application at `ws://173.255.213.55:9093/ws`. You can use this server or run your own instance.
 
-
-* EV3 - $350
-* Raspberry Pi - $40
-* BrickPi - $45
-* Raspberry Pi Camera Module - $30
-* Camera Module mount kit - $5
-* NXT Touch Sensors - $40
-* NXT Ultra Sonic Sensor - $25
-* SD Card - $12
-* 6 AA with 9V out power suply - $3
-* 9v Volt adaptors - $3
-* 12 rechargable AA  NiMH batteries - $15
-* Rayovac PS3 battery charger - $20
+3. Web application clients. 
 
 
+## Hardware Packages
 
-1. Set-Up the Raspberry Pi with BrickPi
-=======================================
+### JJbot
+A Libaray to control Lego Mindsorm sensors and motors (EV3 Sensors 
+are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connected to a BrickPi.  
 
-I followed the instructions here http://www.raspberrypi.org/quick-start-guide. The guide has you install NOOBS. NOOBS is a start program that let's you install different OS on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted.  You will need an 8GB or bigger SD card to install Raspbian. 
+### Ctenophore
+An LED Strip controller. This exposes a web api to control these https://www.adafruit.com/products/306
 
-
-Config Wi-Fi
-------------
-
-Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
-`ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
-
-You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
-info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
-
-```
-// Back up the file first
-sudo vi /etc/network/interfaces
-```
-
-Change the file to read, where you enter your own ssid and password. A tempalate for this file is available in the project root named `interfaces.lilybot`. Just add your SSID and PASSWORD and copy it to `/etc/interfaces/` or manually edit it to look like:
+### GrovePi
+A lilbary to interface with the GrovePi and its sensors.
 
 
-```
-allow-hotplug wlan0
-auto wlan0
- 
- 
-iface wlan0 inet dhcp
-        wpa-ssid "ssid"
-        wpa-psk "password"
+# Getting Started
 
-```
+## 1. Install the Raspbian Operating System
+If you already have a Raspberry Pi up and running you can skip to step 2.
+
+We will set up a new Raspberry Pi model B with the Rasbian distribution. I followed the instructions here http://www.raspberrypi.org/help/noobs-setup/. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
+
+Once you have NOOBS installed on the SD Card, connect the wi-fi dongle, enthernet cable, (monitor and keyboard if you have one) and finally boot up by connecting the power.
+
+On first boot select the Raspbian operating system and click "i". This will takes a while. On successfult install the Rpi will reboot and you will find yourself at the rasp-conf screen. 
 
 
+### Links
 
-After you edit the `interfaces` file, reboot the Pi and check for the Pi's IP address on your router, it may have changed. 
-You should now be able to ssh in over Wi-Fi.
+* NOOBS Download (Use NOOBS Lite if you have a ethernet network connection to the pi) `http://www.raspberrypi.org/downloads/`
 
+* SD Formatter 4.0 - https://www.sdcard.org/downloads/formatter_4/
+
+<div id="step2"></div>
+
+## 2. Initial rasp-config Configuration
+To get to the rasp-config screen type `rasp-config` on the command line. 
 
 **Troubleshooting**
 
@@ -97,57 +78,118 @@ To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/
 
 Install and Update Software
 ---------------------------
+* Change option 3 to boot to console.
+
+* Change hostname to something ore descriptive and unique. This is more import when running multiple RPi's
+
+* Load the SPI kernal
+
+* Enable Camera
+
+Finsh and reboot. Once you reboot we will change your keyboard country code to what's appropriate for you, for me its US. 
+* Keyboard Country Code
+  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
+
+  To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
+    ```
+    XKBLAYOUT=”us”
+
+    ```
+
+
+## 3. Configure Wi-Fi
+
+I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
+http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
+
+Check here for a list of compatible wi-fi dongles http://elinux.org/RPi_USB_Wi-Fi_Adapters
+
+In the terminal see if your wi-fi dongle is detected with ifconfig.
+```
+sudo ifconfig
+```
+
+
+  * With Ethernet Cable
+Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
+`ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
+
+
+  * With console cable
+Follow this guide to set up the console cable
+https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
+
+
+
+
+You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
+info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
+
+
+You can use the interfaces template in the root directory named `interfaces.lilbot` 
+
+Plug in the wifi dongle
+
+
+```
+// Back up the file first
+sudo cp /etc/network/interfaces /etc/network/interfaces.bkp
+
+sudo cp interfaces.lilybot /etc/network/interfaces
+
+sudo vi /etc/network/interfaces
+
+// After editing the file restart
+sudo shutdown -r now
+```
+
+Change the file to read, where you enter your own ssid and password. 
+
+```
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto wlan0
+allow-hotplug wlan0
+
+iface wlan0 inet dhcp
+    wpa-ssid "YOUR_SSID"
+    wpa-psk "YOUR_PASSKEY"
+```
+
+
+After you edit the `interfaces` file, restart the wlan0 adapter. 
+```
+sudo ifdown wlan0
+sudo ifup wlan0
+```
+
+If succesful you can check the RPi's IP address on your router or do a ifconfig. The IP address will have changed. 
+You should now be able to ssh in over Wi-Fi. Note you may need to reboot before you can access the Internet.
+
+
+## 4. Install and Update Software
 
 Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
 Then log out and log back in. 
 
 
-Run the following code and grab some coffee, the second command takes awhile.
+
+Run the following code and grab some coffee, the second command takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
-sudo apt-get update
-sudo apt-get upgrade
-```
-
-Now install some librabries and helpful stuff. The first two are optional but I like to have them.
-
-```
-sudo apt-get install git-core
-sudo apt-get install screen
-sudo apt-get install ipython
-sudo apt-get install python-pip
-sudo apt-get install bluez
-sudo apt-get install python-bluetooth
-
-
-```
-
-Now make a project directory and clone some github repos. This will place the gihub clones in `/home/pi/Projects/`.
-
-```
-cd ~
-mkdir Projects
-cd Projects 
-git clone https://github.com/DexterInd/BrickPi_Python.git
-git clone https://github.com/wilblack/lilybot.git
-
-```
-
-Install some Python pip packages
-
-```
-sudo pip install tornado
-sudo pip install ws4py
-sudo pup install pyreadlines
+wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
+chmod 755 apt-get-installer.sh
+./installer.sh
 ```
 
 
-2. Install Camera and Camera Software
-=====================================
+### Install Camera and Camera Software (Optional)
+
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
-
-
 
 Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi 
 to install the software on the RPi. They are summarized below
@@ -196,11 +238,47 @@ To stop streaming use
 ```
 
 
+## Start on ardyh client 
+The ardyh client will start two applications. The first application is a web server running on port 9010 to set local settings for the bot. It is available at <IP_ADDRESS>:9010. 
 
-3. Run jjbot
-============
+The second is a websocket client that is confugred to connect to the ardyh server at `ws://173.255.213.55:9093/ws`
 
-`jjbot` is based on the BrickPi's jj-car example and is found in `lilybot/jjbot`.
+### Manually start rpi_client
+```
+cd rpi_clinet
+./start_ardyh_client.sh
+```
+
+
+### Set up client to start on boot (Depracted, the installer.sh script does this now)
+First edit `rpi_client/ardyh_clientd` so that `DAEMON_PATH` points at the rpi_client/ directory.
+
+```
+DAEMON_PATH="/home/pi/projects/lilybot/rpi_client" 
+```
+
+
+Copy `lilybotd` and `lilybot_camerad` to the `etc/init.d` and update the rc.d file.
+
+
+```
+sudo cp rpi_client/ardyh_clientd /etc/init.d/.
+sudo cp rpi_client/lilybotd_camera /etc/init.d/.
+
+sudo update-rc.d ardyh_clientd defaults
+sudo update-rc.d lilybot_camerad defaults
+```
+
+
+You may need to do a `chmod 775` to make these executable. You can then start and staop the deamon with `sudo /etc/init.d/ardyh_cleint start`
+
+
+Once the deamon starts it ties up the port. You can see what ports are currently being used with
+
+```
+sudo netstat -lptu
+sudo netstat -tulpn
+```
 
 
 

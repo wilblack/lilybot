@@ -181,14 +181,63 @@ function arrows() {
 
 
 Lilybot = function(){
+    /*
+    This object handles all commands for the raspberry pi lilybot
+    */
     var self = this;
         
     this.startCamera = function(){
-        ardyh.socket.send("start-camera-1");
+        var message = {
+            command:"start-camera-1",
+            kwargs:{}
+        }
+        this.send(message);
     };
 
-    this.stopCamera = function(){
-        ardyh.socket.send("stop-camera-1");
+    this.startCamera = function(){
+        var message = {
+            command:"stop-camera-1",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.shutdown = function(){
+        var message = {
+            command:"shutdown",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.restart = function(){
+        var message = {
+            command:"restart",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.target = function(index){
+        var message = {
+            command:"target",
+            kwargs:{index:index}
+        }
+        this.send(message);
+    };
+
+    this.clearTarget = function(){
+        var message = {
+            command:"clearTarget",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+
+    this.send = function(message){
+        var out = JSON.stringify(message);
+        ardyh.socket.send(out);
     };
 
 };  // End lilybot
@@ -206,7 +255,8 @@ Ardyh = function(){
     this.lilybot = new Lilybot();
     this.host = "";
     this.socket = null;
-
+    this.nlogs = 0;
+    this.max_nlogs = 1000;
 
     this.setup = function(){
         // Creates the websocets connection{
@@ -230,14 +280,14 @@ Ardyh = function(){
                 - sensor_values
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
-
+                self._log(msg.data);
                 try {
                   var data = JSON.parse(msg.data);
                   if ('sensor_values' in data) updateSensorValues(data.sensor_values)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
-                  self._log(msg.data);
+                    self.log("Could not parse message")
                 }
             }
 
@@ -259,11 +309,16 @@ Ardyh = function(){
         } // End setup()
 
     this._log = function (txt){
+
         $log = $("#log");
         $newRow = $("<div>");
         $newRow.text(txt);
         $log.append($newRow);
         $log.scrollTop($log[0].scrollHeight);
+        self.nlogs++;
+        if (self.nlogs > self.max_nlogs){
+            $log.eq(0).detach();
+        }
     };
 
     this.showReadyState = function(state){
@@ -277,15 +332,14 @@ Ardyh = function(){
         data should have keywrod 'camera_url'
         */
         self.camera_url = data.camera_url;
-    }
+    };
 
     this.startCamera = function(){
         /* 
         Powers up the camera and sends the stream to the #camera-1.
         */
         this.lilybot.startCamera();
-
-    }
+    };
 
     this.refreshCamera = function(){
         $("#camera-1").html("");
@@ -294,12 +348,35 @@ Ardyh = function(){
         self.webcam = new Webcam($("#camera-1"), self.camera_url)
         self.webcam.createImageLayer();
         resize();
-    }
+    };
 
     this.stopCamera = function(){
         /* Shutsdown the camera. */
         this.lilybot.stopCamera();
-    }
+    };
+
+    this.shutdown = function(){
+        this.lilybot.shutdown();
+    };
+
+    this.restart = function(){
+        this.lilybot.restart();
+    };
+
+    this.target = function(index){
+        this.lilybot.target(index);
+    };
+
+    this.clearTarget = function(){
+        this.lilybot.clearTarget();
+    };
+
+
+    this.pauseLog = function(){
+        console.log("Not implemented");
+                
+    };
+
 
 }; // End Ardyh
 
@@ -319,10 +396,26 @@ ControlsView = function($el){
     if (typeof($el) === "undefined") this.$el = $(".controls");
 
     // Add listeners
-    this.$el.find(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
-    this.$el.find(".refreshCameraBtn").click(function(e){ ardyh.refreshCamera(); });
-    this.$el.find(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+    $(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
+    $(".refreshCameraBtn").click(function(e){ ardyh.refreshCamera(); });
+    $(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+    $(".restartBtn").click(function(e){ ardyh.restart(); });
+    $(".shutdownBtn").click(function(e){ ardyh.shutdown(); });
+    $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
+    
 
+    $(".targetBtn").click(function(e){ 
+        target_index = $("[name=target_index]").val();
+        ardyh.target(target_index); 
+        $(".targetBtn").hide();
+        $(".clearTargetBtn").show();
+    });
+
+    $(".clearTargetBtn").click(function(e){ 
+        ardyh.clearTarget();
+        $(".clearTargetBtn").hide();
+        $(".targetBtn").show();
+    });
 }
 
 
@@ -357,7 +450,7 @@ function resize(){
 
 
     // camera-content stuff.
-    var W = $("#camera-content").outerWidth();
+    var W = $("#content").outerWidth();
     aspect_ratio = 640/480;
 
     $("#camera-1").width(0.7*W);

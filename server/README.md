@@ -15,10 +15,66 @@ Dependencies
 
 tornado - `pip install tornado` 
 
+
+The server listens on port 9093 by default
+
 Start the Server
 ================
 
 1. Got to `lilybot/server`
 2. Run `python main.js`
 
-The server will listen on port 9093
+
+Stop Server
+===========
+
+1. Get the process PID `sudo fuser 9093/tcp`
+2. Kill the process `sudo kill PID`
+
+
+
+## Connecting a Bot to ardyh
+
+### Initial handshake
+
+Bot should send an initial handshake JSON object.
+
+```
+{message: 
+  {"bot_name":"",
+   "bot_roles":[], 
+}
+
+```
+
+**bot_name** - a unique identfiyer for the bot
+
+**bot_roles** - a list of roles in the set {"router", "bot", "controller"}. The router role is for non tinternet connected use. the controller role is for user interfaces usually  with a web or mobile app.
+              
+ 
+#### Commands
+
+A typical command will have the following JSON structure.
+
+```
+  {"command":"",
+   "kwargs":{},
+   }
+
+```
+
+**command** -  a string with the command name. This uses is a RPC model 
+
+**kwargs** - an object whose keyword/values are arguements to the command.
+
+
+A bot needs to register there commands.
+
+
+
+
+
+
+
+
+

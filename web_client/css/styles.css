@@ -1,3 +1,17 @@
+/************************************************************************************
+General Styling
+************************************************************************************/
+
+.hide {
+    display:none;
+}
+
+/************************************************************************************
+End General Styling
+************************************************************************************/
+
+
+
 p {
     line-height:1.1;
     font-size:.9;
@@ -22,8 +36,11 @@ p {
 
 
 #log-wrapper {
+    z-index: 100000;
+    position:fixed;
     background-color: #000000;
-    height:67%;
+    height: 100%;
+    
 }
 
 #log {
@@ -31,9 +48,17 @@ p {
     color:#00DD00;
     overflow-y:scroll;
     font-size:0.9em;
-    height:100%;
+    height:70%;
     width:99%;
 }
+
+#sensor-values {
+    height:38px;
+    position:fixed;
+    z-index: 100000;
+}
+
+
 #ready-state .label{
     display: inline-block;
 }
@@ -64,11 +89,15 @@ p {
     margin:0;
 }
 
+
+
+
+
 /************************************************************************************
 Camera Layout Styling
 ************************************************************************************/
 
-#camera-content {
+#camera.content {
     max-width:914px;
     margin:auto;
 }
@@ -90,7 +119,7 @@ Camera Layout Styling
     float:left;
 }
 
-#camera-content .controls button {
+#camera.content .controls button {
     margin-bottom:0;
 }
 
@@ -104,19 +133,14 @@ Camera Layout Styling
 }
 
 
-#camera-content #sensor-values {
-     height:38px;
-     position:fixed;
-     z-index: 100000;
-}
 
-#camera-content .transparent {
+#camera.content .transparent {
    
     background-color: rgba(0,0,0,0.3);
 }
 
 
-#camera-content #log-wrapper {
+#camera.content #log-wrapper {
     height:60px;
     z-index: 100000;
     position:fixed;
