@@ -30,6 +30,13 @@ A lilbary to interface with the GrovePi and its sensors.
 ## 1. Install the Raspbian Operating System
 We will set up a new Raspberry Pi model B with the Rasbian distribution. I followed the instructions here http://www.raspberrypi.org/help/noobs-setup/. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
 
+
+### Links
+
+* NOOBS Download (Use NOOBS Lite if you have a ethernet network connection to the pi) `http://www.raspberrypi.org/downloads/`
+
+* SD Formatter 4.0 - https://www.sdcard.org/downloads/formatter_4/
+
 ## 2. Initial Configuration
 
 *Keyboard Country Code
