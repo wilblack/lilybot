@@ -35,8 +35,7 @@ We will set up a new Raspberry Pi model B with the Rasbian distribution. I follo
 
 Once you have NOOBS installed on the SD Card, connect the wi-fi dongle, enthernet cable, (monitor and keyboard if you have one) and finally boot up by connecting the power.
 
-On first boot select the Raspbian operating system and click "i". This will take a while. 
-
+On first boot select the Raspbian operating system and click "i". This will takes a while. On successfult install the Rpi will reboot and you will find yourself at the rasp-conf screen. 
 
 
 ### Links
@@ -46,8 +45,19 @@ On first boot select the Raspbian operating system and click "i". This will take
 * SD Formatter 4.0 - https://www.sdcard.org/downloads/formatter_4/
 
 <div id="step2"></div>
-## 2. Initial Configuration
 
+## 2. Initial rasp-config Configuration
+To get to the rasp-config screen type `rasp-config` on the command line. 
+
+* Change option 3 to boot to console.
+
+* Change hostname to something ore descriptive and unique. This is more import when running multiple RPi's
+
+* Load the SPI kernal
+
+* Enable Camera
+
+Finsh and reboot. Once you reboot we will change your keyboard country code to what's appropriate for you, for me its US. 
 * Keyboard Country Code
   By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
 
@@ -57,6 +67,7 @@ On first boot select the Raspbian operating system and click "i". This will take
 XKBLAYOUT=”us”
 
 ```
+
 
 * Configure Wi-Fi
 
