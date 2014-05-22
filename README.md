@@ -62,11 +62,10 @@ Finsh and reboot. Once you reboot we will change your keyboard country code to w
   By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
 
   To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
+    ```
+    XKBLAYOUT=”us”
 
-```
-XKBLAYOUT=”us”
-
-```
+    ```
 
 
 * Configure Wi-Fi
