@@ -42,6 +42,10 @@ IP = "173.255.213.55"
 
 listeners = []
 
+def get_bot_listener(bot_name):
+    return next( bot for bot in listeners if bot['bot_name'] == bot_name )
+
+
 
 class MainHandler(tornado.web.RequestHandler):
     
@@ -104,23 +108,23 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print 'connection opened...'
-        
+        bot = {"socket":self,
+                "subscriptions":[]}
         try:
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
-        print "this is %s" %bot_name
+        
+        bot.update({"bot_name":bot_name})
 
+        print "this is %s" %bot_name
         self.connected_to = bot_name
-        listeners.append( {"bot_name":bot_name, "socket":self} )
+        listeners.append( bot )
 
 
     def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
         """
         Messages should come as a JSON Object string.
-
-        name -  a name or MAC address to identify the bot. This does not need to be unique
-        type : ['bot', 'user']
 
         """
         if VERBOSE: print "recieved message: \n", message
@@ -134,6 +138,12 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 if VERBOSE: print "Message is not JSON"
                 return
 
+        if 'handshake' in messageObj.keys():
+            print "Updating %s's subscriptions to %s" %(messageObj['bot_name'], messageObj['subscriptions'])
+            bot = get_bot_listener(messageObj['bot_name'])
+            bot.update({'subscriptions':messageObj['subscriptions']})
+
+
         # if 'handshake' in messageObj.keys():
         #     pass
         # else:
@@ -144,7 +154,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         
         bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
         listeners.remove(bot)
-
 
         #self.broadcast("Closed %s" %(bot['bot_name']))
 
@@ -165,13 +174,17 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         
     def get_subscribers(self, channel):
         """
-        The only subscriber is rpi2
 
-        If channel is falsy then the all listeners are returned.
+        Checks listeners for a bots with channel in their subscription list.
+        channel is usaully a bot_name.
+
+        Returns:
+            If channel is falsy then the all listeners are returned else
+            returns a lit of listerns.
+
         """
-
         if channel:
-            return [bot for bot in listeners if bot['bot_name'] in ["io.ardyh.rp2", ""] ]
+            return [bot for bot in listeners if channel in bot['subscriptions'] ]
         else:
             return listeners
 
@@ -195,9 +208,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       else:
         if VERBOSE: print "message is a string"        
         message = {"message":message, "ardyh_timestamp": "%s" %(now) }
-      
-
-      
 
 
     def loopCallback(self):

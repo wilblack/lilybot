@@ -170,7 +170,7 @@ Ardyh = function(){
     this.setup = function(){
         // Creates the websocets connection{
 
-        this.host =  "ws://"+ this.DOMAIN +"/ws?web_client";      // combines the three string and creates a new string
+        this.host =  "ws://"+ this.DOMAIN +"/ws?jjbot.solalla.ardyh";      // combines the three string and creates a new string
         this.socket = new WebSocket(this.host);
               
         // event handlers for websocket
@@ -376,6 +376,13 @@ ControlsView = function($el){
             break;
             case 88:
                 self.lilybot.reverse();
+            break;
+
+            case 38:
+                self.lilybot.look_up();
+            break;
+            case 40:
+                self.lilybot.look_down();
             break;
 
        }
