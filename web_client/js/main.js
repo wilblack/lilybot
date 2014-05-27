@@ -1,86 +1,3 @@
-// These are updates on button clicks
-var up;
-var down;
-var left;
-var right;
-var brakes;
-
-function accelerate()       // defines a variable that controls the forward movement
-{
-    up = "u";               // when up == u the bot moves forward 
-    down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
-    ardyh.socket.send("u");   
-}  
-
-function reverse(){
-    down = "d";
-    up = "aaa";left = "aaa";right = "aaa";brakes = "aaa";
-    ardyh.socket.send("d");  
-}
-
-function steer_left(){
-    left = "l";
-    up = "aaa";down = "aaa";right = "aaa";brakes = "aaa";
-    ardyh.socket.send("l");  
-}
-
-function steer_right(){
-    right = "r";
-    up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
-    ardyh.socket.send("r");
-}
-
-function nudge_left(){
-    ardyh.socket.send("nl");  
-}
-
-function nudge_right(){
-    ardyh.socket.send("nr");
-}
-
-
-
-function stop(){
-    up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
-    ardyh.socket.send("b");
-}        
-
-
-function shutdown(){
-    ardyh.socket.send("x");
-} 
-
-
-function restart(){
-    ardyh.socket.send("y");
-} 
-
-
-function lookLeft(){
-  ardyh.socket.send("ll");
-}
-
-function lookRight(){
-  ardyh.socket.send("lr");
-}
-
-function connectBtnCallback(){
-  /*
-   * This should establish a new connection
-   */
-
-   setup2()
-
-}
-
-function showReadyState(state){
-  $el =  $("#ready-state");
-  $el.find("span").hide();
-  $("#ready-state ."+state).show();
-}
-
-
-
 function updateSensorValues(sensor_values){
     /*
     Input
@@ -95,94 +12,14 @@ function updateSensorValues(sensor_values){
        $el.find("."+port).html(sensor_values[i][1]);
     }
 
-    }   
-
-function buttons() { 
-    if(up== "u") {
-      ardyh.socket.send("u");
-    }   
-    
-    if(down== "d") {
-      ardyh.socket.send("d");
-    }
-    
-    if(left== "l") {
-      ardyh.socket.send("l");
-    }   
-    
-    if(right== "r") {
-      ardyh.socket.send("r");
-    }   
-    
-    if(brakes == "b") {
-      ardyh.socket.send("b");
-    }
 }
-
-
-function arrows() {
-    document.onkeyup = KeyCheck;       
-    function KeyCheck(){
-       var KeyID = event.keyCode;
-       switch(KeyID)
-       {
-            case 16:
-            ardyh.socket.send("b");
-            break; 
-            case 17:
-            ardyh.socket.send("b");
-            break;
-            case 37:
-            ardyh.socket.send("l");
-            break;
-            case 38:
-            ardyh.socket.send("u");
-            break;
-            case 39:
-            ardyh.socket.send("r");
-            break;
-            case 40:
-            ardyh.socket.send("d");
-            break;
-
-            // WoW Style
-            case 32: // x
-            ardyh.socket.send("b");
-            break; 
-            case 88: // x
-            ardyh.socket.send("d");
-            break; 
-            case 65: // a
-            ardyh.socket.send("l");
-            break;
-            case 87: // w
-            ardyh.socket.send("u");
-            break;
-            case 68: // d
-            ardyh.socket.send("r");
-            break;
-            case 83: // s
-            ardyh.socket.send("b");
-            break;
-
-            case 81: // q
-            ardyh.socket.send("nl");
-            break;
-            case 69: // e
-            ardyh.socket.send("nr");
-            break;
-
-
-
-       }
-    }
-}
-
 
 
 Lilybot = function(){
     /*
-    This object handles all commands for the raspberry pi lilybot
+    This object handles all commands for the raspberry pi lilybot.
+    There needs to be a seperate one for ctenophore. 
+
     */
     var self = this;
         
@@ -194,7 +31,7 @@ Lilybot = function(){
         this.send(message);
     };
 
-    this.startCamera = function(){
+    this.stopCamera = function(){
         var message = {
             command:"stop-camera-1",
             kwargs:{}
@@ -234,6 +71,78 @@ Lilybot = function(){
         this.send(message);
     };
 
+    this.forward = function(){
+        var message = {
+            command:"forward",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.reverse = function(){
+        var message = {
+            command:"reverse",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.steer_left = function(){
+        var message = {
+            command:"steer_left",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.steer_right = function(){
+        var message = {
+            command:"steer_right",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.nudge_left = function(){
+        var message = {
+            command:"nudge_left",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.nudge_right = function(){
+        var message = {
+            command:"nudge_right",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.stop = function(){
+        var message = {
+            command:"stop",
+            kwargs:{}
+        }
+        this.send(message);
+    }   
+
+
+    this.look_up = function(){
+        var message = {
+            command:"look_up",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.look_down = function(){
+        var message = {
+            command:"look_down",
+            kwargs:{}
+        }
+        this.send(message);
+    }
 
     this.send = function(message){
         var out = JSON.stringify(message);
@@ -261,16 +170,13 @@ Ardyh = function(){
     this.setup = function(){
         // Creates the websocets connection{
 
-        this.host =  "ws://"+ this.DOMAIN +"/ws";      // combines the three string and creates a new string
+        this.host =  "ws://"+ this.DOMAIN +"/ws?web_client";      // combines the three string and creates a new string
         this.socket = new WebSocket(this.host);
               
         // event handlers for websocket
         if(self.socket){
             self.socket.onopen = function(){
                 console.log("connection opened....");
-                arrows();     // function for detecting keyboard presses
-                buttons();    // function for detecting the button press on webpage
-                self.showReadyState("open");
             }
 
             self.socket.onmessage = function(msg) {
@@ -295,6 +201,7 @@ Ardyh = function(){
                 //alert("connection closed....");
                 self._log("The connection has been closed.");
                 self.showReadyState("closed");
+                this.socket = new WebSocket(this.host);
              }
 
             self.socket.onerror = function(){
@@ -317,7 +224,7 @@ Ardyh = function(){
         $log.scrollTop($log[0].scrollHeight);
         self.nlogs++;
         if (self.nlogs > self.max_nlogs){
-            $log.eq(0).detach();
+            $log.find("div").eq(0).detach();
         }
     };
 
@@ -377,6 +284,13 @@ Ardyh = function(){
                 
     };
 
+    this.getBotsList = function(callback){
+        url = "http://" + this.DOMAIN + "/bots-list";
+        $.get(url, function(res){
+            console.log(res);
+            callback(res);
+        }, 'json');
+    };
 
 }; // End Ardyh
 
@@ -393,6 +307,8 @@ View Stuff
 ControlsView = function($el){
     var self = this;
 
+    this.lilybot = new Lilybot();
+
     if (typeof($el) === "undefined") this.$el = $(".controls");
 
     // Add listeners
@@ -402,6 +318,21 @@ ControlsView = function($el){
     $(".restartBtn").click(function(e){ ardyh.restart(); });
     $(".shutdownBtn").click(function(e){ ardyh.shutdown(); });
     $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
+
+    $(".forwardBtn").click(function(e){ self.lilybot.forward(); });
+    $(".stopBtn").click(function(e){ self.lilybot.stop(); });
+    $(".reverseBtn").click(function(e){ self.lilybot.reverse(); });
+    $(".nudgeLeftBtn").click(function(e){ self.lilybot.nudge_left(); });
+    $(".nudgeRightBtn").click(function(e){ self.lilybot.nudge_right(); });
+    $(".steerLeftBtn").click(function(e){ self.lilybot.steer_left(); });
+    $(".steerRightBtn").click(function(e){ self.lilybot.steer_right(); });
+
+
+    $(".refreshBotsBtn").click(function(){
+        ardyh.getBotsList(function(res){
+            $("#bots-list").html(res.join("<br>"));
+        });
+    });
     
 
     $(".targetBtn").click(function(e){ 
@@ -416,7 +347,40 @@ ControlsView = function($el){
         $(".clearTargetBtn").hide();
         $(".targetBtn").show();
     });
-}
+
+
+    // Lilybot butotns listeners
+    document.onkeyup = keyCheck;       
+    function keyCheck(){
+       var keyID = event.keyCode;
+       switch(keyID)
+        {
+            // WoW style keyboard mappings
+            case 81: // q
+                self.lilybot.nudge_left();
+            break; 
+            case 69:
+                self.lilybot.nudge_right();
+            break;
+            case 65:
+                self.lilybot.steer_left();
+            break;
+            case 68:
+                self.lilybot.steer_right();
+            break;
+            case 87:
+                self.lilybot.forward();
+            break;
+            case 83:
+                self.lilybot.stop();
+            break;
+            case 88:
+                self.lilybot.reverse();
+            break;
+
+       }
+    }  // end keyCheck()
+};
 
 
 
