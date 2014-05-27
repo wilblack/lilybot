@@ -44,20 +44,29 @@ listeners = []
 
 
 class MainHandler(tornado.web.RequestHandler):
-  
-    def get(self):
-      """
-      Displays the webpage.
-      """
-      loader = tornado.template.Loader(".")
-      self.write(loader.load("templates/index.html").generate())
+    
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+
+    def get(self, action=None):
+        """
+        Displays the webpage.
+        """
+        if action == "bots-list":
+            out = json.dumps([l['bot_name'] for l in listeners])
+            self.write(out)
+        else:
+            loader = tornado.template.Loader(".")
+            self.write(loader.load("templates/index.html").generate())
 
 
 class TwineHandler(tornado.web.RequestHandler):
 
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+
     def get(self, action):
         print "Got message ", action
-        
 
         for bot in listeners:
             if action == "bottom":
@@ -95,12 +104,12 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print 'connection opened...'
-        self.log('Hello, good to see you again.')
-
+        
         try:
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
+        print "this is %s" %bot_name
 
         self.connected_to = bot_name
         listeners.append( {"bot_name":bot_name, "socket":self} )
@@ -125,13 +134,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 if VERBOSE: print "Message is not JSON"
                 return
 
-        if 'handshake' in messageObj.keys():
-            pass
-        else:
-            self.broadcast(messageObj)
-        
-        
-
+        # if 'handshake' in messageObj.keys():
+        #     pass
+        # else:
+        #     self.broadcast(messageObj)
+        self.broadcast(messageObj)
     def on_close(self):
         print 'connection closed...'
         
@@ -152,6 +159,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         out = message
         # import pdb; pdb.set_trace()
         for sub in self.get_subscribers(channel):
+            out.update({'from':sub['bot_name']})
             sub['socket'].write_message(out)
 
         
@@ -233,6 +241,7 @@ class ArdyhNav():
 application = tornado.web.Application([
       (r'/ws', WSHandler),
       (r'/', MainHandler),
+      (r'/(bots-list)', MainHandler),
       (r'/twine/(.*)', TwineHandler),
       (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
     ])
