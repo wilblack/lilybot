@@ -1,9 +1,24 @@
+import time
+from BrickPi import *   #import BrickPi.py file to use BrickPi operations
 
 class JJBot(object):
     pass
 
     def __init__(self):
-        self.commands = []
+        self.commands = ['forward', 
+                         'stop', 
+                         'reverse', 
+                         'nudge_left', 
+                         'nudge_right', 
+                         'steer_left',
+                         'steer_right',
+                         'look_up',
+                         'look_down']
+
+
+        self.LOOK_SPEED = 80
+        self.LOOK_DT = 0.5
+        
         # try:
         #         print "Trying to load JJBot"
         #         self.bot = JJBot()
@@ -32,81 +47,72 @@ class JJBot(object):
 
 
 
-    # if message == 'u' :
-    #             self.log("Running Forward")
-    #             BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+    def forward(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
             
-    #         elif message == 'd' :
-    #             self.log("Running Reverse")
-    #             BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
+    def reverse(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+
+    def stop(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = 0
+        BrickPi.MotorSpeed[PORT_D] = 0
+        BrickPiUpdateValues()
+
+    def steer_left(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+
+    def steer_right(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+
+
+    def nudge_left(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = 0  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+        time.sleep(.5)
+        BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+
+    def nudge_right(self, kwargs):
+        BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 0  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+        time.sleep(.5)
+        BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
+        BrickPiUpdateValues()
+
+    def look_left(self, kwargs):
+        BrickPi.MotorSpeed[PORT_B] = -1*self.LOOK_SPEED
+        time.sleep(self.LOOK_DT)
+        BrickPi.MotorSpeed[PORT_B] = 0
+        BrickPiUpdateValues()
+
+    def look_right(self, kwargs):
+        BrickPi.MotorSpeed[PORT_B] = self.LOOK_SPEED
+        time.sleep(self.LOOK_DT)
+        BrickPi.MotorSpeed[PORT_B] = 0
+        BrickPiUpdateValues()
+
+    def start_camera_1(self, kwargs):
+        try:
+            self.bot.startCamera()
+        except Exception, e: 
+            print e
+
+    def stop_camera_1(self, kwargs):
+        try:
+            self.bot.stopCamera()
+        except Exception, e:
+            print e
             
-    #         elif message == 'r' :
-    #             self.log("Turning Right")
-    #             BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = -200  #Set the speed of MotorA (-255 to 255)
-            
-    #         elif message == 'l' :
-    #             self.log("Turning Left")
-    #             BrickPi.MotorSpeed[PORT_A] = -200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-            
-    #         elif message == 'b' :
-    #             self.log("New Stopped")
-    #             BrickPi.MotorSpeed[PORT_A] = 0
-    #             BrickPi.MotorSpeed[PORT_D] = 0
-
-    #         # Wil's added capabilites
-    #         elif message == "nl":
-    #             self.log("Nudge Left")
-    #             BrickPi.MotorSpeed[PORT_A] = 0  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-    #             time.sleep(.5)
-    #             BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-              
-    #         elif message == "nr":
-    #             self.log("Nudge Right")
-    #             BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = 0  #Set the speed of MotorA (-255 to 255)
-    #             time.sleep(.5)
-    #             BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-    #             BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorA (-255 to 255)
-
-
-    #         elif message == "ll":
-    #             self.log("Look Left")
-    #             BrickPi.MotorSpeed[PORT_C] = -1*self.LOOK_SPEED
-    #             time.sleep(self.LOOK_DT)
-    #             # BrickPi.MotorSpeed[PORT_C] = -1*self.LOOK_SPEED
-    #             # time.sleep(self.LOOK_DT)
-    #             BrickPi.MotorSpeed[PORT_C] = 0
-
-    #         elif message == "lr":
-    #             self.log("Look Right")
-    #             BrickPi.MotorSpeed[PORT_C] = self.LOOK_SPEED
-    #             time.sleep(self.LOOK_DT)
-    #             # BrickPi.MotorSpeed[PORT_C] = self.LOOK_SPEED
-    #             # time.sleep(self.LOOK_DT)
-    #             BrickPi.MotorSpeed[PORT_C] = 0
-
-    #         elif message == "start-camera-1":  # Shutdown
-    #             self.log("Starting camera")
-    #             try:
-    #                 self.bot.startCamera()
-    #             except Exception, e: 
-    #                 print e
-
-    #         elif message == "stop-camera-1":  # Stop camera
-    #             self.log("Stopping Camera")
-    #             self.bot.stopCamera()
-
-
-    #         elif message == "x":  # Shutdown
-    #             self.log("Shutting down")
-    #             shutdown()
-    #         elif message == "y":  # Shutdown
-    #             restart()
-            
-    #         BrickPiUpdateValues()                # BrickPi updates the values for the motors
+    #                         # BrickPi updates the values for the motors

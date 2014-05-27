@@ -25,4 +25,4 @@ try:
 except:
     pass
 
-URI = "%s?io.ardyh.%s" %(URI_BASE, settings['bot_name'])
+URI = "%s?%s" %(URI_BASE, settings['bot_name'])
