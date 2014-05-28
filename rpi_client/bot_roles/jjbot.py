@@ -1,4 +1,6 @@
 import time
+import subprocess
+
 from BrickPi import *   #import BrickPi.py file to use BrickPi operations
 
 class JJBot(object):
@@ -15,36 +17,8 @@ class JJBot(object):
                          'look_up',
                          'look_down']
 
-
         self.LOOK_SPEED = 80
         self.LOOK_DT = 0.5
-        
-        # try:
-        #         print "Trying to load JJBot"
-        #         self.bot = JJBot()
-        #         self.LOOK_SPEED = 80
-        #         self.LOOK_DT = 0.5
-        #         self.JJBOT = True
-        #     except:
-        #         print "[WARNING] JJBot module not found not."
-        #         self.JJBOT = False
-        #     return rs
-
-
-
-        
-        # try:
-        #     "Trying to start sensors"
-        #     sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 500)
-        #     sensors.start()
-        # except:
-        #     "[WARNING] Sensors not started"
-
-        # # Tells ardyh that is a new connection
-        # out = {"new":"", "camera_port":8080}
-        # self.send(out)
-
-
 
 
     def forward(self, kwargs):
@@ -104,10 +78,28 @@ class JJBot(object):
         BrickPiUpdateValues()
 
     def start_camera_1(self, kwargs):
-        try:
-            self.bot.startCamera()
-        except Exception, e: 
-            print e
+        """
+
+        mkdir /tmp/stream
+        raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
+        LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
+
+        """
+        print "In JJBot.startCamera()"
+        if not os.path.exists(self.source_path):
+            os.mkdir(self.source_path)
+
+        print "Calling raspistill command"
+        command = "raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0"
+        process1 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        print process1
+        
+
+        # print "Calling mjpg_streamer command"
+        # command = 'LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"'
+        # process2 = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+
+
 
     def stop_camera_1(self, kwargs):
         try:

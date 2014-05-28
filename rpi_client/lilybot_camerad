@@ -4,16 +4,16 @@
 # description: lilybot camera daemon
 # processname: lilybot_cmaera
 
-DAEMON_PATH="/home/pi/Projects/lilybot/jjbot"
+DAEMON_PATH="/home/pi/Projects/lilybot/rpi_client"
 
 DAEMON=start_server_camera.sh
 DAEMONOPTS=""
 
 NAME=start_camera_server
-DESC="This starts the lilybot camera server on port 8080"
+DESC="This starts the lilybot camera server on port 8081"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
-PORT=8080
+PORT=8081
 
 case "$1" in
 start)
