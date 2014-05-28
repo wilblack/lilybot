@@ -107,7 +107,7 @@ class Ctenophore(object):
 
 
     def fillOff(self, kwargs):
-            if VERBOSE: print "called fillOff()"
+        if VERBOSE: print "called fillOff()"
 
 
     def allOff(self, kwargs):

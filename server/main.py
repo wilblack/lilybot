@@ -44,35 +44,52 @@ listeners = []
 
 
 class MainHandler(tornado.web.RequestHandler):
-  
-    def get(self):
-      """
-      Displays the webpage.
-      """
-      loader = tornado.template.Loader(".")
-      self.write(loader.load("templates/index.html").generate())
+    
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+
+    def get(self, action=None):
+        """
+        Displays the webpage.
+        """
+        if action == "bots-list":
+            out = json.dumps([l['bot_name'] for l in listeners])
+            self.write(out)
+        else:
+            loader = tornado.template.Loader(".")
+            self.write(loader.load("templates/index.html").generate())
 
 
 class TwineHandler(tornado.web.RequestHandler):
 
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+
     def get(self, action):
         print "Got message ", action
-        for bot in listeners:
-            if action == "top":
-              index = 5
-            elif action == "bottom":
-              index = 15
-            elif action == "front":
-              index = 25
-            elif action == "back":
-              index = 35
-            elif action == "shake":
-              index = 45
 
-            message = json.dumps({'command':'target', 
-                                  'kwargs': {'index':index}
-                                  })
+        for bot in listeners:
+            if action == "bottom":
+              message = json.dumps({'command':'allOff', 
+                                  'kwargs': {}})
+            else:
+              if action == "top":
+                color = "#FF00FF"
+              elif action == "back":
+                color = "#0000FF"
+              elif action == "front":
+                color = "#00FFFF"
+              elif action == "left":
+                color = "#00FF00"
+              elif action == "right":
+                color = "#FF0000"
+              elif action == "shake":
+                color = "#FFFFFF"
+              message = json.dumps({'command':'fillRGB', 
+                                    'kwargs': {'color':color}
+                                    })
             bot['socket'].write_message(message)
+        self.write("Received action %s" %(action))
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
@@ -87,21 +104,15 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print 'connection opened...'
-        self.log('Hello, good to see you again.')
-
+        
         try:
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
+        print "this is %s" %bot_name
 
         self.connected_to = bot_name
         listeners.append( {"bot_name":bot_name, "socket":self} )
-
-        #self.broadcast("New connection: %s" %(self.request.remote_ip))
-
-
-      #sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, 5*1000)
-      #sensors.start()
 
 
     def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
@@ -111,27 +122,23 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         name -  a name or MAC address to identify the bot. This does not need to be unique
         type : ['bot', 'user']
 
-
         """
         if VERBOSE: print "recieved message: \n", message
-        
         try:
-            message = ast.literal_eval(message)
+            messageObj = ast.literal_eval(message)
         except ValueError, e:
             try:
-                message = json.loads(message)
+                messageObj = json.loads(message)
             except:
                 print sys.exc_info()[0]
                 if VERBOSE: print "Message is not JSON"
                 return
 
-        if 'handshake' in message.keys():
-            pass
-        else:
-            self.broadcast(message)
-        
-        
-
+        # if 'handshake' in messageObj.keys():
+        #     pass
+        # else:
+        #     self.broadcast(messageObj)
+        self.broadcast(messageObj)
     def on_close(self):
         print 'connection closed...'
         
@@ -145,15 +152,22 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def broadcast(self, message, mode=None):
         if 'channel' in message.keys():
             channel = message['channel']
+        else:
+            channel = ""
 
+        # out = json.dumps(message)
+        out = message
+        # import pdb; pdb.set_trace()
         for sub in self.get_subscribers(channel):
-            message = json.dumps(message)
-            sub['socket'].write_message(message)
+            out.update({'from':sub['bot_name']})
+            sub['socket'].write_message(out)
 
         
     def get_subscribers(self, channel):
         """
         The only subscriber is rpi2
+
+        If channel is falsy then the all listeners are returned.
         """
 
         if channel:
@@ -227,6 +241,7 @@ class ArdyhNav():
 application = tornado.web.Application([
       (r'/ws', WSHandler),
       (r'/', MainHandler),
+      (r'/(bots-list)', MainHandler),
       (r'/twine/(.*)', TwineHandler),
       (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
     ])

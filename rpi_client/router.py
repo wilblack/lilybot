@@ -26,16 +26,19 @@ class Router(object):
             self.jjbot = JJBot()
 
     def received_message(self, message):
-        #if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
+        if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
         # Try to JSON deconde it
+        
         try:
             # Using literal_eval to ahndle the unicoded keyword porblem.
             message = ast.literal_eval(message.data)
         except:
             # If that fails use the good old json.loads()
             print "[Router.recieved_message()] Could not load message.data"
-            message = json.loads(message)
-
+            import pdb; pdb.setm_trace()
+            message = json.loads(message.data)
+            
+            
         if not "command" in message.keys(): 
             if 'sensor_values' in message['message'].keys():
                 getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_values'])
