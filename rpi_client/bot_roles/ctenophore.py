@@ -173,7 +173,7 @@ class Ctenophore(object):
     def sensor_callback(self, sensor_values):
         STAGE1 = 15
         STAGE2 = 30
-        self.led.all_off()
+        #self.led.all_off()
                 
         val1 = sensor_values[0][1]
         val2 = sensor_values[2][1]

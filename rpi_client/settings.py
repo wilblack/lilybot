@@ -4,7 +4,7 @@ settings= {
     "bot_name":"rp2",
     "bot_roles":"bot",
     "bot_packages":["ctenophore"],
-    "subscriptions":['io.ardyh.rpi1.sensor_values'],
+    "subscriptions":['rpi1.solalla.ardyh'],
     
     # These ar enot being used yet.
     "network_name":"ardyhnet",
