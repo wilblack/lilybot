@@ -1,7 +1,12 @@
 import time
 import subprocess
 
-from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+
+try:
+    from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+except:
+    pass
+
 
 class JJBot(object):
     pass
