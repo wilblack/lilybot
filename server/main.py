@@ -43,7 +43,7 @@ IP = "173.255.213.55"
 listeners = []
 
 def get_bot_listener(bot_name):
-    return next( bot for bot in listeners if bot['bot_name'] == bot_name )
+    return next( (bot for bot in listeners if bot['bot_name'] == bot_name), [] )
 
 
 
@@ -108,18 +108,21 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print 'connection opened...'
-        bot = {"socket":self,
-                "subscriptions":[]}
+       
         try:
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
-        
-        bot.update({"bot_name":bot_name})
-
         print "this is %s" %bot_name
-        self.connected_to = bot_name
-        listeners.append( bot )
+
+        old_socket = get_bot_listener(bot_name)
+        if old_socket:
+            old_socket.update({'socket':self})
+        else:
+            bot = {"socket":self,
+                    "subscriptions":[],
+                    "bot_name":bot_name}
+            listeners.append( bot )
 
 
     def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
@@ -142,18 +145,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             print "Updating %s's subscriptions to %s" %(messageObj['bot_name'], messageObj['subscriptions'])
             bot = get_bot_listener(messageObj['bot_name'])
             bot.update({'subscriptions':messageObj['subscriptions']})
+            return
 
-
-        # if 'handshake' in messageObj.keys():
-        #     pass
-        # else:
-        #     self.broadcast(messageObj)
         self.broadcast(messageObj)
+
+
     def on_close(self):
-        print 'connection closed...'
+        print 'Lost a bot. connection closed...'
         
-        bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
-        listeners.remove(bot)
+        #bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
+        #listeners.remove(bot)
 
         #self.broadcast("Closed %s" %(bot['bot_name']))
 
@@ -169,8 +170,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         # import pdb; pdb.set_trace()
         for sub in self.get_subscribers(channel):
             out.update({'from':sub['bot_name']})
-            sub['socket'].write_message(out)
-
+            try:
+                sub['socket'].write_message(out)
+            except AttributeError:
+                print "No socket found ", sub
         
     def get_subscribers(self, channel):
         """
