@@ -42,6 +42,10 @@ IP = "173.255.213.55"
 
 listeners = []
 
+def get_bot_listener(bot_name):
+    return next( (bot for bot in listeners if bot['bot_name'] == bot_name), [] )
+
+
 
 class MainHandler(tornado.web.RequestHandler):
     
@@ -53,7 +57,7 @@ class MainHandler(tornado.web.RequestHandler):
         Displays the webpage.
         """
         if action == "bots-list":
-            out = json.dumps([l['bot_name'] for l in listeners])
+            out = json.dumps([ {'bot_name':l['bot_name'], 'subscriptions':l['subscriptions']} for l in listeners])
             self.write(out)
         else:
             loader = tornado.template.Loader(".")
@@ -104,23 +108,26 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print 'connection opened...'
-        
+       
         try:
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
         print "this is %s" %bot_name
 
-        self.connected_to = bot_name
-        listeners.append( {"bot_name":bot_name, "socket":self} )
+        old_socket = get_bot_listener(bot_name)
+        if old_socket:
+            old_socket.update({'socket':self})
+        else:
+            bot = {"socket":self,
+                    "subscriptions":[],
+                    "bot_name":bot_name}
+            listeners.append( bot )
 
 
     def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
         """
         Messages should come as a JSON Object string.
-
-        name -  a name or MAC address to identify the bot. This does not need to be unique
-        type : ['bot', 'user']
 
         """
         if VERBOSE: print "recieved message: \n", message
@@ -134,17 +141,20 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 if VERBOSE: print "Message is not JSON"
                 return
 
-        # if 'handshake' in messageObj.keys():
-        #     pass
-        # else:
-        #     self.broadcast(messageObj)
-        self.broadcast(messageObj)
-    def on_close(self):
-        print 'connection closed...'
-        
-        bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
-        listeners.remove(bot)
+        if 'handshake' in messageObj.keys():
+            print "Updating %s's subscriptions to %s" %(messageObj['bot_name'], messageObj['subscriptions'])
+            bot = get_bot_listener(messageObj['bot_name'])
+            bot.update({'subscriptions':messageObj['subscriptions']})
+            return
 
+        self.broadcast(messageObj)
+
+
+    def on_close(self):
+        print 'Lost a bot. connection closed...'
+        
+        #bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
+        #listeners.remove(bot)
 
         #self.broadcast("Closed %s" %(bot['bot_name']))
 
@@ -160,18 +170,24 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         # import pdb; pdb.set_trace()
         for sub in self.get_subscribers(channel):
             out.update({'from':sub['bot_name']})
-            sub['socket'].write_message(out)
-
+            try:
+                sub['socket'].write_message(out)
+            except AttributeError:
+                print "No socket found ", sub
         
     def get_subscribers(self, channel):
         """
-        The only subscriber is rpi2
 
-        If channel is falsy then the all listeners are returned.
+        Checks listeners for a bots with channel in their subscription list.
+        channel is usaully a bot_name.
+
+        Returns:
+            If channel is falsy then the all listeners are returned else
+            returns a lit of listerns.
+
         """
-
         if channel:
-            return [bot for bot in listeners if bot['bot_name'] in ["io.ardyh.rp2", ""] ]
+            return [bot for bot in listeners if channel in bot['subscriptions'] ]
         else:
             return listeners
 
@@ -195,9 +211,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
       else:
         if VERBOSE: print "message is a string"        
         message = {"message":message, "ardyh_timestamp": "%s" %(now) }
-      
-
-      
 
 
     def loopCallback(self):
