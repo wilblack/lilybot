@@ -39,10 +39,6 @@
 
 </nav>
 <div id="content" class="camera">
-
-
-
-
     <div id="left-panel">
         <div class="controls top">
             <button class="button small secondary startCameraBtn">Start Camera</button>
@@ -72,17 +68,12 @@
         </div>
     </div>
 
-    <div id="log-wrapper">
-        <div id="log" class="padded transparent"></div> <!-- End .secondary -->
-    </div>
 
     <div id="camera-1">
         <noscript><img src="" /></noscript>
     </div><!-- End camera 1 -->
     
   </div>
-
-
   
     <div id="right-panel">
         <div class="controls top">
@@ -153,7 +144,23 @@
 
     $(document).ready(function(){
         
-        resize();
+        handshake_message = {
+         'bot_name':'jjbot.solalla.ardyh', 
+         'bot_roles':[],
+         'mac':'',
+         'handshake':true,
+         'subscriptions':['rp1.solalla.ardyh']
+      }
+
+
+      ardyh = new Ardyh(handshake_message);
+      ardyh.setup();
+
+      controls = new ControlsView();
+      resize();
+      $(window).resize(function(){
+          resize();
+      });
 
     });
   </script>

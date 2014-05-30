@@ -153,14 +153,18 @@ Lilybot = function(){
 
 
 
-Ardyh = function(){
+Ardyh = function(handshake_message){
     /*
     Object to handle websocket connections and message passing and logging. 
+    
+    Params
+    handshake_message - [Object] The initial handshake message to use when connecting to ardyh. 
 
     */
     var self = this;
+    this.handshake_message = handshake_message;
     this.DOMAIN = "173.255.213.55:9093"
-    this.camera_url = "http://192.168.1.140:8080"
+    this.camera_url = "http://192.168.1.140:8081"
     this.lilybot = new Lilybot();
     this.host = "";
     this.socket = null;
@@ -169,14 +173,18 @@ Ardyh = function(){
 
     this.setup = function(){
         // Creates the websocets connection{
-
-        this.host =  "ws://"+ this.DOMAIN +"/ws?web_client";      // combines the three string and creates a new string
-        this.socket = new WebSocket(this.host);
+        this.host =  'ws://'+ this.DOMAIN +'/ws?' + self.handshake_message.bot_name;      // combines the three string and creates a new string
+        //self.host =  "ws://"+ self.DOMAIN +"/ws?jjbot.solalla.ardyh";      // combines the three string and creates a new string
+        self.socket = new WebSocket(self.host);
               
         // event handlers for websocket
         if(self.socket){
             self.socket.onopen = function(){
                 console.log("connection opened....");
+                
+                
+                var out = JSON.stringify(handshake_message);
+                self.socket.send(out);
             }
 
             self.socket.onmessage = function(msg) {
@@ -189,7 +197,8 @@ Ardyh = function(){
                 self._log(msg.data);
                 try {
                   var data = JSON.parse(msg.data);
-                  if ('sensor_values' in data) updateSensorValues(data.sensor_values)
+                  message = data.message;
+                  if ('sensor_values' in message) updateSensorValues(message.sensor_values)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
@@ -201,7 +210,7 @@ Ardyh = function(){
                 //alert("connection closed....");
                 self._log("The connection has been closed.");
                 self.showReadyState("closed");
-                this.socket = new WebSocket(this.host);
+                this.socket = new WebSocket(self.host);
              }
 
             self.socket.onerror = function(){
@@ -216,8 +225,8 @@ Ardyh = function(){
         } // End setup()
 
     this._log = function (txt){
-
         $log = $("#log");
+        if ($log.length === 0) return;
         $newRow = $("<div>");
         $newRow.text(txt);
         $log.append($newRow);
@@ -330,7 +339,16 @@ ControlsView = function($el){
 
     $(".refreshBotsBtn").click(function(){
         ardyh.getBotsList(function(res){
-            $("#bots-list").html(res.join("<br>"));
+
+            var html = '';
+            for (i in res){
+                html +='<div>'+res[i].bot_name+'</div>';
+                for (j in res[i].subscriptions) {
+                    html += '<div><small>'+res[i].subscriptions[j]+'</small></div>';
+                }
+                html += '<hr>';
+            }
+            $("#bots-list").html(html);
         });
     });
     
@@ -376,6 +394,13 @@ ControlsView = function($el){
             break;
             case 88:
                 self.lilybot.reverse();
+            break;
+
+            case 38:
+                self.lilybot.look_up();
+            break;
+            case 40:
+                self.lilybot.look_down();
             break;
 
        }
@@ -458,7 +483,9 @@ Webcam = function($el, url){
         img.onload = self.imageOnload;
         img.onclick = self.imageOnclick;
         img.height = $("#camera-1").height();
-        img.src = self.url + "/?action=snapshot&n=" + (++self.imageNr);
+        var src = self.url + "/?action=snapshot&n=" + (++self.imageNr)
+        console.log(src);
+        img.src = src;
         
         var webcam = self.$el[0];
         webcam.insertBefore(img, webcam.firstChild);
@@ -477,8 +504,6 @@ Webcam = function($el, url){
             $("#camera-1 img").width( $("#camera-1").width() );    
         }
         
-        
-
         while (1 < self.finished.length) {
               var del = self.finished.shift(); // Delete old image(s) from document
               del.parentNode.removeChild(del);
@@ -496,15 +521,22 @@ Webcam = function($el, url){
 
 
 
-$(document).ready(function(){
-    ardyh = new Ardyh();
-    ardyh.setup();
+// $(document).ready(function(){
+//     handshake_message = {
+//        'bot_name':'jjbot.solalla.ardyh', 
+//        'bot_roles':[],
+//        'mac':'',
+//        'handshake':true,
+//        'subscriptions':['rp1.solalla.ardyh']
+//     }
 
-    controls = new ControlsView();
 
+//     ardyh = new Ardyh(handshake_message);
+//     ardyh.setup();
 
-    resize();
-    $(window).resize(function(){
-        resize();
-    });
-});
+//     controls = new ControlsView();
+//     resize();
+//     $(window).resize(function(){
+//         resize();
+//     });
+// });
