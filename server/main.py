@@ -57,7 +57,7 @@ class MainHandler(tornado.web.RequestHandler):
         Displays the webpage.
         """
         if action == "bots-list":
-            out = json.dumps([l['bot_name'] for l in listeners])
+            out = json.dumps([ {'bot_name':l['bot_name'], 'subscriptions':l['subscriptions']} for l in listeners])
             self.write(out)
         else:
             loader = tornado.template.Loader(".")
