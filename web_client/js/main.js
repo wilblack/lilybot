@@ -324,10 +324,12 @@ ControlsView = function($el){
     $(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
     $(".refreshCameraBtn").click(function(e){ ardyh.refreshCamera(); });
     $(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+    $(".lookupBtn").click(function(e){ self.lilybot.look_up(); });
+    $(".lookdownBtn").click(function(e){ self.lilybot.look_down(); });
+    
     $(".restartBtn").click(function(e){ ardyh.restart(); });
     $(".shutdownBtn").click(function(e){ ardyh.shutdown(); });
-    $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
-
+    
     $(".forwardBtn").click(function(e){ self.lilybot.forward(); });
     $(".stopBtn").click(function(e){ self.lilybot.stop(); });
     $(".reverseBtn").click(function(e){ self.lilybot.reverse(); });
@@ -336,8 +338,12 @@ ControlsView = function($el){
     $(".steerLeftBtn").click(function(e){ self.lilybot.steer_left(); });
     $(".steerRightBtn").click(function(e){ self.lilybot.steer_right(); });
 
+    $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
 
     $(".refreshBotsBtn").click(function(){
+        /*
+        Refreshes the connected bots list.
+        */
         ardyh.getBotsList(function(res){
 
             var html = '';
