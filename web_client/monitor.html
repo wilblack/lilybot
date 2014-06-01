@@ -71,7 +71,10 @@
   
     <div id="right-panel" class="controls">
       <button class="pauseBtn" >Pause</button>
-     </div>
+      <label>Connected bots</label>
+      <button class="refreshBotsBtn small" >Refesh</button>
+      <div id="bots-list"></div>
+      </div>
 
 
 </div><!-- end content -->
@@ -123,8 +126,24 @@
     $(document).foundation();
 
     $(document).ready(function(){
-        
-        resize();
+      handshake_message = {
+         'bot_name':'monitor.solalla.ardyh', 
+         'bot_roles':[],
+         'mac':'',
+         'handshake':true,
+         'subscriptions':['rp1.solalla.ardyh', 'rp2.solalla.ardyh', 'rp3.solalla.ardyh']
+      }
+
+
+      ardyh = new Ardyh(handshake_message);
+      ardyh.setup();
+
+      controls = new ControlsView();
+      resize();
+      $(window).resize(function(){
+          resize();
+      });
+
 
     });
   </script>

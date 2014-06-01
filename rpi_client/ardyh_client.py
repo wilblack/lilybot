@@ -48,31 +48,28 @@ class ArdyhClient(TornadoWebSocketClient):
     """
 
     def __init__(self, protocols, uri='ws://173.255.213.55:9093/ws?'):
+        self.channel = settings['bot_name']
+        self.bot_name = settings['bot_name']
+        self.bot_roles = settings['bot_roles']
+
+        self.connect_attempt_ts = dt.now()
         rs = super(ArdyhClient, self).__init__(uri, protocols)
-        
 
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
         self.CTENOPHORE = CTENOPHORE
         
-
-        self.channel = "io.ardyh.{}".format(settings['bot_name'])
-
-        # set the name to MAC address if not found.
-        self.bot_name = settings['bot_name']
-        self.bot_roles = settings['bot_roles']
-
         self.core = Core()
         self.router = Router()
 
 
     def opened(self):
-        print "Connection to ardh is open"
+        print "Connection to ardyh is open"
         message = {'bot_name':self.bot_name, 
                    'bot_roles':self.bot_roles,
                    'mac':get_mac_address(),
                    'handshake':True,
-                   'subscribe':settings['subscriptions']
+                   'subscriptions':settings['subscriptions']
                    }
 
 
@@ -92,20 +89,15 @@ class ArdyhClient(TornadoWebSocketClient):
         """
         Message should be of the form {MESSAGE_OBJ}
         
-
-        - message
-        -- bot_name
+        -- channel
         -- from
-        -- message
-        -- command
-        -- channel 
-        -- ardyh_timestamp - May not be present
-
+        -- command 
+        
         """
 
-        channel = settings['bot_name']
+
         message.update({
-            "bot_name":self.bot_name,
+            "from":self.bot_name,
             "channel":self.channel
         })
         message = json.dumps(message)
@@ -118,9 +110,10 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def closed(self, code, reason=None):
         print "Closed down", code, reason
-        
-        if "jjbot" in settings["bot_packages"]:
-            ioloop.IOLoop.instance().stop()
+        self.closed_ts = dt.now()
+        #import pdb; pdb.set_trace()
+        #self.__init__(uri=URI, protocols=['http-only', 'chat'])
+
 
 
     def log(self, message):

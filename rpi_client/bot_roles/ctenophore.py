@@ -27,13 +27,14 @@ class PassiveThread (threading.Thread):
     """
     
     """
-    def __init__(self, name, ctenophore, output_queue):
+    def __init__(self, name, ctenophore, output_queue, nleds):
         super(PassiveThread, self).__init__()
         
         self.name = name
         self.ctenophore = ctenophore
         self.output_queue  = output_queue
         self.stoprequest = threading.Event()
+        self.nleds = nleds
 
     def run(self):
         print "Starting thread %s" %(self.name)
@@ -42,6 +43,10 @@ class PassiveThread (threading.Thread):
             color = ('#%06X' % randint(0,256**3-1))
             self.ctenophore.pulse({"color":color})
 
+            reverse = randint(0,2)
+            if reverse > 0:
+                self.ctenophore.pulse({"color":color, "direction":"reverse"})
+            
             PULSE_DT = randint(12, 24)
             time.sleep(PULSE_DT)              # sleep for 200 ms
 
@@ -49,6 +54,28 @@ class PassiveThread (threading.Thread):
     def join(self, timeout=None):
         self.stoprequest.set() # Turns off the thread if it already started
         super(WorkerThread, self).join(timeout)
+
+
+class BlinkThread (PassiveThread):
+    """
+    A thread the blinks every so often
+    """
+
+    def run(self):
+        print "Starting thread %s" %(self.name)
+        while not self.stoprequest.isSet():
+            #self.ctenophore.fillRGB({"color":"#22FF33"})
+            color = ('#%06X' % randint(0,256**3-1))
+            index = randint(0,self.nleds)
+
+            self.ctenophore.setRGB({"color":color, "index":index})
+            time.sleep(randint(0,4))
+            self.ctenophore.setRGB({"color":"#000000", "index":index})
+
+            DT = randint(4, 8)
+            time.sleep(DT)              # sleep for 200 ms
+
+
 
 
 class Ctenophore(object):
@@ -74,13 +101,15 @@ class Ctenophore(object):
 
 
         # Create a single input and a single output queue for all threads.
-        input_queue = Queue.Queue()
         output_queue = Queue.Queue()
         # Start passive thread
-        self.passiveThread = PassiveThread("Passive Thread", self, output_queue)
+        self.passiveThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
         #self.passiveThread.setDaemon(True)
         self.passiveThread.start()
 
+        output_queue2 = Queue.Queue()
+        self.blinkThread = BlinkThread("Blink Thread", self, output_queue, self.NLEDS)
+        self.blinkThread.start()
         
 
 
@@ -107,7 +136,7 @@ class Ctenophore(object):
 
 
     def fillOff(self, kwargs):
-            if VERBOSE: print "called fillOff()"
+        if VERBOSE: print "called fillOff()"
 
 
     def allOff(self, kwargs):
@@ -139,13 +168,18 @@ class Ctenophore(object):
     def pulse(self, kwargs):
         DT = 0.005
         color = kwargs['color']
-        direction = kwargs.get('direction', None)
+        direction = kwargs.get('direction', 'forward')
 
-        for i in range(self.NLEDS):
+        if direction == 'forward':
+            seq = range(self.NLEDS)
+        elif direction == 'reverse':
+            seq = range(self.NLEDS, 0, -1)
+
+        for i in seq:
             self.setRGB({"color":color, "index":i})
             time.sleep(DT)
 
-        for i in range(self.NLEDS):
+        for i in seq:
             self.setOff({"index":i})
             time.sleep(DT)
 
@@ -173,7 +207,7 @@ class Ctenophore(object):
     def sensor_callback(self, sensor_values):
         STAGE1 = 15
         STAGE2 = 30
-        self.led.all_off()
+        #self.led.all_off()
                 
         val1 = sensor_values[0][1]
         val2 = sensor_values[2][1]

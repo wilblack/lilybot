@@ -49,6 +49,35 @@ On first boot select the Raspbian operating system and click "i". This will take
 ## 2. Initial rasp-config Configuration
 To get to the rasp-config screen type `rasp-config` on the command line. 
 
+**Troubleshooting**
+
+
+You may get the follwoing error when connecting to the Raspberry Pi over WiFi if you have already connected over ethernet. 
+
+```
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the RSA key sent by the remote host is
+86:f8:37:41:9e:37:12:4f:f6:4b:65:be:9e:d6:27:b4.
+Please contact your system administrator.
+Add correct host key in /Users/wilblack/.ssh/known_hosts to get rid of this message.
+Offending RSA key in /Users/wilblack/.ssh/known_hosts:4
+RSA host key for 192.168.1.113 has changed and you have requested strict checking.
+Host key verification failed.
+
+```
+
+To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/.ssh/known_hosts` and remove the line whihc points at you Raspberry Pi's IP address.
+
+
+
+
+Install and Update Software
+---------------------------
 * Change option 3 to boot to console.
 
 * Change hostname to something ore descriptive and unique. This is more import when running multiple RPi's
@@ -209,8 +238,6 @@ To stop streaming use
 ```
 
 
-
-
 ## Start on ardyh client 
 The ardyh client will start two applications. The first application is a web server running on port 9010 to set local settings for the bot. It is available at <IP_ADDRESS>:9010. 
 
@@ -252,8 +279,6 @@ Once the deamon starts it ties up the port. You can see what ports are currently
 sudo netstat -lptu
 sudo netstat -tulpn
 ```
-
-
 
 
 

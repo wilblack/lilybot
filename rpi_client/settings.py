@@ -1,10 +1,10 @@
 URI_BASE = "ws://173.255.213.55:9093/ws"
 
 settings= {
-    "bot_name":"rp2",
+    "bot_name":"rp2.solalla.ardyh",
     "bot_roles":"bot",
     "bot_packages":["ctenophore"],
-    "subscriptions":['io.ardyh.rpi1.sensor_values'],
+    "subscriptions":['rp1.solalla.ardyh'],
     
     # These ar enot being used yet.
     "network_name":"ardyhnet",
@@ -25,4 +25,4 @@ try:
 except:
     pass
 
-URI = "%s?io.ardyh.%s" %(URI_BASE, settings['bot_name'])
+URI = "%s?%s" %(URI_BASE, settings['bot_name'])

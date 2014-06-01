@@ -1,86 +1,3 @@
-// These are updates on button clicks
-var up;
-var down;
-var left;
-var right;
-var brakes;
-
-function accelerate()       // defines a variable that controls the forward movement
-{
-    up = "u";               // when up == u the bot moves forward 
-    down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
-    ardyh.socket.send("u");   
-}  
-
-function reverse(){
-    down = "d";
-    up = "aaa";left = "aaa";right = "aaa";brakes = "aaa";
-    ardyh.socket.send("d");  
-}
-
-function steer_left(){
-    left = "l";
-    up = "aaa";down = "aaa";right = "aaa";brakes = "aaa";
-    ardyh.socket.send("l");  
-}
-
-function steer_right(){
-    right = "r";
-    up = "aaa";down = "aaa";left = "aaa";brakes = "aaa";
-    ardyh.socket.send("r");
-}
-
-function nudge_left(){
-    ardyh.socket.send("nl");  
-}
-
-function nudge_right(){
-    ardyh.socket.send("nr");
-}
-
-
-
-function stop(){
-    up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
-    ardyh.socket.send("b");
-}        
-
-
-function shutdown(){
-    ardyh.socket.send("x");
-} 
-
-
-function restart(){
-    ardyh.socket.send("y");
-} 
-
-
-function lookLeft(){
-  ardyh.socket.send("ll");
-}
-
-function lookRight(){
-  ardyh.socket.send("lr");
-}
-
-function connectBtnCallback(){
-  /*
-   * This should establish a new connection
-   */
-
-   setup2()
-
-}
-
-function showReadyState(state){
-  $el =  $("#ready-state");
-  $el.find("span").hide();
-  $("#ready-state ."+state).show();
-}
-
-
-
 function updateSensorValues(sensor_values){
     /*
     Input
@@ -95,94 +12,14 @@ function updateSensorValues(sensor_values){
        $el.find("."+port).html(sensor_values[i][1]);
     }
 
-    }   
-
-function buttons() { 
-    if(up== "u") {
-      ardyh.socket.send("u");
-    }   
-    
-    if(down== "d") {
-      ardyh.socket.send("d");
-    }
-    
-    if(left== "l") {
-      ardyh.socket.send("l");
-    }   
-    
-    if(right== "r") {
-      ardyh.socket.send("r");
-    }   
-    
-    if(brakes == "b") {
-      ardyh.socket.send("b");
-    }
 }
-
-
-function arrows() {
-    document.onkeyup = KeyCheck;       
-    function KeyCheck(){
-       var KeyID = event.keyCode;
-       switch(KeyID)
-       {
-            case 16:
-            ardyh.socket.send("b");
-            break; 
-            case 17:
-            ardyh.socket.send("b");
-            break;
-            case 37:
-            ardyh.socket.send("l");
-            break;
-            case 38:
-            ardyh.socket.send("u");
-            break;
-            case 39:
-            ardyh.socket.send("r");
-            break;
-            case 40:
-            ardyh.socket.send("d");
-            break;
-
-            // WoW Style
-            case 32: // x
-            ardyh.socket.send("b");
-            break; 
-            case 88: // x
-            ardyh.socket.send("d");
-            break; 
-            case 65: // a
-            ardyh.socket.send("l");
-            break;
-            case 87: // w
-            ardyh.socket.send("u");
-            break;
-            case 68: // d
-            ardyh.socket.send("r");
-            break;
-            case 83: // s
-            ardyh.socket.send("b");
-            break;
-
-            case 81: // q
-            ardyh.socket.send("nl");
-            break;
-            case 69: // e
-            ardyh.socket.send("nr");
-            break;
-
-
-
-       }
-    }
-}
-
 
 
 Lilybot = function(){
     /*
-    This object handles all commands for the raspberry pi lilybot
+    This object handles all commands for the raspberry pi lilybot.
+    There needs to be a seperate one for ctenophore. 
+
     */
     var self = this;
         
@@ -194,7 +31,7 @@ Lilybot = function(){
         this.send(message);
     };
 
-    this.startCamera = function(){
+    this.stopCamera = function(){
         var message = {
             command:"stop-camera-1",
             kwargs:{}
@@ -234,6 +71,78 @@ Lilybot = function(){
         this.send(message);
     };
 
+    this.forward = function(){
+        var message = {
+            command:"forward",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.reverse = function(){
+        var message = {
+            command:"reverse",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.steer_left = function(){
+        var message = {
+            command:"steer_left",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.steer_right = function(){
+        var message = {
+            command:"steer_right",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.nudge_left = function(){
+        var message = {
+            command:"nudge_left",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.nudge_right = function(){
+        var message = {
+            command:"nudge_right",
+            kwargs:{}
+        }
+        this.send(message);
+    }
+
+    this.stop = function(){
+        var message = {
+            command:"stop",
+            kwargs:{}
+        }
+        this.send(message);
+    }   
+
+
+    this.look_up = function(){
+        var message = {
+            command:"look_up",
+            kwargs:{}
+        }
+        this.send(message);
+    };
+
+    this.look_down = function(){
+        var message = {
+            command:"look_down",
+            kwargs:{}
+        }
+        this.send(message);
+    }
 
     this.send = function(message){
         var out = JSON.stringify(message);
@@ -244,14 +153,18 @@ Lilybot = function(){
 
 
 
-Ardyh = function(){
+Ardyh = function(handshake_message){
     /*
     Object to handle websocket connections and message passing and logging. 
+    
+    Params
+    handshake_message - [Object] The initial handshake message to use when connecting to ardyh. 
 
     */
     var self = this;
+    this.handshake_message = handshake_message;
     this.DOMAIN = "173.255.213.55:9093"
-    this.camera_url = "http://192.168.1.140:8080"
+    this.camera_url = "http://192.168.1.140:8081"
     this.lilybot = new Lilybot();
     this.host = "";
     this.socket = null;
@@ -260,17 +173,18 @@ Ardyh = function(){
 
     this.setup = function(){
         // Creates the websocets connection{
-
-        this.host =  "ws://"+ this.DOMAIN +"/ws";      // combines the three string and creates a new string
-        this.socket = new WebSocket(this.host);
+        this.host =  'ws://'+ this.DOMAIN +'/ws?' + self.handshake_message.bot_name;      // combines the three string and creates a new string
+        //self.host =  "ws://"+ self.DOMAIN +"/ws?jjbot.solalla.ardyh";      // combines the three string and creates a new string
+        self.socket = new WebSocket(self.host);
               
         // event handlers for websocket
         if(self.socket){
             self.socket.onopen = function(){
                 console.log("connection opened....");
-                arrows();     // function for detecting keyboard presses
-                buttons();    // function for detecting the button press on webpage
-                self.showReadyState("open");
+                
+                
+                var out = JSON.stringify(handshake_message);
+                self.socket.send(out);
             }
 
             self.socket.onmessage = function(msg) {
@@ -283,7 +197,8 @@ Ardyh = function(){
                 self._log(msg.data);
                 try {
                   var data = JSON.parse(msg.data);
-                  if ('sensor_values' in data) updateSensorValues(data.sensor_values)
+                  message = data.message;
+                  if ('sensor_values' in message) updateSensorValues(message.sensor_values)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
@@ -295,6 +210,7 @@ Ardyh = function(){
                 //alert("connection closed....");
                 self._log("The connection has been closed.");
                 self.showReadyState("closed");
+                this.socket = new WebSocket(self.host);
              }
 
             self.socket.onerror = function(){
@@ -309,15 +225,15 @@ Ardyh = function(){
         } // End setup()
 
     this._log = function (txt){
-
         $log = $("#log");
+        if ($log.length === 0) return;
         $newRow = $("<div>");
         $newRow.text(txt);
         $log.append($newRow);
         $log.scrollTop($log[0].scrollHeight);
         self.nlogs++;
         if (self.nlogs > self.max_nlogs){
-            $log.eq(0).detach();
+            $log.find("div").eq(0).detach();
         }
     };
 
@@ -377,6 +293,13 @@ Ardyh = function(){
                 
     };
 
+    this.getBotsList = function(callback){
+        url = "http://" + this.DOMAIN + "/bots-list";
+        $.get(url, function(res){
+            console.log(res);
+            callback(res);
+        }, 'json');
+    };
 
 }; // End Ardyh
 
@@ -393,15 +316,47 @@ View Stuff
 ControlsView = function($el){
     var self = this;
 
+    this.lilybot = new Lilybot();
+
     if (typeof($el) === "undefined") this.$el = $(".controls");
 
     // Add listeners
     $(".startCameraBtn").click(function(e){ ardyh.startCamera(); });
     $(".refreshCameraBtn").click(function(e){ ardyh.refreshCamera(); });
     $(".stopCameraBtn").click(function(e){ ardyh.stopCamera(); });
+    $(".lookupBtn").click(function(e){ self.lilybot.look_up(); });
+    $(".lookdownBtn").click(function(e){ self.lilybot.look_down(); });
+    
     $(".restartBtn").click(function(e){ ardyh.restart(); });
     $(".shutdownBtn").click(function(e){ ardyh.shutdown(); });
+    
+    $(".forwardBtn").click(function(e){ self.lilybot.forward(); });
+    $(".stopBtn").click(function(e){ self.lilybot.stop(); });
+    $(".reverseBtn").click(function(e){ self.lilybot.reverse(); });
+    $(".nudgeLeftBtn").click(function(e){ self.lilybot.nudge_left(); });
+    $(".nudgeRightBtn").click(function(e){ self.lilybot.nudge_right(); });
+    $(".steerLeftBtn").click(function(e){ self.lilybot.steer_left(); });
+    $(".steerRightBtn").click(function(e){ self.lilybot.steer_right(); });
+
     $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
+
+    $(".refreshBotsBtn").click(function(){
+        /*
+        Refreshes the connected bots list.
+        */
+        ardyh.getBotsList(function(res){
+
+            var html = '';
+            for (i in res){
+                html +='<div>'+res[i].bot_name+'</div>';
+                for (j in res[i].subscriptions) {
+                    html += '<div><small>'+res[i].subscriptions[j]+'</small></div>';
+                }
+                html += '<hr>';
+            }
+            $("#bots-list").html(html);
+        });
+    });
     
 
     $(".targetBtn").click(function(e){ 
@@ -416,7 +371,47 @@ ControlsView = function($el){
         $(".clearTargetBtn").hide();
         $(".targetBtn").show();
     });
-}
+
+
+    // Lilybot butotns listeners
+    document.onkeyup = keyCheck;       
+    function keyCheck(){
+       var keyID = event.keyCode;
+       switch(keyID)
+        {
+            // WoW style keyboard mappings
+            case 81: // q
+                self.lilybot.nudge_left();
+            break; 
+            case 69:
+                self.lilybot.nudge_right();
+            break;
+            case 65:
+                self.lilybot.steer_left();
+            break;
+            case 68:
+                self.lilybot.steer_right();
+            break;
+            case 87:
+                self.lilybot.forward();
+            break;
+            case 83:
+                self.lilybot.stop();
+            break;
+            case 88:
+                self.lilybot.reverse();
+            break;
+
+            case 38:
+                self.lilybot.look_up();
+            break;
+            case 40:
+                self.lilybot.look_down();
+            break;
+
+       }
+    }  // end keyCheck()
+};
 
 
 
@@ -494,7 +489,9 @@ Webcam = function($el, url){
         img.onload = self.imageOnload;
         img.onclick = self.imageOnclick;
         img.height = $("#camera-1").height();
-        img.src = self.url + "/?action=snapshot&n=" + (++self.imageNr);
+        var src = self.url + "/?action=snapshot&n=" + (++self.imageNr)
+        console.log(src);
+        img.src = src;
         
         var webcam = self.$el[0];
         webcam.insertBefore(img, webcam.firstChild);
@@ -513,8 +510,6 @@ Webcam = function($el, url){
             $("#camera-1 img").width( $("#camera-1").width() );    
         }
         
-        
-
         while (1 < self.finished.length) {
               var del = self.finished.shift(); // Delete old image(s) from document
               del.parentNode.removeChild(del);
@@ -532,15 +527,22 @@ Webcam = function($el, url){
 
 
 
-$(document).ready(function(){
-    ardyh = new Ardyh();
-    ardyh.setup();
+// $(document).ready(function(){
+//     handshake_message = {
+//        'bot_name':'jjbot.solalla.ardyh', 
+//        'bot_roles':[],
+//        'mac':'',
+//        'handshake':true,
+//        'subscriptions':['rp1.solalla.ardyh']
+//     }
 
-    controls = new ControlsView();
 
+//     ardyh = new Ardyh(handshake_message);
+//     ardyh.setup();
 
-    resize();
-    $(window).resize(function(){
-        resize();
-    });
-});
+//     controls = new ControlsView();
+//     resize();
+//     $(window).resize(function(){
+//         resize();
+//     });
+// });
