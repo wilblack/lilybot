@@ -22,9 +22,9 @@ class JJBot(object):
                          'look_up',
                          'look_down']
 
-        self.LOOK_SPEED = 80
-        self.LOOK_DT = 0.5
-
+        self.LOOK_SPEED = 255
+        self.LOOK_DT = 0.6
+        self.NUDGE_DT = 0.3
 
     def forward(self, kwargs):
         BrickPi.MotorSpeed[PORT_A] = 255  #Set the speed of MotorA (-255 to 255)
@@ -42,13 +42,13 @@ class JJBot(object):
         BrickPiUpdateValues()
 
     def steer_left(self, kwargs):
-        BrickPi.MotorSpeed[PORT_A] = -255  #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_D] = 255  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_A] = -128  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = 128  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
 
     def steer_right(self, kwargs):
-        BrickPi.MotorSpeed[PORT_A] = 255  #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_D] = -255  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_A] = 128  #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_D] = -128  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
 
 
@@ -56,7 +56,7 @@ class JJBot(object):
         BrickPi.MotorSpeed[PORT_A] = 0  #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_D] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
-        time.sleep(.5)
+        time.sleep(self.NUDGE_DT)
         BrickPi.MotorSpeed[PORT_A] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_D] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
@@ -65,19 +65,19 @@ class JJBot(object):
         BrickPi.MotorSpeed[PORT_A] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_D] = 0  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
-        time.sleep(.5)
+        time.sleep(self.NUDGE_DT)
         BrickPi.MotorSpeed[PORT_A] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_D] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
 
     def look_up(self, kwargs):
-        BrickPi.MotorSpeed[PORT_B] = -1*self.LOOK_SPEED
+        BrickPi.MotorSpeed[PORT_B] = self.LOOK_SPEED
         time.sleep(self.LOOK_DT)
         BrickPi.MotorSpeed[PORT_B] = 0
         BrickPiUpdateValues()
 
     def look_down(self, kwargs):
-        BrickPi.MotorSpeed[PORT_B] = self.LOOK_SPEED
+        BrickPi.MotorSpeed[PORT_B] = -1*self.LOOK_SPEED
         time.sleep(self.LOOK_DT)
         BrickPi.MotorSpeed[PORT_B] = 0
         BrickPiUpdateValues()
