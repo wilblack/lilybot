@@ -41,6 +41,7 @@ class Router(object):
             
         if not "command" in message.keys(): 
             if 'sensor_values' in message['message'].keys():
+                if 'sensor_package' in message['message'].keys(): return # Can't handle grovepi stuff yet
                 getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_values'])
                 return
             else:
