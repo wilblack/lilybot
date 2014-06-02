@@ -5,8 +5,7 @@
 # Start bluetooth discovery
 # hciconfig hci0 piscan
 
-export PYTHONPATH=$PYTHONPATH:/home/pi/projects/RPi-LPD8806\
-        :/home/pi/projects/BrickPi_Python
+export PYTHONPATH=$PYTHONPATH:/home/pi/projects/RPi-LPD8806:/home/pi/projects/BrickPi_Python
 
 
 cd  /home/pi/projects/lilybot/rpi_client

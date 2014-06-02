@@ -5,7 +5,7 @@ Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 """
 
 import json, urllib, sys, ast
-
+import threading
 
 from datetime import datetime as dt
 
@@ -26,7 +26,10 @@ LOOP_CALLBACK_DT = 0.4
 
 if "jjbot" in settings["bot_packages"]:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
-    import threading
+    
+
+if 'grovebot' in settings["bot_packages"]:
+    from bot_roles.grovebot import *
 
 
 
@@ -48,23 +51,26 @@ class ArdyhClient(TornadoWebSocketClient):
     """
 
     def __init__(self, protocols, uri='ws://173.255.213.55:9093/ws?'):
-        self.channel = settings['bot_name']
-        self.bot_name = settings['bot_name']
-        self.bot_roles = settings['bot_roles']
-
-        self.connect_attempt_ts = dt.now()
         rs = super(ArdyhClient, self).__init__(uri, protocols)
+        
 
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
         self.CTENOPHORE = CTENOPHORE
         
+
+        self.channel = "io.ardyh.{}".format(settings['bot_name'])
+
+        # set the name to MAC address if not found.
+        self.bot_name = settings['bot_name']
+        self.bot_roles = settings['bot_roles']
+
         self.core = Core()
         self.router = Router()
 
 
     def opened(self):
-        print "Connection to ardyh is open"
+        print "Connection to ardh is open"
         message = {'bot_name':self.bot_name, 
                    'bot_roles':self.bot_roles,
                    'mac':get_mac_address(),
@@ -75,8 +81,8 @@ class ArdyhClient(TornadoWebSocketClient):
 
         self.send(message)
 
-        if "jjbot" in settings["bot_packages"]:
-
+        if ["jjbot", "grovebot"] and settings["bot_packages"]:
+            print "Registering IO Loop callback"
             sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT*1000)
             sensors.start()
 
@@ -89,15 +95,20 @@ class ArdyhClient(TornadoWebSocketClient):
         """
         Message should be of the form {MESSAGE_OBJ}
         
-        -- channel
+
+        - message
+        -- bot_name
         -- from
-        -- command 
-        
+        -- message
+        -- command
+        -- channel 
+        -- ardyh_timestamp - May not be present
+
         """
 
-
+        channel = settings['bot_name']
         message.update({
-            "from":self.bot_name,
+            "bot_name":self.bot_name,
             "channel":self.channel
         })
         message = json.dumps(message)
@@ -110,10 +121,8 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def closed(self, code, reason=None):
         print "Closed down", code, reason
-        self.closed_ts = dt.now()
-        #import pdb; pdb.set_trace()
-        #self.__init__(uri=URI, protocols=['http-only', 'chat'])
-
+        
+        ioloop.IOLoop.instance().stop()
 
 
     def log(self, message):
@@ -125,42 +134,56 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def loopCallback(self):
         if "jjbot" in settings["bot_packages"]:
-            sensor_values = self.get_sensors_values() # This is where to sensor values get sent to ardyh
-            out = {"message": {"sensor_values":sensor_values} }
-            self.send(out)
+            sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
+            out = {"message": {"sensor_values":sensor_values, "sensor_package":"jjbot"} }
+
+        if "grovebot" in settings["bot_packages"]:
+            sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
+            out = {"message": {"sensor_values":sensor_values, "sensor_package":"grovebot"} }
+
+        self.send(out)
 
 
-    def get_sensors_values(self):
-        out = [
-            ['PORT_1', BrickPi.Sensor[PORT_1]],
-            ['PORT_2', BrickPi.Sensor[PORT_2]],
-            ['PORT_3', BrickPi.Sensor[PORT_3]],
-            ['PORT_4', BrickPi.Sensor[PORT_4]],
-          ]
+    def get_sensors_values(self, bot_package):
+        if bot_package == 'jjbot':
+            out = [
+                ['PORT_1', BrickPi.Sensor[PORT_1]],
+                ['PORT_2', BrickPi.Sensor[PORT_2]],
+                ['PORT_3', BrickPi.Sensor[PORT_3]],
+                ['PORT_4', BrickPi.Sensor[PORT_4]],
+              ]
+        if bot_package == 'grovebot':
+            out = grovePiSensorValues.toDict()
         return out
 
-if "jjbot" in settings["bot_packages"]:
-    class myThread (threading.Thread):
+
+if ["jjbot", "grovebot"] and settings["bot_packages"]:
+
+    class SensorThread (threading.Thread):
         """
         I think this just tells the BrickPi to update the values, their is no networking involved.
 
         """
-        def __init__(self, threadID, name, counter):
+        def __init__(self, threadID, name):
             threading.Thread.__init__(self)
             self.threadID = threadID
             self.name = name
-            self.counter = counter
         def run(self):
             print "Starting thread %s" %(self.threadID)
             while sensor_thread_running:
-                result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
-                time.sleep(UPDATE_SENSOR_DT)              # sleep for 200 ms
+                if 'jjbot' in settings['bot_packages']:
+                    result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
+                if 'grovebot' in settings['bot_packages']:
+                    print "[SensorThread.run()] Calling grovePiSensorValues.update()"
+                    grovePiSensorValues.update()
 
-
+                time.sleep(UPDATE_SENSOR_DT)
 
 
 
 if __name__ == "__main__":
+    
+    sensor_thread_running = True # This is a gloable, should probably be on a per sensor basis.
 
     if "jjbot" in settings["bot_packages"]:
         BrickPiSetup()  # setup the serial port for communication
@@ -171,11 +194,19 @@ if __name__ == "__main__":
 
         BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT   #Set the type of sensor at PORT_1
         BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
-
-        sensor_thread_running = True
-        thread1 = myThread(1, "Thread-1", 1)
+        
+        thread1 = SensorThread(1, "Thread-1")
         thread1.setDaemon(True)
+        print "Starting BrickPi sensors"
         thread1.start()
+
+    if "grovebot" in settings["bot_packages"]:
+        
+        grovebot_thread = SensorThread(2, 'Grovebot Thread')
+        grovebot_thread.setDaemon(True)
+        print "Starting GroveBot sensors"
+        grovebot_thread.start()
+
 
     # Start streaming data to ardyh.
     ardyh = ArdyhClient(uri=URI, protocols=['http-only', 'chat'])
