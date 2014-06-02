@@ -59,7 +59,7 @@ class ArdyhClient(TornadoWebSocketClient):
         self.CTENOPHORE = CTENOPHORE
         
 
-        self.channel = "io.ardyh.{}".format(settings['bot_name'])
+        self.channel = settings['bot_name']
 
         # set the name to MAC address if not found.
         self.bot_name = settings['bot_name']
@@ -174,7 +174,6 @@ if ["jjbot", "grovebot"] and settings["bot_packages"]:
                 if 'jjbot' in settings['bot_packages']:
                     result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
                 if 'grovebot' in settings['bot_packages']:
-                    print "[SensorThread.run()] Calling grovePiSensorValues.update()"
                     grovePiSensorValues.update()
 
                 time.sleep(UPDATE_SENSOR_DT)
