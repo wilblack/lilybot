@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="css/font-awesome.min.css">
 
   <script src="js/vendor/custom.modernizr.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+
 
 </head>
 <body>
@@ -52,14 +54,27 @@
 
   <div id="center-panel">
       <div id="sensor-values" class="transparent">
+        
+      <!-- BrickPi Sensors -->
         <div class="small-6 columns">
-        <div><small>PORT_1: <span class="PORT_1"></span></small></div>
-        <div><small>PORT_2: <span class="PORT_2"></span></small></div>
+          <div><small>PORT_1: <span class="PORT_1"></span></small></div>
+          <div><small>PORT_2: <span class="PORT_2"></span></small></div>
         </div>
         <div class="small-6 columns">
-        <div><small>PORT_3: <span class="PORT_3"></span></small></div>
-        <div><small>PORT_4: <span class="PORT_4"></span></small></div>
+          <div><small>PORT_3: <span class="PORT_3"></span></small></div>
+          <div><small>PORT_4: <span class="PORT_4"></span></small></div>
         </div>
+        
+        <!-- GrovePi Sensors -->
+        <div class="small-6 columns">
+          <div><small>Temp: <span class="grovebot-temp"></span></small></div>
+          <div><small>Light: <span class="grovebot-light"></span></small></div>
+        </div>
+
+        <div class="small-6 columns">
+          <div><small>Sound: <span class="grovebot-sound"></span></small></div>
+        </div>
+
     </div>
 
     <div id="log-wrapper" class="full-height">
