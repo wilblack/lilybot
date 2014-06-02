@@ -19,6 +19,9 @@ function updateSensorValues(sensor_values, sensor_package){
         $(".grovebot-temp").html(sensor_values.temp+"&deg;C");
         $(".grovebot-light").html(sensor_values.light);
         $(".grovebot-sound").html(sensor_values.sound);
+        $(".grovebot-touch").html(sensor_values.touch);
+        $(".grovebot-slider").html(sensor_values.slider);
+        $(".grovebot-button").html(sensor_values.button);
     }
 
 }
