@@ -165,7 +165,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         else:
             channel = ""
 
-        # out = json.dumps(message)
         out = message
         # import pdb; pdb.set_trace()
         for sub in self.get_subscribers(channel):

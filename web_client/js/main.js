@@ -1,4 +1,4 @@
-function updateSensorValues(sensor_values){
+function updateSensorValues(sensor_values, sensor_package){
     /*
     Input
     sensor_values - A list of lists with each inner of the from [PORTNAME, VALUE]
@@ -6,10 +6,19 @@ function updateSensorValues(sensor_values){
 
     */
     
-    $el = $("#sensor-values");
-    for (var i in sensor_values){
-       var port = sensor_values[i][0]
-       $el.find("."+port).html(sensor_values[i][1]);
+
+    if (sensor_package === 'jjbot'){
+        $el = $("#sensor-values");
+        for (var i in sensor_values){
+           var port = sensor_values[i][0]
+           $el.find("."+port).html(sensor_values[i][1]);
+        }
+    }
+
+    if (sensor_package === 'grovebot') {
+        $(".grovebot-temp").html(sensor_values.temp+"&deg;C");
+        $(".grovebot-light").html(sensor_values.light);
+        $(".grovebot-sound").html(sensor_values.sound);
     }
 
 }
@@ -198,7 +207,7 @@ Ardyh = function(handshake_message){
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
-                  if ('sensor_values' in message) updateSensorValues(message.sensor_values)
+                  if ('sensor_values' in message) updateSensorValues(message.sensor_values, message.sensor_package)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
