@@ -73,3 +73,16 @@ class GrovePiSensorValues:
 
 grovePiSensorValues = GrovePiSensorValues()
 
+
+class Grovebot(object):
+    
+    def __init__(self):
+        self.commands = []
+
+
+
+
+
+
+
+

@@ -112,6 +112,7 @@ class ArdyhClient(TornadoWebSocketClient):
             "channel":self.channel
         })
         message = json.dumps(message)
+        
         if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
@@ -129,10 +130,11 @@ class ArdyhClient(TornadoWebSocketClient):
         now = dt.now().strftime(self.LOG_DTFORMAT)
         message = "[%s] %s" %(now, message)
         print message
-        self.send(message)
+        #self.send(message)
 
 
     def loopCallback(self):
+        out = {}
         if "jjbot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
             out = {"message": {"sensor_values":sensor_values, "sensor_package":"jjbot"} }
@@ -211,6 +213,7 @@ if __name__ == "__main__":
     ardyh = ArdyhClient(uri=URI, protocols=['http-only', 'chat'])
     ardyh.connect()
     #starts the websockets connection
+    print "Starting ioLoop"
     tornado.ioloop.IOLoop.instance().start()
     print "Could not open web socket connect to ardyh"
 

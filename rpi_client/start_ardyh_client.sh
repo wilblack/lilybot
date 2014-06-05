@@ -7,7 +7,6 @@
 
 export PYTHONPATH=$PYTHONPATH:/home/pi/projects/RPi-LPD8806:/home/pi/projects/BrickPi_Python
 
-
 cd  /home/pi/projects/lilybot/rpi_client
 #sudo chmod 755 RPi_Server_Code.py
 
