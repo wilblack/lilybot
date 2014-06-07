@@ -40,7 +40,7 @@ class Router(object):
 
 
     def received_message(self, message):
-        #if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
+        if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
         # Try to JSON deconde it
         
         try:
