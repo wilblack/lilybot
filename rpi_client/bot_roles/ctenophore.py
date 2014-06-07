@@ -342,8 +342,8 @@ class MagicMushroom(Ctenophore):
                 self.cap_on = True
                 self.color_cap({'color':"#FF0000"})
         else:
-            self.allOff({})
             if self.cap_on:
+                self.allOff({})
                 self.cap_on = False
             
 
