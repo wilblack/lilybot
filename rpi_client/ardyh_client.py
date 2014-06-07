@@ -143,7 +143,7 @@ class ArdyhClient(TornadoWebSocketClient):
             sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
             out = {"message": {"sensor_values":sensor_values, "sensor_package":"grovebot"} }
 
-        self.send(out)
+        if out: self.send(out)
 
 
     def get_sensors_values(self, bot_package):

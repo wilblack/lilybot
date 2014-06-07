@@ -47,7 +47,7 @@ class PassiveThread (threading.Thread):
             if reverse > 0:
                 self.ctenophore.pulse({"color":color, "direction":"reverse"})
             
-            PULSE_DT = randint(12, 24)
+            PULSE_DT = randint(8, 12)
             time.sleep(PULSE_DT)              # sleep for 200 ms
 
 
@@ -69,15 +69,29 @@ class BlinkThread (PassiveThread):
             index = randint(0,self.nleds)
 
             self.ctenophore.setRGB({"color":color, "index":index})
-            time.sleep(randint(0,4))
+            time.sleep(randint(1,3))
             self.ctenophore.setRGB({"color":"#000000", "index":index})
 
-            DT = randint(4, 8)
+            DT = randint(2, 4)
             time.sleep(DT)              # sleep for 200 ms
 
 
+class CommandThread(threading.Thread):
+    """
+    A thread to handle responses to commands and sensor_values.
+    It runs the command once and shuts down.
+    """
 
+    def __init__(self, ctenophore, command, kwargs):
+        super(CommandThread, self).__init__()
+        self.ctenophore = ctenophore
+        self.command = command
+        self.kwargs = kwargs
 
+    def run(self):
+        print "\n\n[CommandThread.run(%s)]" %self.command
+        getattr(self.ctenophore, self.command)(self.kwargs)
+        
 class Ctenophore(object):
     
     def __init__(self):
@@ -111,6 +125,13 @@ class Ctenophore(object):
         self.blinkThread = BlinkThread("Blink Thread", self, output_queue, self.NLEDS)
         self.blinkThread.start()
         
+        output_queue3 = Queue.Queue()
+        self.blinkThread2 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
+        self.blinkThread2.start()
+        
+        output_queue4 = Queue.Queue()
+        self.blinkThread3 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
+        self.blinkThread3.start()
 
 
     def setMode(self, kwargs):
@@ -144,11 +165,20 @@ class Ctenophore(object):
 
 
     def target(self, kwargs):
+        """
+        kwargs
+        - index
+        - width
+
+        """
+        # Should move this to a thread
         self.led.all_off()
         nrepeat = 4
         dt = 0.2
-        width = 5 # Total length will be 2 8 width + 1
+        
+        width = int(kwargs.get('width', '5'))   # Total length will be 2 8 width + 1
         index = int(kwargs["index"])
+
 
         for j in range(nrepeat):
             
@@ -166,6 +196,7 @@ class Ctenophore(object):
             self.led.all_off()
 
     def pulse(self, kwargs):
+        # Should move this to a thread
         DT = 0.005
         color = kwargs['color']
         direction = kwargs.get('direction', 'forward')
@@ -210,28 +241,31 @@ class Ctenophore(object):
         STAGE2 = 30
         #self.led.all_off()
         
-        getattr(self, "%s_sensor_callback" %sensor_package)(sensor_values)
-    
+        try:
+            getattr(self, "%s_sensor_callback" %sensor_package)(sensor_values)
+        except:
+            pass
 
 
     def grovebot_sensor_callback(self, sensor_values):
         #import pdb; pdb.set_trace()
         if sensor_values['slider'] == 1:
-            self.target({'index':20})
+            self.led.fillRGB(255, 0, 255, 0, self.NLEDS)
         
         if sensor_values['touch'] == 1:
-            self.target({'index':40})
+            self.led.fillRGB(0, 255, 255, 0, self.NLEDS)
 
         if sensor_values['sound'] > 350:
             self.led.fillRGB(0, 0, 255, 0, self.NLEDS)
 
         if sensor_values['light'] <200:
             self.led.fillRGB(100, 100, 100, 0, self.NLEDS)
+        if sensor_values['light'] >= 200:
+            self.all_off()
 
 
-
-    def jjbot_sensor_callback(selg, sensor_values):
-        import pdb; pdb.set_trace()
+    def jjbot_sensor_callback(self, sensor_values):
+        
         val1 = sensor_values[0][1]
         val2 = sensor_values[2][1]
 
@@ -240,15 +274,12 @@ class Ctenophore(object):
             self.led.fillRGB(155,155, 0, 0, self.NLEDS)
             self.led.update()
 
-
-        self.history.append(val1);
+        self.history.append(val1)
         self.history.pop(0)
 
         index = self.NLEDS - val1
         
         percent = int(floor(100*float(index)/self.NLEDS))
-
-        
         
         if index >= 0 and index < STAGE1 and sum(self.history) < len(self.history) * STAGE1:
             # Stage 1
@@ -264,3 +295,107 @@ class Ctenophore(object):
         self.led.update()
 
 
+class MagicMushroom(Ctenophore):
+    """
+    This class is used to control the lights for the magic mushroom project. 
+    It must handle sensor_values from a grovebot and a jjbot. It differs from
+    ctenophore in that its first STOCK_HEIGHT leds are used in the mushroom 
+    'stock', the remaing are used in the mushroom 'cap'  
+    """
+    
+    
+    def __init__(self):
+
+        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff' ]
+
+        # Initialize Lights, this does not belong here.
+        self.NLEDS = NLEDS
+        self.STOCK_HEIGHT = 7
+        self.ALL_STOP = False
+        self.led = LEDStrip(self.NLEDS)
+        self.led.all_off()
+
+        self.cap_on = False
+        self.target_on = False
+        
+        self.history = [255, 255, 255]
+        if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
+        
+        for i in range(0, self.NLEDS):
+            self.led.setRGB(i, 0,255,255)
+            self.led.setRGB(self.NLEDS - i, 255, 255, 0)
+            self.led.update()
+            sleep(0.01)
+            self.led.all_off()
+
+
+        
+
+
+    def grovebot_sensor_callback(self, sensor_values):
+        
+        if sensor_values['slider'] == 1:
+            # Turns of passive threads
+            #self.led.fillRGB(200, 0, 255, self.STOCK_HEIGHT+1, self.NLEDS)
+            print "%s" %self.cap_on    
+            if not self.cap_on:
+                self.cap_on = True
+                self.color_cap({'color':"#FF0000"})
+        else:
+            self.allOff({})
+            if self.cap_on:
+                self.cap_on = False
+            
+
+        if sensor_values['touch'] == 1:
+            # Make it tingle at a point
+            print 'touch = 1'
+            if not self.target_on:
+                kwargs = {'index': self.STOCK_HEIGHT + 10,
+                          'width': 8}
+                ct = CommandThread(self, 'target', kwargs)
+                print "\n\nStarting ct thread\n\n"
+                ct.start()
+                self.target_on = True
+        else:
+            if self.target_on:
+                self.target_on = False
+
+            #self.led.fillRGB(0, 255, 255, 0, self.NLEDS)
+
+        if sensor_values['sound'] > 200:
+            self.led.fillRGB(0, 0, 255, self.STOCK_HEIGHT+1, self.NLEDS)
+
+
+        if sensor_values['light'] <200:
+            self.led.fillRGB(100, 100, 100, self.STOCK_HEIGHT+1, self.NLEDS)
+        
+        # if sensor_values['light'] >= 200:
+        #     self.all_off()
+
+    def green_cap(self, kwargs=None):
+
+        self.led.fillRGB(0, 255, 0, self.STOCK_HEIGHT+1, self.NLEDS)
+        index = 1
+        while index < (self.NLEDS - self.STOCK_HEIGHT):
+            self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
+            index += 4
+        
+        self.led.update()
+
+    def color_cap(self, kwargs):
+        """
+        kwargs:
+         - color: an hex color string i.e.  '#00DD00'
+        """
+
+        r,g,b = hex2rgb(kwargs['color'])
+        self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
+        index = 1
+        while index < (self.NLEDS - self.STOCK_HEIGHT):
+            self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
+            index += 4
+        
+        self.led.update()
+        
+        
