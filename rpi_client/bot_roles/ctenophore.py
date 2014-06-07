@@ -306,7 +306,7 @@ class MagicMushroom(Ctenophore):
     
     def __init__(self):
 
-        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff' ]
+        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff', 'color_cap' ]
 
         # Initialize Lights, this does not belong here.
         self.NLEDS = NLEDS
@@ -388,10 +388,11 @@ class MagicMushroom(Ctenophore):
         kwargs:
          - color: an hex color string i.e.  '#00DD00'
         """
-
+        
         r,g,b = hex2rgb(kwargs['color'])
         self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
         index = 1
+        
         while index < (self.NLEDS - self.STOCK_HEIGHT):
             self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
             index += 4

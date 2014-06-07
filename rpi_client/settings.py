@@ -13,10 +13,6 @@ settings= {
     "default_network_pwd":"ardyhnet"
 }
 
-CTENOPHORE = True
-NLEDS = 64
-
-JJBOT = False
 
 VERBOSE = True
 
