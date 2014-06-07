@@ -4,11 +4,13 @@ various bot_roles and defined in bot_roles/.
 
 """
 import json, ast
-from settings import CTENOPHORE, JJBOT, VERBOSE
+from settings import CTENOPHORE, JJBOT, VERBOSE, settings
 
 from bot_roles.core import Core
 from bot_roles.ctenophore import Ctenophore
 from bot_roles.jjbot import JJBot
+
+
 
 
 class Router(object):
@@ -25,6 +27,10 @@ class Router(object):
         if self.JJBOT:
             self.jjbot = JJBot()
 
+        if 'grovebot' in settings['bot_packages']:
+            from bot_roles.grovebot import Grovebot
+
+
     def received_message(self, message):
         if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
         # Try to JSON deconde it
@@ -35,13 +41,15 @@ class Router(object):
         except:
             # If that fails use the good old json.loads()
             print "[Router.recieved_message()] Could not load message.data"
-            import pdb; pdb.setm_trace()
             message = json.loads(message.data)
-            
             
         if not "command" in message.keys(): 
             if 'sensor_values' in message['message'].keys():
-                getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_values'])
+                if self.JJBOT:
+                    getattr(self.jjbot, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
+
+                elif self.CTENOPHORE:
+                    getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
                 return
             else:
                 return

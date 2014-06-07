@@ -204,11 +204,34 @@ class Ctenophore(object):
         return rs or False
 
 
-    def sensor_callback(self, sensor_values):
+    def sensor_callback(self, sensor_package, sensor_values):
+        
         STAGE1 = 15
         STAGE2 = 30
         #self.led.all_off()
-                
+        
+        getattr(self, "%s_sensor_callback" %sensor_package)(sensor_values)
+    
+
+
+    def grovebot_sensor_callback(self, sensor_values):
+        #import pdb; pdb.set_trace()
+        if sensor_values['slider'] == 1:
+            self.target({'index':20})
+        
+        if sensor_values['touch'] == 1:
+            self.target({'index':40})
+
+        if sensor_values['sound'] > 350:
+            self.led.fillRGB(0, 0, 255, 0, self.NLEDS)
+
+        if sensor_values['light'] <200:
+            self.led.fillRGB(100, 100, 100, 0, self.NLEDS)
+
+
+
+    def jjbot_sensor_callback(selg, sensor_values):
+        import pdb; pdb.set_trace()
         val1 = sensor_values[0][1]
         val2 = sensor_values[2][1]
 
@@ -239,3 +262,5 @@ class Ctenophore(object):
             # Pissed
             self.led.fillRGB(255, 0, 0, 0, index)
         self.led.update()
+
+
