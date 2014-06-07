@@ -25,4 +25,4 @@ try:
 except:
     pass
 
-URI = "%s?%s" %(URI_BASE, settings['bot_name'])
+URI = "%s?%s" %(URI_BASE, settings['bot_name'])  # This is only used for the ardyh connection, not for skynet
