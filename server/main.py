@@ -95,6 +95,50 @@ class TwineHandler(tornado.web.RequestHandler):
             bot['socket'].write_message(message)
         self.write("Received action %s" %(action))
 
+class MagicMushroomHandler(tornado.web.RequestHandler):
+    """
+    Simple WEB API to change the state of the magic mushroom
+
+    /magic-mushroom/COMMAND/?kwargs
+
+    COMAANDS:
+    - off
+    - color-cap : clor is parameter, did not add the hash sign to the hex color
+
+    Example Usage
+    /magic-mushroom/color-cap/?color=FF00FF
+    
+    """
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+
+    def get(self, action):
+        action = action.strip("/")
+        print "Got message ", action
+        
+        params = {}
+        pieces = self.request.query.split("&")
+        for piece in pieces:
+            key, val = piece.split('=')
+            params.update({key:val})
+        
+        kwargs = {}
+        for bot in listeners:
+            print bot
+            if action == "off":
+              command= 'allOff'
+              kwargs = {}
+
+            elif action == "color-cap":
+                kwargs = {'color':'#'+params['color']}
+                command = "color_cap"
+
+            message = json.dumps({'command':command,
+                                    'kwargs': kwargs
+                                    })
+            bot['socket'].write_message(message)
+        self.write("Received action %s with kwargs %s" %(action, kwargs))
+
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     
@@ -255,6 +299,7 @@ application = tornado.web.Application([
       (r'/', MainHandler),
       (r'/(bots-list)', MainHandler),
       (r'/twine/(.*)', TwineHandler),
+      (r'/magic-mushroom/(.*)', MagicMushroomHandler),
       (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
     ])
 
