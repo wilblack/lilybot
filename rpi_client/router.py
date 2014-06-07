@@ -4,7 +4,7 @@ various bot_roles and defined in bot_roles/.
 
 """
 import json, ast
-from settings import CTENOPHORE, JJBOT, VERBOSE, settings
+from settings import VERBOSE, settings
 
 from bot_roles.core import Core
 from bot_roles.ctenophore import Ctenophore, MagicMushroom
@@ -31,7 +31,7 @@ class Router(object):
             self.jjbot = JJBot()
 
         if 'magic_mushroom' in bot_packages:
-            self.jjbot = MagicMushroom()
+            self.magic_mushroom = MagicMushroom()
 
         if 'grovebot' in bot_packages:
             from bot_roles.grovebot import Grovebot
@@ -75,11 +75,11 @@ class Router(object):
                 received = True
 
             if not received:
-                print "%s not recognized as a valid command" % (cmd)
-
+                print "%s not recognized as a valid command" %(cmd)
+            return
 
         if 'sensor_values' in message['message'].keys():
-            received = True
+            received = False
             if self.jjbot:
                 getattr(self.jjbot, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
                 received = True
@@ -94,3 +94,4 @@ class Router(object):
             
             if not received:
                 print "Senor values ignored. No bot_packge found"
+

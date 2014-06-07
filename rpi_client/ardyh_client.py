@@ -56,12 +56,8 @@ class ArdyhClient(TornadoWebSocketClient):
 
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
-        self.CTENOPHORE = CTENOPHORE
-        
-
+       
         self.channel = settings['bot_name']
-
-        # set the name to MAC address if not found.
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
 
@@ -90,7 +86,6 @@ class ArdyhClient(TornadoWebSocketClient):
     def received_message(self, message):
         self.router.received_message(message)
 
-
     def send(self, message):
         """
         Message should be of the form {MESSAGE_OBJ}
@@ -105,7 +100,7 @@ class ArdyhClient(TornadoWebSocketClient):
         -- ardyh_timestamp - May not be present
 
         """
-
+        if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message) 
         channel = settings['bot_name']
         message.update({
             "bot_name":self.bot_name,
@@ -124,7 +119,7 @@ class ArdyhClient(TornadoWebSocketClient):
         print "Closed down", code, reason
         
         ioloop.IOLoop.instance().stop()
-
+        #ioloop.IOLoop.instance().start()
 
     def log(self, message):
         now = dt.now().strftime(self.LOG_DTFORMAT)
