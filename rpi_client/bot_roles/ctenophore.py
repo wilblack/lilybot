@@ -75,7 +75,6 @@ class BlinkThread (PassiveThread):
             DT = randint(2, 4)
             time.sleep(DT)              # sleep for 200 ms
 
-
 class CommandThread(threading.Thread):
     """
     A thread to handle responses to commands and sensor_values.
@@ -306,7 +305,7 @@ class MagicMushroom(Ctenophore):
     
     def __init__(self):
 
-        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff', 'color_cap' ]
+        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff', 'color_cap', 'set_state' ]
 
         # Initialize Lights, this does not belong here.
         self.NLEDS = NLEDS
@@ -319,6 +318,8 @@ class MagicMushroom(Ctenophore):
         self.target_on = False
         
         self.history = [255, 255, 255]
+        self.blinkThreads = []
+
         if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
         
         for i in range(0, self.NLEDS):
@@ -373,30 +374,42 @@ class MagicMushroom(Ctenophore):
         # if sensor_values['light'] >= 200:
         #     self.all_off()
 
-    def green_cap(self, kwargs=None):
 
-        self.led.fillRGB(0, 255, 0, self.STOCK_HEIGHT+1, self.NLEDS)
-        index = 1
-        while index < (self.NLEDS - self.STOCK_HEIGHT):
-            self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
-            index += 4
-        
-        self.led.update()
-
-    def color_cap(self, kwargs):
+    def set_state(self, kwargs):
         """
         kwargs:
-         - color: an hex color string i.e.  '#00DD00'
+         - state : 'off', 'red', 'green', 'blue', 'random'
         """
         
-        r,g,b = hex2rgb(kwargs['color'])
-        self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
-        index = 1
+        state = kwargs['state']
         
-        while index < (self.NLEDS - self.STOCK_HEIGHT):
-            self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
-            index += 4
-        
-        self.led.update()
+        print "[MagicMushroom.set_state()] with state" ,state
+        if state == '#off':
+            self.allOff({})
+            
+            for thread in self.blinkThreads:
+                thread.stoprequest.set()
+
+            self.blinkThread = []
+
+        elif state == '#random':
+            for i in range(0,8):
+                output_queue = Queue.Queue()
+                thread = BlinkThread("Blink Thread %s" %i, self, output_queue, self.NLEDS)
+                thread.start()
+                self.blinkThreads.append(thread)
+            
+            output_queue = Queue.Queue()
+            thread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
+            thread.start()
+            self.blinkThreads.append(thread)
+
+        else:
+            #Assume is a hex-color    
+            print "Looking for color %s" %state
+            r,g,b = hex2rgb(state)
+
+            self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)        
+            self.led.update()
         
         
