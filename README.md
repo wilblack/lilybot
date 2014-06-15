@@ -115,12 +115,6 @@ Plug in an enternet cable and turn the raspberry on. ssh should be enabled by de
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
 
-  * With console cable
-Follow this guide to set up the console cable
-https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
-
-
-
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
@@ -183,6 +177,14 @@ Run the following code and grab some coffee, the second command takes awhile. Th
 wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
 chmod 755 apt-get-installer.sh
 ./installer.sh
+```
+
+### Start a cron job to kee pthe connect going if you lose it.
+
+Edit `/etc/crontab` by adding the following line
+
+```
+*  *    * * *   root    /home/pi/projects/lilybot/rpi_client/restart.sh > /home/pi/restart.log
 ```
 
 
