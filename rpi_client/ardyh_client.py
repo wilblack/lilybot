@@ -16,7 +16,7 @@ import tornado
 import tornado.web
 import tornado.ioloop
 
-from settings import *
+from settings import settings, URI, VERBOSE
 from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
@@ -30,7 +30,6 @@ if "jjbot" in settings["bot_packages"]:
 
 if 'grovebot' in settings["bot_packages"]:
     from bot_roles.grovebot import *
-
 
 
 class ArdyhClient(TornadoWebSocketClient):
@@ -152,7 +151,6 @@ class ArdyhClient(TornadoWebSocketClient):
         if bot_package == 'grovebot':
             out = grovePiSensorValues.toDict()
         return out
-
 
 if ["jjbot", "grovebot"] and settings["bot_packages"]:
 

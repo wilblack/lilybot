@@ -1,5 +1,8 @@
 import sys
+from settings import SENSORS
+
 sys.path.append("/home/pi/projects/GrovePi/Software/Python")
+
 
 
 from grovepi import *
@@ -7,45 +10,10 @@ from grovepi import *
 
 class GrovePiSensorValues:
     
-    sensors = [{'type':'temp',
-                'default':0,
-               },
-
-               {'type':'humidity',
-                'default':0,
-               },
-
-               {'type':'sound',
-                'default':0,
-               },
-
-               {'type':'light',
-                'default':0,
-               },
-
-               {'type':'slider',
-                'default':0,
-               },
-
-               {'type':'touch',
-                'default':0,
-               },
-
-               {'type':'pir',
-                'default':0,
-               },
-
-               {'type':'dist',
-                'default':0,
-               },
-
-               {'type':'acc_xyz',
-                'default':[0,0,0],
-               },
-
-               ]
+    
 
     def __init__(self):
+        self.sensors = SENSORS
         for sensor in self.sensors:
            setattr(self, sensor['type'], sensor['default'])
 
