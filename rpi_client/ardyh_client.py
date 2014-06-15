@@ -16,7 +16,7 @@ import tornado
 import tornado.web
 import tornado.ioloop
 
-from settings import settings, URI, VERBOSE
+from settings import settings, URI, VERBOSE, SENSORS
 from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
@@ -70,7 +70,8 @@ class ArdyhClient(TornadoWebSocketClient):
                    'bot_roles':self.bot_roles,
                    'mac':get_mac_address(),
                    'handshake':True,
-                   'subscriptions':settings['subscriptions']
+                   'subscriptions':settings['subscriptions'],
+                   'sensors':SENSORS
                    }
 
 
