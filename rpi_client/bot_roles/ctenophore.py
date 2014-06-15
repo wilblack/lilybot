@@ -75,11 +75,14 @@ class BlinkThread (PassiveThread):
             DT = randint(2, 4)
             time.sleep(DT)              # sleep for 200 ms
 
-
 class CommandThread(threading.Thread):
     """
     A thread to handle responses to commands and sensor_values.
     It runs the command once and shuts down.
+
+    kwargs['duration'] to set a duration in seconds to wait until calling
+    kwargs['command2']
+
     """
 
     def __init__(self, ctenophore, command, kwargs):
@@ -91,7 +94,12 @@ class CommandThread(threading.Thread):
     def run(self):
         print "\n\n[CommandThread.run(%s)]" %self.command
         getattr(self.ctenophore, self.command)(self.kwargs)
-        
+        if 'duration' in self.kwargs.keys() and 'command2' in self.kwargs.keys():
+            time.sleep(self.kwargs['duration'])
+            print "runnning command2: %s" %self.kwargs['command2']
+            getattr(self.ctenophore, self.kwargs['command2'])(self.kwargs['kwargs2'])
+            
+
 class Ctenophore(object):
     
     def __init__(self):
@@ -134,8 +142,6 @@ class Ctenophore(object):
         self.blinkThread3.start()
 
 
-    def setMode(self, kwargs):
-        pass
 
     def setRGB(self, kwargs):
         r, g, b = hex2rgb(kwargs["color"])
@@ -148,7 +154,13 @@ class Ctenophore(object):
 
 
     def fillRGB(self, kwargs):
-        self.led.all_off()
+        """
+        kwargs
+        - color - hex color code, i.g. '#4466FF'
+        - start - zero-based starting index
+        - end - zero-ending index 
+        """
+        
         r, g, b = hex2rgb(kwargs["color"])
         start = kwargs.get("start", 0)
         end = kwargs.get("end", self.NLEDS)
@@ -156,11 +168,7 @@ class Ctenophore(object):
         self.led.update()
 
 
-    def fillOff(self, kwargs):
-        if VERBOSE: print "called fillOff()"
-
-
-    def allOff(self, kwargs):
+    def allOff(self, kwargs={}):
             self.led.all_off()
 
 
@@ -306,7 +314,7 @@ class MagicMushroom(Ctenophore):
     
     def __init__(self):
 
-        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff', 'color_cap' ]
+        self.commands = ['setRGB', 'fillRGB', 'target', 'allOff', 'color_cap', 'set_state' ]
 
         # Initialize Lights, this does not belong here.
         self.NLEDS = NLEDS
@@ -317,8 +325,12 @@ class MagicMushroom(Ctenophore):
 
         self.cap_on = False
         self.target_on = False
-        
+        self.sound_on = False
+
         self.history = [255, 255, 255]
+        self.blinkThreads = []
+        self.soundThread = None
+
         if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
         
         for i in range(0, self.NLEDS):
@@ -364,39 +376,72 @@ class MagicMushroom(Ctenophore):
             #self.led.fillRGB(0, 255, 255, 0, self.NLEDS)
 
         if sensor_values['sound'] > 200:
-            self.led.fillRGB(0, 0, 255, self.STOCK_HEIGHT+1, self.NLEDS)
+            if not self.sound_on:
+                kwargs = {'start': 0,
+                          'end':self.NLEDS,
+                          'color': '#FF5050',
+                          'duration':0.5,
+                          'command2':'allOff',
+                          'kwargs2':{}
+                         }
+                ct = CommandThread(self, 'fillRGB', kwargs)
+                print "\n\nStarting ct thread\n\n"
+                ct.start()
+                self.soundThread = ct
+                self.sound_on = True
+
+        else:
+
+            if self.sound_on:                
+                self.sound_on = False
 
 
         if sensor_values['light'] <200:
-            self.led.fillRGB(100, 100, 100, self.STOCK_HEIGHT+1, self.NLEDS)
-        
+            kwargs = {'color':'#2200AA',
+                      'start':0,
+                      'end': self.STOCK_HEIGHT}
+            print "Lights out: ", kwargs
+            self.fillRGB(kwargs)
+            
         # if sensor_values['light'] >= 200:
         #     self.all_off()
 
-    def green_cap(self, kwargs=None):
 
-        self.led.fillRGB(0, 255, 0, self.STOCK_HEIGHT+1, self.NLEDS)
-        index = 1
-        while index < (self.NLEDS - self.STOCK_HEIGHT):
-            self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
-            index += 4
-        
-        self.led.update()
-
-    def color_cap(self, kwargs):
+    def set_state(self, kwargs):
         """
         kwargs:
-         - color: an hex color string i.e.  '#00DD00'
+         - state : 'off', 'red', 'green', 'blue', 'random'
         """
         
-        r,g,b = hex2rgb(kwargs['color'])
-        self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
-        index = 1
+        state = kwargs['state']
         
-        while index < (self.NLEDS - self.STOCK_HEIGHT):
-            self.led.setRGB(self.STOCK_HEIGHT + index, 255, 255, 255)
-            index += 4
-        
-        self.led.update()
+        print "[MagicMushroom.set_state()] with state" ,state
+        if state == '#off':
+            self.allOff({})
+            
+            for thread in self.blinkThreads:
+                thread.stoprequest.set()
+
+            self.blinkThread = []
+
+        elif state == '#random':
+            for i in range(0,8):
+                output_queue = Queue.Queue()
+                thread = BlinkThread("Blink Thread %s" %i, self, output_queue, self.NLEDS)
+                thread.start()
+                self.blinkThreads.append(thread)
+            
+            output_queue = Queue.Queue()
+            thread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
+            thread.start()
+            self.blinkThreads.append(thread)
+
+        else:
+            #Assume is a hex-color    
+            print "Looking for color %s" %state
+            r,g,b = hex2rgb(state)
+
+            self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)        
+            self.led.update()
         
         
