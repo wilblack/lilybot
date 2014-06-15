@@ -16,12 +16,19 @@ function updateSensorValues(sensor_values, sensor_package){
     }
 
     if (sensor_package === 'grovebot') {
+
         $(".grovebot-temp").html(sensor_values.temp+"&deg;C");
+        $(".grovebot-humidity").html(sensor_values.humidity);
         $(".grovebot-light").html(sensor_values.light);
         $(".grovebot-sound").html(sensor_values.sound);
         $(".grovebot-touch").html(sensor_values.touch);
         $(".grovebot-slider").html(sensor_values.slider);
-        $(".grovebot-button").html(sensor_values.button);
+        $(".grovebot-dist").html(sensor_values.dist);
+        $(".grovebot-acc_xyz").html(sensor_values.acc_xyz.join(", "));
+        $(".grovebot-pir").html(sensor_values.pir);
+        
+        // $(".grovebot-button").html(sensor_values.button);
+    
     }
 
 }
