@@ -7,12 +7,42 @@ settings= {
     "bot_roles":"bot",
     "bot_packages":["grovebot"],
     "subscriptions":[],
-
-    "sensors":[
-        {'type':'temp',
-         'units':'C',
-         'verbose':'Temperature'
-        }
-        ]
-    
 }
+
+SENSORS =[
+    {'type':'temp',
+        'default':0,
+       },
+
+       {'type':'humidity',
+        'default':0,
+       },
+
+       {'type':'sound',
+        'default':0,
+       },
+
+       {'type':'light',
+        'default':0,
+       },
+
+       {'type':'slider',
+        'default':0,
+       },
+
+       {'type':'touch',
+        'default':0,
+       },
+
+       {'type':'pir',
+        'default':0,
+       },
+
+       {'type':'dist',
+        'default':0,
+       },
+
+       {'type':'acc_xyz',
+        'default':[0,0,0],
+       },
+]
