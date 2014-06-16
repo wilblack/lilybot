@@ -86,6 +86,18 @@ def main(argv):
 
   try:
     print "Success! Now add code here."
+
+    body = {"rows":[
+              {"json": {"temp":4.4,"humidity":4.4}},
+              {"json": {"temp":5.5,"humidity":5.5}},
+           ]}
+    response = service.tabledata().insertAll(
+        projectId='glossy-protocol-606',
+        datasetId='rp3_grovebot',
+        tableId='sensor_values',
+        body=body).execute()
+
+
   except client.AccessTokenRefreshError:
     print ("The credentials have been revoked or expired, please re-run"
       "the application to re-authorize")

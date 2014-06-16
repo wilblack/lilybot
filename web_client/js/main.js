@@ -182,7 +182,7 @@ Ardyh = function(handshake_message){
     */
     var self = this;
     this.handshake_message = handshake_message;
-    this.DOMAIN = "173.255.213.55:9093"
+    this.DOMAIN = "162.243.146.219:9093"
     this.camera_url = "http://192.168.1.140:8081"
     this.lilybot = new Lilybot();
     this.host = "";
