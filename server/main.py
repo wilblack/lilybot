@@ -46,16 +46,25 @@ def get_bot_listener(bot_name):
     return next( (bot for bot in listeners if bot['bot_name'] == bot_name), [] )
 
 
-
-class MainHandler(tornado.web.RequestHandler):
+class ArdyhWebRequestHandler(tornado.web.RequestHandler):
     
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+    def set_allow_origin(self, request):
+        origin_domain = self.request.headers["Origin"]
+        self.set_header("Access-Control-Allow-Origin", origin_domain)
+
+
+class MainHandler(ArdyhWebRequestHandler):
+    
+    # def set_default_headers(self):
+    #     self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+    #     self.set_header("Access-Control-Allow-Origin", "http://ctenophore.solalla.com")
 
     def get(self, action=None):
         """
         Displays the webpage.
         """
+        self.set_allow_origin(self.request)
+
         if action == "bots-list":
             out = json.dumps([ {'bot_name':l['bot_name'], 'subscriptions':l['subscriptions']} for l in listeners])
             self.write(out)
@@ -64,13 +73,11 @@ class MainHandler(tornado.web.RequestHandler):
             self.write(loader.load("templates/index.html").generate())
 
 
-class TwineHandler(tornado.web.RequestHandler):
-
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+class TwineHandler(ArdyhWebRequestHandler):
 
     def get(self, action):
         print "Got message ", action
+        self.set_allow_origin(self.request)
 
         for bot in listeners:
             if action == "bottom":
@@ -95,7 +102,7 @@ class TwineHandler(tornado.web.RequestHandler):
             bot['socket'].write_message(message)
         self.write("Received action %s" %(action))
 
-class MagicMushroomHandler(tornado.web.RequestHandler):
+class MagicMushroomHandler(ArdyhWebRequestHandler):
     """
     Simple WEB API to change the state of the magic mushroom
 
@@ -109,10 +116,14 @@ class MagicMushroomHandler(tornado.web.RequestHandler):
     /magic-mushroom/color-cap/?color=FF00FF
     
     """
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+    # def set_default_headers(self):
+    #     self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+    #     self.set_header("Access-Control-Allow-Origin", "http://ctenophore.solalla.com")
 
     def get(self, action):
+        self.set_allow_origin(self.request)
+
+
         action = action.strip("/")
         print "Got message ", action
         
@@ -123,21 +134,34 @@ class MagicMushroomHandler(tornado.web.RequestHandler):
             params.update({key:val})
         
         kwargs = {}
+
         for bot in listeners:
-            print bot
-            if action == "off":
-              command= 'allOff'
-              kwargs = {}
+            if bot['socket']:
+                
+                if action == "off":
+                  command= 'allOff'
+                  kwargs = {}
 
-            elif action == "color-cap":
-                kwargs = {'color':'#'+params['color']}
-                command = "color_cap"
+                elif action == "color-cap":
+                    kwargs = {'color':'#'+params['color']}
+                    command = "color_cap"
 
-            message = json.dumps({'command':command,
-                                    'kwargs': kwargs
-                                    })
-            bot['socket'].write_message(message)
+                elif action == 'set-state':
+                    command = 'set_state'
+                    kwargs = {'state': '#' + params['state']}
+
+                message = json.dumps({'command':command,
+                                        'kwargs': kwargs
+                                        })
+                try:
+                    print "sending ", message
+                    print "to bot", bot['bot_name']
+                    bot['socket'].write_message(message)
+                except AttributeError:
+                    print "WTF bot %s is no good" %(bot['bot_name'])
+
         self.write("Received action %s with kwargs %s" %(action, kwargs))
+
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
@@ -159,6 +183,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             bot_name = ""
         print "this is %s" %bot_name
 
+        self.bot_name = bot_name
         old_socket = get_bot_listener(bot_name)
         if old_socket:
             old_socket.update({'socket':self})
@@ -195,10 +220,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
     def on_close(self):
-        print 'Lost a bot. connection closed...'
-        
-        #bot = next( bot for bot in listeners if bot['bot_name'] == self.connected_to )
-        #listeners.remove(bot)
+        print 'Lost a %s. connection closed.' %self.bot_name
+        bot = next( bot for bot in listeners if bot['bot_name'] == self.bot_name )
+        listeners.remove(bot)
 
         #self.broadcast("Closed %s" %(bot['bot_name']))
 
