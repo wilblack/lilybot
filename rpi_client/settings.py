@@ -1,6 +1,5 @@
 #URI_BASE = "ws://173.255.213.55:9093/ws"
 URI_BASE = "ws://162.243.146.219:9093/ws"
->>>>>>> ee2ffd8d938c1ce80f08571e5dbb02ae248754ae
 VERBOSE = True
 SENSORS = []
 
