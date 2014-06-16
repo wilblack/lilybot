@@ -1,5 +1,5 @@
-URI_BASE = "ws://173.255.213.55:9093/ws"
-
+#URI_BASE = "ws://173.255.213.55:9093/ws"
+URI_BASE = "ws://162.243.146.219/ws"
 settings= {
     "bot_name":"rp2.solalla.ardyh",
     "bot_roles":"bot",
