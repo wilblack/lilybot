@@ -66,8 +66,10 @@ Bot should send an initial handshake JSON object.
 
 ```
 {message: 
-  {"bot_name":"",
+  {"handshake":true
+   "bot_name":"",
    "bot_roles":[], 
+   "subscriptions":[]
 }
 
 ```
