@@ -24,7 +24,11 @@ Check to see if redis was installed correctly,
 ```
 redis-cli ping
 ```
-The output should be `PONG`.
+The output should be `PONG`. The redis-server can be started, stopped, etc... using mormal init.d commands i.e.
+
+```
+sudo /etc/init.d/redis-server restart
+```
 
 
 
