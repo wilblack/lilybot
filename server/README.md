@@ -14,6 +14,20 @@ Dependencies
 ============
 redis - 
 
+```
+sudo apt-add-repository ppa:chris-lea/redis-server
+sudo apt-get update
+sudo apt-get install redis-server
+```
+
+Check to see if redis was installed correctly,
+```
+redis-cli ping
+```
+The output should be `PONG`.
+
+
+
 ### Python Packages
 
 ```
