@@ -40,10 +40,11 @@ sudo pip install redis
 ```
 
 
-The server listens on port 9093 by default
+
 
 Start the Server
 ================
+The server listens on port 9093 by default
 
 1. Got to `lilybot/server`
 2. Run `python main.js`
