@@ -18,6 +18,7 @@ redis -
 sudo apt-add-repository ppa:chris-lea/redis-server
 sudo apt-get update
 sudo apt-get install redis-server
+sudo apt-get install python-dev
 ```
 
 Check to see if redis was installed correctly,
@@ -37,6 +38,7 @@ sudo /etc/init.d/redis-server restart
 ```
 sudo pip install tornado
 sudo pip install redis
+sudo pip install hiredis
 ```
 
 
