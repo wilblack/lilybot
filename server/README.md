@@ -12,8 +12,14 @@ go to 173.255.213.55:9093 and you can see if your device connected.
 
 Dependencies
 ============
+redis - 
 
-tornado - `pip install tornado` 
+### Python Packages
+
+```
+sudo pip install tornado
+sudo pip install redis
+```
 
 
 The server listens on port 9093 by default
