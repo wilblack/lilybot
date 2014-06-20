@@ -6,17 +6,18 @@ Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 
 import json, urllib, sys, ast
 import threading
+import logging
 
 from datetime import datetime as dt
 
-from ws4py.client.tornadoclient import TornadoWebSocketClient
+from socketIO_client import SocketIO
 from tornado import ioloop
 
 import tornado
 import tornado.web
 import tornado.ioloop
 
-from settings import settings, URI, VERBOSE, SENSORS
+from settings import *
 from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
@@ -32,7 +33,9 @@ if 'grovebot' in settings["bot_packages"]:
     from bot_roles.grovebot import *
 
 
-class ArdyhClient(TornadoWebSocketClient):
+logging.basicConfig(level=logging.DEBUG)
+
+class SkynetClient(object):
     """
     Web Socket client to connect to ardyh on start up.
     
@@ -49,42 +52,70 @@ class ArdyhClient(TornadoWebSocketClient):
 
     """
 
-    def __init__(self, protocols, uri='ws://173.255.213.55:9093/ws?'):
-        rs = super(ArdyhClient, self).__init__(uri, protocols)
+    def __init__(self, uri, port):
         
-
-        self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
-       
         self.channel = settings['bot_name']
+        self.uuid = SKYNET_UUID
+        self.token = SKYNET_TOKEN
+        # set the name to MAC address if not found.
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
 
         self.core = Core()
         self.router = Router()
 
+        self.connect(uri, port)
+        print "[__init__()] Finished connecting"
 
-    def opened(self):
-        print "Connection to ardh is open"
-        message = {'bot_name':self.bot_name, 
-                   'bot_roles':self.bot_roles,
-                   'mac':get_mac_address(),
-                   'handshake':True,
-                   'subscriptions':settings['subscriptions'],
-                   'sensors':SENSORS
-                   }
+    def connect(self, uri, port):
+        global socketIO
+        with SocketIO(uri, port) as socketIO:
+            print ('Connecting')
+            socketIO.on('identify',self.opened)
+            socketIO.wait(4) #wait 4 seconds to be sure you get an identify back
+            
+            print "[connect()] Sending identify request"
+            socketIO.emit('identity',{'uuid':self.uuid,'token':self.token,'socketid':self.socketId})
+            
+            socketIO.on('ready',self.on_ready)
+            socketIO.wait(4) #wait 4 seconds to be sure you get an identify back
 
 
-        self.send(message)
+    def opened(self, *args):
+        print "Connection to skynet is open"
+        self.socketId = args[0]['socketid']
+        # message = {'bot_name':self.bot_name, 
+        #            'bot_roles':self.bot_roles,
+        #            'mac':get_mac_address(),
+        #            'handshake':True,
+        #            'subscriptions':settings['subscriptions']
+        #            }
 
-        if ["jjbot", "grovebot"] and settings["bot_packages"]:
-            print "Registering IO Loop callback"
-            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT*1000)
-            sensors.start()
+
+        # self.send(message)
+
+        # if ["jjbot", "grovebot"] and settings["bot_packages"]:
+        #     print "Registering IO Loop callback"
+        #     sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT*1000)
+        #     sensors.start()
+
+
+    def on_ready(self, *args):
+        print('we are ready')
+        
+        res = args[0]
+        if res['status'] == 201:
+            while True:
+                socketIO.wait(1)
+                self.loopCallback()
+        else:
+            print "[on_ready()] Could not establish ready state."
 
 
     def received_message(self, message):
         self.router.received_message(message)
+
 
     def send(self, message):
         """
@@ -100,14 +131,13 @@ class ArdyhClient(TornadoWebSocketClient):
         -- ardyh_timestamp - May not be present
 
         """
-        if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message) 
+
         channel = settings['bot_name']
         message.update({
             "bot_name":self.bot_name,
             "channel":self.channel
         })
         message = json.dumps(message)
-        
         if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
@@ -119,17 +149,16 @@ class ArdyhClient(TornadoWebSocketClient):
         print "Closed down", code, reason
         
         ioloop.IOLoop.instance().stop()
-        #ioloop.IOLoop.instance().start()
+
 
     def log(self, message):
         now = dt.now().strftime(self.LOG_DTFORMAT)
         message = "[%s] %s" %(now, message)
         print message
-        #self.send(message)
+        self.send(message)
 
 
     def loopCallback(self):
-        out = {}
         if "jjbot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
             out = {"message": {"sensor_values":sensor_values, "sensor_package":"jjbot"} }
@@ -138,7 +167,7 @@ class ArdyhClient(TornadoWebSocketClient):
             sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
             out = {"message": {"sensor_values":sensor_values, "sensor_package":"grovebot"} }
 
-        if out: self.send(out)
+        print out
 
 
     def get_sensors_values(self, bot_package):
@@ -152,6 +181,7 @@ class ArdyhClient(TornadoWebSocketClient):
         if bot_package == 'grovebot':
             out = grovePiSensorValues.toDict()
         return out
+
 
 if ["jjbot", "grovebot"] and settings["bot_packages"]:
 
@@ -204,11 +234,12 @@ if __name__ == "__main__":
 
 
     # Start streaming data to ardyh.
-    ardyh = ArdyhClient(uri=URI, protocols=['http-only', 'chat'])
-    ardyh.connect()
+    URI = 'http://skynet.im'
+    skynet = SkynetClient(URI, 80)
+
+    
     #starts the websockets connection
-    print "Starting ioLoop"
-    tornado.ioloop.IOLoop.instance().start()
-    print "Could not open web socket connect to ardyh"
+    #tornado.ioloop.IOLoop.instance().start()
+    #print "Could not open web socket connect to ardyh"
 
 

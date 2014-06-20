@@ -7,12 +7,13 @@
 
 export PYTHONPATH=$PYTHONPATH:/home/pi/projects/RPi-LPD8806:/home/pi/projects/BrickPi_Python
 
+
 cd  /home/pi/projects/lilybot/rpi_client
 #sudo chmod 755 RPi_Server_Code.py
 
 NOW=$(date +"%Y-%m-%dT%T %Z")
-echo "[$NOW] Starting and arddyh client"
+echo "[$NOW] Starting skynet_client.py"
 
-python ardyh_client.py
+python skynet_client.py
 
 

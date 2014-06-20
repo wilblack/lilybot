@@ -1,0 +1,2 @@
+timestamp, sound, dist, temp, light, acc_x, acc_y, acc_z, humidity, slider, touch, pir
+0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0

@@ -63,17 +63,20 @@ Stop Server
 ## Connecting a Bot to ardyh
 
 ### Initial handshake
-
-Bot should send an initial handshake JSON object.
+The bot should first connect with ardyh giving it a bot_name
+```
+ws://173.255.213.55:9093/ws?my-bot-name
+```
+Then immediately followup up with a handshake JSON object.
 
 ```
+
 {message: 
   {"handshake":true
    "bot_name":"",
    "bot_roles":[], 
    "subscriptions":[]
 }
-
 ```
 
 **bot_name** - a unique identfiyer for the bot

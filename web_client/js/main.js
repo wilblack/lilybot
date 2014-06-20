@@ -1,3 +1,5 @@
+window.LOG_PAUSED=false;
+
 function updateSensorValues(sensor_values, sensor_package){
     /*
     Input
@@ -16,12 +18,19 @@ function updateSensorValues(sensor_values, sensor_package){
     }
 
     if (sensor_package === 'grovebot') {
+
         $(".grovebot-temp").html(sensor_values.temp+"&deg;C");
+        $(".grovebot-humidity").html(sensor_values.humidity);
         $(".grovebot-light").html(sensor_values.light);
         $(".grovebot-sound").html(sensor_values.sound);
         $(".grovebot-touch").html(sensor_values.touch);
         $(".grovebot-slider").html(sensor_values.slider);
-        $(".grovebot-button").html(sensor_values.button);
+        $(".grovebot-dist").html(sensor_values.dist);
+        $(".grovebot-acc_xyz").html(sensor_values.acc_xyz.join(", "));
+        $(".grovebot-pir").html(sensor_values.pir);
+        
+        // $(".grovebot-button").html(sensor_values.button);
+    
     }
 
 }
@@ -175,7 +184,7 @@ Ardyh = function(handshake_message){
     */
     var self = this;
     this.handshake_message = handshake_message;
-    this.DOMAIN = "173.255.213.55:9093"
+    this.DOMAIN = "162.243.146.219:9093"
     this.camera_url = "http://192.168.1.140:8081"
     this.lilybot = new Lilybot();
     this.host = "";
@@ -206,7 +215,12 @@ Ardyh = function(handshake_message){
                 - sensor_values
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
-                self._log(msg.data);
+               
+
+                if(!LOG_PAUSED){
+                     self._log(msg.data);
+                }
+
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
@@ -302,7 +316,13 @@ Ardyh = function(handshake_message){
 
     this.pauseLog = function(){
         console.log("Not implemented");
-                
+          if(LOG_PAUSED===true){
+            LOG_PAUSED = false;
+            $('.pauseBtn').html('Pause');
+          } else{
+            LOG_PAUSED = true;
+            $('.pauseBtn').html('Unpause');
+          }     
     };
 
     this.getBotsList = function(callback){
@@ -350,7 +370,7 @@ ControlsView = function($el){
     $(".steerLeftBtn").click(function(e){ self.lilybot.steer_left(); });
     $(".steerRightBtn").click(function(e){ self.lilybot.steer_right(); });
 
-    $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
+    $(".pauseBtn").click(function(e){ ardyh.pauseLog(); });
 
     $(".refreshBotsBtn").click(function(){
         /*
