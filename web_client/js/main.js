@@ -1,3 +1,5 @@
+window.LOG_PAUSED=false;
+
 function updateSensorValues(sensor_values, sensor_package){
     /*
     Input
@@ -213,7 +215,12 @@ Ardyh = function(handshake_message){
                 - sensor_values
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
-                self._log(msg.data);
+               
+
+                if(!LOG_PAUSED){
+                     self._log(msg.data);
+                }
+
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
@@ -309,7 +316,13 @@ Ardyh = function(handshake_message){
 
     this.pauseLog = function(){
         console.log("Not implemented");
-                
+          if(LOG_PAUSED===true){
+            LOG_PAUSED = false;
+            $('.pauseBtn').html('Pause');
+          } else{
+            LOG_PAUSED = true;
+            $('.pauseBtn').html('Unpause');
+          }     
     };
 
     this.getBotsList = function(callback){
@@ -357,7 +370,7 @@ ControlsView = function($el){
     $(".steerLeftBtn").click(function(e){ self.lilybot.steer_left(); });
     $(".steerRightBtn").click(function(e){ self.lilybot.steer_right(); });
 
-    $(".pauseLogBtn").click(function(e){ ardyh.pauseLog(); });
+    $(".pauseBtn").click(function(e){ ardyh.pauseLog(); });
 
     $(".refreshBotsBtn").click(function(){
         /*

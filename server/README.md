@@ -12,14 +12,41 @@ go to 173.255.213.55:9093 and you can see if your device connected.
 
 Dependencies
 ============
+redis - 
 
-tornado - `pip install tornado` 
+```
+sudo apt-add-repository ppa:chris-lea/redis-server
+sudo apt-get update
+sudo apt-get install redis-server
+sudo apt-get install python-dev
+```
+
+Check to see if redis was installed correctly,
+```
+redis-cli ping
+```
+The output should be `PONG`. The redis-server can be started, stopped, etc... using mormal init.d commands i.e.
+
+```
+sudo /etc/init.d/redis-server restart
+```
 
 
-The server listens on port 9093 by default
+
+### Python Packages
+
+```
+sudo pip install tornado
+sudo pip install redis
+sudo pip install hiredis
+```
+
+
+
 
 Start the Server
 ================
+The server listens on port 9093 by default
 
 1. Got to `lilybot/server`
 2. Run `python main.js`
@@ -43,9 +70,12 @@ ws://173.255.213.55:9093/ws?my-bot-name
 Then immediately followup up with a handshake JSON object.
 
 ```
-message = {'handshake':true,
-           'bot_name':bot_name,
-           'subscriptions':['rp2.solalla.ardyh']
+
+{message: 
+  {"handshake":true
+   "bot_name":"",
+   "bot_roles":[], 
+   "subscriptions":[]
 }
 ```
 
