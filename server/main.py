@@ -26,6 +26,8 @@ import collections
 import datetime
 from datetime import datetime as dt
 
+import redis
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -217,6 +219,18 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             bot.update({'subscriptions':messageObj['subscriptions']})
             return
 
+        # save message to redis
+        now = dt.utcnow()
+        ts = time.mktime(now.timetuple()) + now.microsecond * 1e-6
+        rstore = messageObj
+        
+        # try:
+        #     bot_name = rstore.pop("bot_name")
+        #     rstore.update({'timestamp':ts})
+        #     r.rpush(bot_name, json.dumps(rstore))
+        # except:
+        #     pass
+
         self.broadcast(messageObj)
 
 
@@ -330,7 +344,8 @@ application = tornado.web.Application([
 
 
 if __name__ == "__main__":
-    
+    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT) 
     #application.listen(PORT)

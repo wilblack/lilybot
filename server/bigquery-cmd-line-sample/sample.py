@@ -24,7 +24,8 @@ by running:
   $ python sample.py --help
 
 """
-
+import json
+import redis
 import argparse
 import httplib2
 import os
@@ -63,44 +64,75 @@ FLOW = client.flow_from_clientsecrets(CLIENT_SECRETS,
     ],
     message=tools.message_if_missing(CLIENT_SECRETS))
 
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+def rp3_to_bq():
+    """
+    schema 
+    timestamp:float, sound:integer, dist:integer, temp:float, light:integer, acc_x:float, acc_y:float, acc_z:float, humdiiy:float, slider:integer, touch:integer, pir:integer
+    """
+    items = r.lrange('rp3.solalla.ardyh', 0, -1)
+    rows = ''
+    for item in items:
+        try:
+            obj = json.loads(item)
+            sensor_values = obj['message']['sensor_values']
+        except:
+            continue
+
+        ts = obj['timestamp']
+        acc_x, acc_y, acc_z = sensor_values.pop('acc_xyz')
+        sensor_values.update({'acc_x':acc_x,
+                              'acc_y':acc_y,
+                              'acc_z':acc_z,
+                              'timestamp':ts
+                              })
+        row = json.dumps({'json':sensor_values })
+        rows += row+"\n"
+        
+    
+    out = {'rows':rows}
+    return out
+
 
 def main(argv):
-  # Parse the command-line flags.
-  flags = parser.parse_args(argv[1:])
 
-  # If the credentials don't exist or are invalid run through the native client
-  # flow. The Storage object will ensure that if successful the good
-  # credentials will get written back to the file.
-  storage = file.Storage('sample.dat')
-  credentials = storage.get()
-  if credentials is None or credentials.invalid:
-    credentials = tools.run_flow(FLOW, storage, flags)
+    # Parse the command-line flags.
+    flags = parser.parse_args(argv[1:])
 
-  # Create an httplib2.Http object to handle our HTTP requests and authorize it
-  # with our good Credentials.
-  http = httplib2.Http()
-  http = credentials.authorize(http)
+    # If the credentials don't exist or are invalid run through the native client
+    # flow. The Storage object will ensure that if successful the good
+    # credentials will get written back to the file.
+    storage = file.Storage('sample.dat')
+    credentials = storage.get()
+    if credentials is None or credentials.invalid:
+      credentials = tools.run_flow(FLOW, storage, flags)
 
-  # Construct the service object for the interacting with the BigQuery API.
-  service = discovery.build('bigquery', 'v2', http=http)
+    # Create an httplib2.Http object to handle our HTTP requests and authorize it
+    # with our good Credentials.
+    http = httplib2.Http()
+    http = credentials.authorize(http)
 
-  try:
-    print "Success! Now add code here."
+    # Construct the service object for the interacting with the BigQuery API.
+    service = discovery.build('bigquery', 'v2', http=http)
 
-    body = {"rows":[
-              {"json": {"temp":4.4,"humidity":4.4}},
-              {"json": {"temp":5.5,"humidity":5.5}},
-           ]}
-    response = service.tabledata().insertAll(
-        projectId='glossy-protocol-606',
-        datasetId='rp3_grovebot',
-        tableId='sensor_values',
-        body=body).execute()
+    try:
 
+        bodyObj = rp3_to_bq()
+        print bodyObj['rows'][0]
+        print "Attempting to load %s rows" %( len(bodyObj['rows']) )
+        body = bodyObj
 
-  except client.AccessTokenRefreshError:
-    print ("The credentials have been revoked or expired, please re-run"
-      "the application to re-authorize")
+        response = service.tabledata().insertAll(
+            projectId='glossy-protocol-606',
+            datasetId='rp3_grovebot',
+            tableId='sensor_values2',
+            body=body).execute()
+        print response
+
+    except client.AccessTokenRefreshError:
+      print ("The credentials have been revoked or expired, please re-run"
+        "the application to re-authorize")
 
 
 # For more information on the BigQuery API you can visit:
