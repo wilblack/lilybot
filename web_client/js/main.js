@@ -1,3 +1,11 @@
+window.bot_colormap = {
+    'rp1.solalla.ardyh':'#FF0000',
+    'rp2.solalla.ardyh':'#00FF00',
+    'rp3.solalla.ardyh':'#0000FF',
+    'monitor.solalla.ardyh':'#FFFF00',
+    'ctenophore.solalla.ardyh':'#FF00FFf',
+    'default':'#FFFFFF'
+}
 window.LOG_PAUSED=false;
 
 function updateSensorValues(sensor_values, sensor_package){
@@ -217,18 +225,20 @@ Ardyh = function(handshake_message){
                 */
                
 
-                if(!LOG_PAUSED){
-                     self._log(msg.data);
-                }
+
 
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
+                  bot_name = data.bot_name
                   if ('sensor_values' in message) updateSensorValues(message.sensor_values, message.sensor_package)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
                     self.log("Could not parse message")
+                }
+                if(!LOG_PAUSED){
+                     self._log(msg.data,bot_name);
                 }
             }
 
@@ -250,10 +260,14 @@ Ardyh = function(handshake_message){
 
         } // End setup()
 
-    this._log = function (txt){
+    this._log = function (txt, bot_name){
         $log = $("#log");
         if ($log.length === 0) return;
-        $newRow = $("<div>");
+        if(typeof(bot_name)==='undefined'){
+            bot_name = 'default'
+        }
+        var color = bot_colormap[bot_name]
+        $newRow = $("<div style='color:"+color+";'>");
         $newRow.text(txt);
         $log.append($newRow);
         $log.scrollTop($log[0].scrollHeight);
@@ -377,10 +391,11 @@ ControlsView = function($el){
         Refreshes the connected bots list.
         */
         ardyh.getBotsList(function(res){
-
+            
             var html = '';
             for (i in res){
-                html +='<div>'+res[i].bot_name+'</div>';
+                var bot_name = res[i].bot_name;
+                html +="<div><div class='circle' style='background-color:"+bot_colormap[bot_name]+";'></div>"+bot_name+'</div>';
                 for (j in res[i].subscriptions) {
                     html += '<div><small>'+res[i].subscriptions[j]+'</small></div>';
                 }
