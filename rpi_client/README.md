@@ -48,6 +48,17 @@ It turned out that zope.interface could not be installed properly becuase I had 
 
 `git clone https://github.com/adammhaile/RPi-LPD8806`
 
+## Raspberry Pi Command Line Shortcuts
+To run these commands, you need the IP address of the Raspberry Pi and ssh into it. On Windows, you can use PuTTY or on
+Mac/Linux you can use the console.
+
+```
+#to shutdown a Raspberry Pi
+sudo shutdown -h now
+
+#to reboot
+sudo shutdown -r now
+```
 
 ## Start the Server
 
