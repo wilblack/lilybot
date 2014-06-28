@@ -284,6 +284,44 @@ sudo netstat -tulpn
 
 
 
+# Appendix
+
+## Installing SSH Keys on Rapsberry Pi
+
+
+See http://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md
+
+Copy local key to the Raspberry Pi
+
+```
+cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys'
+
+```
+
+
+
+
+## Ansible
+
+You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
+
+Check the status of all the ardyh_cliend deamons. 
+```
+ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
+```
+
+Restart all Raspberry Pi's
+```
+ansible -i hosts rpi_bots -u pi -m shell -a 'shutdown -r now' --sudo
+```
+
+Shutdown a single bot
+```
+ansible -i hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
+```
+
+
+
 Helpful Links
 -------------
 
