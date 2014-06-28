@@ -1,0 +1,7 @@
+---
+- hosts: rpi_bots
+  remote_user : pi
+
+  tasks:
+  - name: Show arcdyh_clientd status
+    command: /etc/init.d/ardyh_clientd status
