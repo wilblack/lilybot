@@ -27,6 +27,12 @@ function updateSensorValues(sensor_values, sensor_package){
 
     if (sensor_package === 'grovebot') {
 
+
+        var acc_xyz_verbose  = "NaN"; 
+        if(sensor_values.acc_xyz && sensor_values.acc_xyz.length>0) {
+            acc_xyz_verbose= sensor_values.acc_xyz.join(", ");
+        }
+        
         $(".grovebot-temp").html(sensor_values.temp+"&deg;C");
         $(".grovebot-humidity").html(sensor_values.humidity);
         $(".grovebot-light").html(sensor_values.light);
@@ -34,7 +40,7 @@ function updateSensorValues(sensor_values, sensor_package){
         $(".grovebot-touch").html(sensor_values.touch);
         $(".grovebot-slider").html(sensor_values.slider);
         $(".grovebot-dist").html(sensor_values.dist);
-        $(".grovebot-acc_xyz").html(sensor_values.acc_xyz.join(", "));
+        $(".grovebot-acc_xyz").html(acc_xyz_verbose);
         $(".grovebot-pir").html(sensor_values.pir);
         
         // $(".grovebot-button").html(sensor_values.button);
@@ -224,9 +230,7 @@ Ardyh = function(handshake_message){
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
                
-
-
-
+                
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
@@ -235,8 +239,10 @@ Ardyh = function(handshake_message){
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
-                    self.log("Could not parse message")
+                    self._log("Could not parse message")
+                    self._log(typeof(data))
                 }
+                
                 if(!LOG_PAUSED){
                      self._log(msg.data,bot_name);
                 }
@@ -268,6 +274,8 @@ Ardyh = function(handshake_message){
         }
         var color = bot_colormap[bot_name]
         $newRow = $("<div style='color:"+color+";'>");
+        // var timestamp = Date() + ": ";
+        // txt = timestamp + txt;
         $newRow.text(txt);
         $log.append($newRow);
         $log.scrollTop($log[0].scrollHeight);

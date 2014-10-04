@@ -48,7 +48,18 @@
           <input name="target_index" type="number" value=5 placeholder="LED position">
           <button class="targetBtn">Target LED</button>
           <button class="clearTargetBtn hide">Clear Target</button>
+
         </div>
+        
+        <button class="pauseBtn" >Pause</button>
+        <label>Connected bots</label>
+        <button class="refreshBotsBtn small" >Refesh</button>
+        <div id="bots-list"></div>
+
+        <div>
+            <canvas id="myChart" width="" height="200"></canvas>
+        </div>
+
     </div> <!-- left-panel -->
 
 
@@ -80,7 +91,7 @@
 
     </div>
 
-    <div id="log-wrapper" class="full-height">
+    <div id="log-wrapper" class="full-height small-6 columns">
         <div id="log" class="padded transparent"></div> <!-- End .secondary -->
     </div>
   </div>
@@ -100,7 +111,8 @@
   <script src='js/vendor/jquery.js'></script>  
   <script src="js/main.js"></script>
   <script src="js/foundation.min.js"></script>
-
+  <script src="js/vendor/Chart.min.js"></script>
+  <script src="js/plotting.js"></script>
 
 
 
@@ -161,6 +173,8 @@
       $(window).resize(function(){
           resize();
       });
+
+      setupCharts();
 
 
     });
