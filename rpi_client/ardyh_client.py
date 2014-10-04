@@ -195,7 +195,6 @@ if __name__ == "__main__":
         thread1.start()
 
     if "grovebot" in settings["bot_packages"]:
-        
         grovebot_thread = SensorThread(2, 'Grovebot Thread')
         grovebot_thread.setDaemon(True)
         print "Starting GroveBot sensors"
