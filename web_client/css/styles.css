@@ -9,6 +9,18 @@ General Styling
 .red {
     color:#FF0000;
 }
+
+.circle {
+    display: inline-block;
+    margin-right: 5px;
+    border-radius: 50%;
+    width:15px;
+    height:15px;
+}
+
+.padding {
+    padding:5px 5px 5px 5px;
+}
 /************************************************************************************
 End General Styling
 ************************************************************************************/
