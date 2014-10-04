@@ -16,13 +16,12 @@ import tornado
 import tornado.web
 import tornado.ioloop
 
-from settings import settings, URI, VERBOSE, SENSORS
+from settings import settings, URI, VERBOSE, SENSORS, UPDATE_SENSOR_DT, LOOP_CALLBACK_DT
 from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
 
-UPDATE_SENSOR_DT = 0.2
-LOOP_CALLBACK_DT = 0.4
+
 
 if "jjbot" in settings["bot_packages"]:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
@@ -65,7 +64,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
 
     def opened(self):
-        print "Connection to ardh is open"
+        print "Connection to ardyh is open"
         message = {'bot_name':self.bot_name, 
                    'bot_roles':self.bot_roles,
                    'mac':get_mac_address(),

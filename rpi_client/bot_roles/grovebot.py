@@ -10,7 +10,6 @@ from grovepi import *
 
 class GrovePiSensorValues:
     
-    
 
     def __init__(self):
         self.sensors = SENSORS
@@ -66,19 +65,21 @@ class GrovePiSensorValues:
 
         # This is the pir sensor
         try:
-            self.pir = digitalRead(4)
+            self.pir = digitalRead(3)
         except IOError:
             pass
         except ValueError:
             pass
 
-        # This is the dht sensor
+        # This is the dht sensor port 
         try:
-            self.temp, self.humidity = dht(4,1)
+            print "dht reading"
+            self.temp, self.humidity = digitalRead(4)
+            
         except IOError:
-            pass
+            print "dht IOError"
         except ValueError:
-            pass
+            print "dht ValueError"
 
         # This is the acc_xyy Accelerometer sensor
         try:
@@ -103,12 +104,7 @@ class GrovePiSensorValues:
             val = getattr(self, sensor['type'])
             out.update({sensor['type']: val})
 
-        # out = {'temp':round(self.temp,2),
-        #        'sound':self.sound,
-        #        'light':self.light,
-        #        'slider':self.slider,
-        #        'button':self.button,
-        #        'touch':self.touch}
+        print "toDict: ", out
         return out
 
 
