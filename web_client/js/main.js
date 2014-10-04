@@ -224,9 +224,6 @@ Ardyh = function(handshake_message){
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
                
-
-
-
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
@@ -259,7 +256,6 @@ Ardyh = function(handshake_message){
         }
 
         } // End setup()
-
     this._log = function (txt, bot_name){
         $log = $("#log");
         if ($log.length === 0) return;
@@ -268,6 +264,9 @@ Ardyh = function(handshake_message){
         }
         var color = bot_colormap[bot_name]
         $newRow = $("<div style='color:"+color+";'>");
+        
+        var timestamp = 
+
         $newRow.text(txt);
         $log.append($newRow);
         $log.scrollTop($log[0].scrollHeight);
@@ -571,25 +570,3 @@ Webcam = function($el, url){
     }
 
 }
-
-
-
-// $(document).ready(function(){
-//     handshake_message = {
-//        'bot_name':'jjbot.solalla.ardyh', 
-//        'bot_roles':[],
-//        'mac':'',
-//        'handshake':true,
-//        'subscriptions':['rp1.solalla.ardyh']
-//     }
-
-
-//     ardyh = new Ardyh(handshake_message);
-//     ardyh.setup();
-
-//     controls = new ControlsView();
-//     resize();
-//     $(window).resize(function(){
-//         resize();
-//     });
-// });

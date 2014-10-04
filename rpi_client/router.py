@@ -11,7 +11,6 @@ from bot_roles.ctenophore import Ctenophore, MagicMushroom
 from bot_roles.jjbot import JJBot
 
 
-
 class Router(object):
 
     def __init__(self):
@@ -21,7 +20,6 @@ class Router(object):
         self.magic_mushroom = False
         self.grovebot = False
         bot_packages = settings['bot_packages']
-        
 
         self.core = Core()
         if 'ctenophore' in bot_packages:
@@ -37,12 +35,10 @@ class Router(object):
             from bot_roles.grovebot import Grovebot
             self.grovebot = Grovebot
 
-
-
     def received_message(self, message):
-        if VERBOSE: print "[Router.received_message] Received message: %s" %(message)
+        if VERBOSE: print "[Router.received_message] Received message: %s" % (message)
         # Try to JSON deconde it
-        
+
         try:
             # Using literal_eval to ahndle the unicoded keyword porblem.
             message = ast.literal_eval(message.data)
@@ -50,8 +46,8 @@ class Router(object):
             # If that fails use the good old json.loads()
             print "[Router.recieved_message()] Could not load message.data"
             message = json.loads(message.data)
-            
-        if "command" in message.keys(): 
+
+        if "command" in message.keys():
 
             cmd = message['command']
             kwargs = message.get('kwargs', {})
@@ -75,7 +71,7 @@ class Router(object):
                 received = True
 
             if not received:
-                print "%s not recognized as a valid command" %(cmd)
+                print "%s not recognized as a valid command" % (cmd)
             return
 
         if 'sensor_values' in message['message'].keys():
@@ -91,7 +87,6 @@ class Router(object):
             if self.magic_mushroom:
                 getattr(self.magic_mushroom, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
                 received = True
-            
+
             if not received:
                 print "Senor values ignored. No bot_packge found"
-
