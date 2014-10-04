@@ -100,7 +100,7 @@ class ArdyhClient(TornadoWebSocketClient):
             "channel":self.channel
         })
         message = json.dumps(message)
-        
+
         if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
@@ -110,7 +110,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def closed(self, code, reason=None):
         print "Closed down", code, reason
-        
+
         ioloop.IOLoop.instance().stop()
         #ioloop.IOLoop.instance().start()
 
@@ -172,7 +172,7 @@ if ["jjbot", "grovebot"] and settings["bot_packages"]:
 
 
 if __name__ == "__main__":
-    
+
     sensor_thread_running = True # This is a gloable, should probably be on a per sensor basis.
 
     if "jjbot" in settings["bot_packages"]:
@@ -184,19 +184,17 @@ if __name__ == "__main__":
 
         BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT   #Set the type of sensor at PORT_1
         BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
-        
+
         thread1 = SensorThread(1, "Thread-1")
         thread1.setDaemon(True)
         print "Starting BrickPi sensors"
         thread1.start()
 
     if "grovebot" in settings["bot_packages"]:
-        
         grovebot_thread = SensorThread(2, 'Grovebot Thread')
         grovebot_thread.setDaemon(True)
         print "Starting GroveBot sensors"
         grovebot_thread.start()
-
 
     # Start streaming data to ardyh.
     ardyh = ArdyhClient(uri=URI, protocols=['http-only', 'chat'])
@@ -205,5 +203,3 @@ if __name__ == "__main__":
     print "Starting ioLoop"
     tornado.ioloop.IOLoop.instance().start()
     print "Could not open web socket connect to ardyh"
-
-
