@@ -1,7 +1,7 @@
 window.bot_colormap = {
     'rp1.solalla.ardyh':'#FF0000',
     'rp2.solalla.ardyh':'#00FF00',
-    'rp3.solalla.ardyh':'#0000FF',
+    'rp3.solalla.ardyh':'#3366FF',
     'monitor.solalla.ardyh':'#FFFF00',
     'ctenophore.solalla.ardyh':'#FF00FFf',
     'default':'#FFFFFF'
