@@ -1,7 +1,7 @@
 window.bot_colormap = {
     'rp1.solalla.ardyh':'#FF0000',
     'rp2.solalla.ardyh':'#00FF00',
-    'rp3.solalla.ardyh':'#0000FF',
+    'rp3.solalla.ardyh':'#3366FF',
     'monitor.solalla.ardyh':'#FFFF00',
     'ctenophore.solalla.ardyh':'#FF00FFf',
     'default':'#FFFFFF'
@@ -27,6 +27,12 @@ function updateSensorValues(sensor_values, sensor_package){
 
     if (sensor_package === 'grovebot') {
 
+
+        var acc_xyz_verbose  = "NaN"; 
+        if(sensor_values.acc_xyz && sensor_values.acc_xyz.length>0) {
+            acc_xyz_verbose= sensor_values.acc_xyz.join(", ");
+        }
+        
         $(".grovebot-temp").html(sensor_values.temp+"&deg;C");
         $(".grovebot-humidity").html(sensor_values.humidity);
         $(".grovebot-light").html(sensor_values.light);
@@ -34,7 +40,7 @@ function updateSensorValues(sensor_values, sensor_package){
         $(".grovebot-touch").html(sensor_values.touch);
         $(".grovebot-slider").html(sensor_values.slider);
         $(".grovebot-dist").html(sensor_values.dist);
-        $(".grovebot-acc_xyz").html(sensor_values.acc_xyz.join(", "));
+        $(".grovebot-acc_xyz").html(acc_xyz_verbose);
         $(".grovebot-pir").html(sensor_values.pir);
         
         // $(".grovebot-button").html(sensor_values.button);
@@ -224,9 +230,6 @@ Ardyh = function(handshake_message){
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
                
-
-
-
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
@@ -235,8 +238,10 @@ Ardyh = function(handshake_message){
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
-                    self.log("Could not parse message")
+                    self._log("Could not parse message")
+                    self._log(typeof(data))
                 }
+                
                 if(!LOG_PAUSED){
                      self._log(msg.data,bot_name);
                 }
@@ -259,7 +264,6 @@ Ardyh = function(handshake_message){
         }
 
         } // End setup()
-
     this._log = function (txt, bot_name){
         $log = $("#log");
         if ($log.length === 0) return;
@@ -571,25 +575,3 @@ Webcam = function($el, url){
     }
 
 }
-
-
-
-// $(document).ready(function(){
-//     handshake_message = {
-//        'bot_name':'jjbot.solalla.ardyh', 
-//        'bot_roles':[],
-//        'mac':'',
-//        'handshake':true,
-//        'subscriptions':['rp1.solalla.ardyh']
-//     }
-
-
-//     ardyh = new Ardyh(handshake_message);
-//     ardyh.setup();
-
-//     controls = new ControlsView();
-//     resize();
-//     $(window).resize(function(){
-//         resize();
-//     });
-// });
