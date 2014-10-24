@@ -15,6 +15,9 @@ The software components of lilybot consist of three main functions.
 
 ## Hardware Packages
 
+To configure a hardware package you need to edit `rpi_client/local_settings.py`
+
+
 ### JJbot
 A Libaray to control Lego Mindsorm sensors and motors (EV3 Sensors 
 are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connected to a BrickPi.  
@@ -115,6 +118,12 @@ Plug in an enternet cable and turn the raspberry on. ssh should be enabled by de
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
 
+  * With console cable
+Follow this guide to set up the console cable
+https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
+
+
+
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
@@ -177,14 +186,6 @@ Run the following code and grab some coffee, the second command takes awhile. Th
 wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
 chmod 755 apt-get-installer.sh
 ./installer.sh
-```
-
-### Start a cron job to kee pthe connect going if you lose it.
-
-Edit `/etc/crontab` by adding the following line
-
-```
-*  *    * * *   root    /home/pi/projects/lilybot/rpi_client/restart.sh > /home/pi/restart.log
 ```
 
 
@@ -280,39 +281,6 @@ Once the deamon starts it ties up the port. You can see what ports are currently
 ```
 sudo netstat -lptu
 sudo netstat -tulpn
-```
-
-
-
-# Appendix
-
-## Installing SSH Keys on Rapsberry Pi
-
-
-See http://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md
-
-Copy local key to the Raspberry Pi
-
-```
-cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys'
-
-```
-
-
-
-
-## Ansible
-
-You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
-
-Check the status of all the ardyh_cliend deamons. 
-```
-ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
-```
-
-Restart all Raspberry Pi's
-```
-ansible -i hosts rpi_bots -u pi --sudo [--ask-sudo-pass]  -m shell -a 'shutdown -r now' --sudo [--ask-sudo-pass] 
 ```
 
 

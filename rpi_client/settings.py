@@ -7,6 +7,8 @@ VERBOSE = True
 UPDATE_SENSOR_DT = 0.5
 LOOP_CALLBACK_DT = 0.4
 
+SENSORS = []
+
 try:
     from local_settings import *
 except:

@@ -64,7 +64,6 @@ class BlinkThread (PassiveThread):
     def run(self):
         print "Starting thread %s" %(self.name)
         while not self.stoprequest.isSet():
-            #self.ctenophore.fillRGB({"color":"#22FF33"})
             color = ('#%06X' % randint(0,256**3-1))
             index = randint(0,self.nleds)
 
@@ -101,6 +100,8 @@ class CommandThread(threading.Thread):
             getattr(self.ctenophore, self.kwargs['command2'])(self.kwargs['kwargs2'])
 
 
+
+
 class TimerThread(threading.Thread):
     """
     A thread to handle responses to commands and sensor_values.
@@ -122,10 +123,7 @@ class TimerThread(threading.Thread):
             inactive_dt = dt.now() - self.ctenophore.last_state_change
             if inactive_dt.seconds > 20:
                 self.ctenophore.set_state({'state':'#random'})
-
             time.sleep(5)
-        
-
 
 
 
@@ -361,11 +359,6 @@ class MagicMushroom(Ctenophore):
         self.timerThread = []
 
 
-        # output_queue = Queue.Queue()
-        # thread = TimerThread(self)
-        # thread.start()
-        # self.timerThread = thread
-
         if VERBOSE: print "Initializing %s LEDS" % (self.NLEDS)
         for i in range(0, self.NLEDS):
             self.led.setRGB(i, 0, 255, 255)
@@ -373,6 +366,9 @@ class MagicMushroom(Ctenophore):
             self.led.update()
             sleep(0.01)
             self.led.all_off()
+
+        kwargs = {'state':'#random'}
+        self.set_state(kwargs)
 
     def grovebot_sensor_callback(self, sensor_values):
         # Check the distance values
@@ -453,8 +449,22 @@ class MagicMushroom(Ctenophore):
 
     def set_state(self, kwargs):
         """
+        Accepts a dict called kwargs
+
+        Starts threads based on the kwargs['state']. 
+
+
+
         kwargs:
-         - state : '#off', ,'#random', '#red-white-blue', '#FF0000', '#00FF00'
+         - state [String] String, it must start with '#'. Possible states are
+             '#off', 
+             '#random', 
+             '#red-white-blue', 
+             '#green-purple'
+             '#glow-warm',
+
+             '#<HEXCOLOR>',
+
         """
 
         state = kwargs['state']
@@ -463,7 +473,6 @@ class MagicMushroom(Ctenophore):
             self.allOff({})
             for thread in self.blinkThreads:
                 thread.stoprequest.set()
-
             self.blinkThread = []
 
         elif state == '#random':
@@ -504,6 +513,11 @@ class MagicMushroom(Ctenophore):
 
             self.led.update()
 
+        elif state == '#glow-warm':
+
+            self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
+
+            self.led.update()
 
         else:
             # Assume is a hex-color
