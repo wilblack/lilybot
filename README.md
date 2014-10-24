@@ -240,8 +240,28 @@ To stop streaming use
 
 ```
 
+# For Developers
 
-## Start on ardyh client 
+## The Ardyh Client 
+
+### Starting and Stoppping.
+The ardyh client is ran as a a service command with the name ardyh_clientd. It can be controlled using `/etc/init.d/ardyh_clientd`. By default the installer script will registers this service to start on boot. For debugging you may not want this. To turn it off use
+```
+# Turn off start on boot for ardyh_cleintd
+sudo update-rc.d -f ardyh_clientd remove
+```
+
+To view the current running ardyh_clientd use 
+```
+ps aux | grep ardyh_clientd
+```
+
+To view all threads where <PID> is gotten from the above command.
+```
+ps -e -T | grep <PID>
+```
+
+
 The ardyh client will start two applications. The first application is a web server running on port 9010 to set local settings for the bot. It is available at <IP_ADDRESS>:9010. 
 
 The second is a websocket client that is confugred to connect to the ardyh server at `ws://173.255.213.55:9093/ws`
