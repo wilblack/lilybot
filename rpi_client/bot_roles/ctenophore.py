@@ -73,11 +73,11 @@ class BlinkThread (PassiveThread):
             index = randint(0,self.nleds)
 
             self.ctenophore.setRGB({"color":color, "index":index})
-            time.sleep(randint(1,3))
+            time.sleep(randint(3,20))
             self.ctenophore.setRGB({"color":"#000000", "index":index})
 
             DT = randint(2, 4)
-            time.sleep(DT)              # sleep for 200 ms
+            #time.sleep(DT)              # sleep for 200 ms
 
 
 class CommandThread(threading.Thread):
@@ -371,8 +371,8 @@ class MagicMushroom(Ctenophore):
             self.led.all_off()
 
         # Initially set stat to the random state.
-        kwargs = {'state':'#random'}
         self.state = ''
+        kwargs = {'state':'#random'}
         self.set_state(kwargs)
 
     def grovebot_sensor_callback(self, sensor_values):
@@ -488,7 +488,6 @@ class MagicMushroom(Ctenophore):
         Starts threads based on the kwargs['state']. 
 
 
-
         kwargs:
          - state [String] String, it must start with '#'. Possible states are
              '#off', 
@@ -504,29 +503,31 @@ class MagicMushroom(Ctenophore):
         state = kwargs['state']
         print "[MagicMushroom.set_state()] with state", state
         
-        if state == '#off':
-            print "[set_state] Turning everything off"
-            self.allOff({})
-            
-            if self.currentThread:
-                self.currentThread.stoprequest.set()
-            
-            for thread in self.blinkThreads:
-                thread.stoprequest.set()
-            self.blinkThread = []
+        
+        print "[set_state] Turning everything off"
+        self.allOff({})
+        
+        if self.currentThread:
+            self.currentThread.stoprequest.set()
+        
+        for thread in self.blinkThreads:
+            thread.stoprequest.set()
+        self.blinkThread = []
 
+        if state == '#off':
+            return
 
         elif state == '#random':
-            for i in range(0, 12):
+            for i in range(0, 20):
                 output_queue = Queue.Queue()
                 thread = BlinkThread("Blink Thread %s" %i, self, output_queue, self.NLEDS)
                 thread.start()
                 self.blinkThreads.append(thread)
 
-            output_queue = Queue.Queue()
-            self.currentThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
-            self.currentThread.start()
-            self.blinkThreads.append(thread)
+            # output_queue = Queue.Queue()
+            # self.currentThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
+            # self.currentThread.start()
+            # self.blinkThreads.append(thread)
 
 
         elif state == '#red-white-blue':
