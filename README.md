@@ -312,12 +312,16 @@ ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status'
 
 Restart all Raspberry Pi's
 ```
+<<<<<<< HEAD
 ansible -i hosts rpi_bots -u pi -m shell -a 'shutdown -r now' --sudo
 ```
 
 Shutdown a single bot
 ```
 ansible -i hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
+=======
+ansible -i hosts rpi_bots -u pi --sudo [--ask-sudo-pass]  -m shell -a 'shutdown -r now' --sudo [--ask-sudo-pass] 
+>>>>>>> 18ee2574255abd3e2ae9f88d484e98b8c295ac67
 ```
 
 

@@ -49,3 +49,8 @@ echo "\n*****************************\n"
 
 sudo cp rpi_client/ardyh_clientd /etc/init.d/.
 sudo update-rc.d ardyh_clientd defaults
+
+echo "Copying interfaces file for Wi-Fi\n"
+echo "The will look for a newtowrk named ardyhnet with passkey ardyhnet.\n"
+echo "To change this edit /etc/network/interfaces"
+sudo cp interfaces.lilybot /etc/network/interfaces
