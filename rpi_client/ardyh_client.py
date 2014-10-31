@@ -16,13 +16,11 @@ import tornado
 import tornado.web
 import tornado.ioloop
 
-from settings import settings, URI, VERBOSE, SENSORS
+from settings import settings, URI, VERBOSE, SENSORS, UPDATE_SENSOR_DT, LOOP_CALLBACK_DT
 from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
 
-UPDATE_SENSOR_DT = 0.2
-LOOP_CALLBACK_DT = 0.4
 
 if "jjbot" in settings["bot_packages"]:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
@@ -51,11 +49,9 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def __init__(self, protocols, uri='ws://173.255.213.55:9093/ws?'):
         rs = super(ArdyhClient, self).__init__(uri, protocols)
-        
 
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%H:%M:%S"
-       
         self.channel = settings['bot_name']
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
@@ -63,25 +59,23 @@ class ArdyhClient(TornadoWebSocketClient):
         self.core = Core()
         self.router = Router()
 
-
     def opened(self):
         print "Connection to ardh is open"
-        message = {'bot_name':self.bot_name, 
-                   'bot_roles':self.bot_roles,
-                   'mac':get_mac_address(),
-                   'handshake':True,
-                   'subscriptions':settings['subscriptions'],
-                   'sensors':SENSORS
-                   }
-
+        message = {
+            'bot_name': self.bot_name,
+            'bot_roles': self.bot_roles,
+            'mac': get_mac_address(),
+            'handshake': True,
+            'subscriptions': settings['subscriptions'],
+            'sensors': SENSORS
+        }
 
         self.send(message)
 
         if ["jjbot", "grovebot"] and settings["bot_packages"]:
             print "Registering IO Loop callback"
-            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT*1000)
+            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT * 1000)
             sensors.start()
-
 
     def received_message(self, message):
         self.router.received_message(message)
@@ -89,25 +83,24 @@ class ArdyhClient(TornadoWebSocketClient):
     def send(self, message):
         """
         Message should be of the form {MESSAGE_OBJ}
-        
 
         - message
         -- bot_name
         -- from
         -- message
         -- command
-        -- channel 
+        -- channel
         -- ardyh_timestamp - May not be present
 
         """
-        if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message) 
+        if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message)
         channel = settings['bot_name']
         message.update({
             "bot_name":self.bot_name,
             "channel":self.channel
         })
         message = json.dumps(message)
-        
+
         if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
@@ -117,7 +110,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def closed(self, code, reason=None):
         print "Closed down", code, reason
-        
+
         ioloop.IOLoop.instance().stop()
         #ioloop.IOLoop.instance().start()
 
@@ -138,6 +131,8 @@ class ArdyhClient(TornadoWebSocketClient):
             sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
             out = {"message": {"sensor_values":sensor_values, "sensor_package":"grovebot"} }
 
+        timestamp = now = dt.now().strftime(self.LOG_DTFORMAT)
+        out.update({'timestamp': timestamp})
         if out: self.send(out)
 
 
@@ -177,7 +172,7 @@ if ["jjbot", "grovebot"] and settings["bot_packages"]:
 
 
 if __name__ == "__main__":
-    
+
     sensor_thread_running = True # This is a gloable, should probably be on a per sensor basis.
 
     if "jjbot" in settings["bot_packages"]:
@@ -189,19 +184,17 @@ if __name__ == "__main__":
 
         BrickPi.SensorType[PORT_1] = TYPE_SENSOR_ULTRASONIC_CONT   #Set the type of sensor at PORT_1
         BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
-        
+
         thread1 = SensorThread(1, "Thread-1")
         thread1.setDaemon(True)
         print "Starting BrickPi sensors"
         thread1.start()
 
     if "grovebot" in settings["bot_packages"]:
-        
         grovebot_thread = SensorThread(2, 'Grovebot Thread')
         grovebot_thread.setDaemon(True)
         print "Starting GroveBot sensors"
         grovebot_thread.start()
-
 
     # Start streaming data to ardyh.
     ardyh = ArdyhClient(uri=URI, protocols=['http-only', 'chat'])
@@ -210,5 +203,3 @@ if __name__ == "__main__":
     print "Starting ioLoop"
     tornado.ioloop.IOLoop.instance().start()
     print "Could not open web socket connect to ardyh"
-
-

@@ -15,6 +15,9 @@ The software components of lilybot consist of three main functions.
 
 ## Hardware Packages
 
+To configure a hardware package you need to edit `rpi_client/local_settings.py`
+
+
 ### JJbot
 A Libaray to control Lego Mindsorm sensors and motors (EV3 Sensors 
 are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connected to a BrickPi.  
@@ -46,11 +49,33 @@ On first boot select the Raspbian operating system and click "i". This will take
 
 <div id="step2"></div>
 
-## 2. Initial rasp-config Configuration
+## 2. Raspberry Pi Configuration with rasp-config
 To get to the rasp-config screen type `rasp-config` on the command line. 
 
-**Troubleshooting**
+Once you are in the rasp-config menu, make the following changes.
 
+* Change option 3 to boot to console.
+
+* Change hostname to something more descriptive and unique. This is more import when running multiple RPi's
+
+* Load the SPI kernal
+
+* Enable Camera
+
+
+Finsh and reboot. Once you reboot we will change your keyboard country code.
+
+* Keyboard Country Code
+  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
+
+  To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
+    ```
+    XKBLAYOUT=”us”
+
+    ```
+
+
+**Troubleshooting**
 
 You may get the follwoing error when connecting to the Raspberry Pi over WiFi if you have already connected over ethernet. 
 
@@ -74,29 +99,6 @@ Host key verification failed.
 To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/.ssh/known_hosts` and remove the line whihc points at you Raspberry Pi's IP address.
 
 
-
-
-Install and Update Software
----------------------------
-* Change option 3 to boot to console.
-
-* Change hostname to something ore descriptive and unique. This is more import when running multiple RPi's
-
-* Load the SPI kernal
-
-* Enable Camera
-
-Finsh and reboot. Once you reboot we will change your keyboard country code to what's appropriate for you, for me its US. 
-* Keyboard Country Code
-  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
-
-  To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
-    ```
-    XKBLAYOUT=”us”
-
-    ```
-
-
 ## 3. Configure Wi-Fi
 
 I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
@@ -109,16 +111,18 @@ In the terminal see if your wi-fi dongle is detected with ifconfig.
 sudo ifconfig
 ```
 
-
   * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
 
+  * With console cable
+Follow this guide to set up the console cable
+https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
+
 
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
-
 
 You can use the interfaces template in the root directory named `interfaces.lilbot` 
 
@@ -170,7 +174,6 @@ Change your default log in shell from sh to bash. Run change shell `chsh` and wh
 Then log out and log back in. 
 
 
-
 Run the following code and grab some coffee, the second command takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
@@ -179,13 +182,7 @@ chmod 755 apt-get-installer.sh
 ./installer.sh
 ```
 
-### Start a cron job to kee pthe connect going if you lose it.
 
-Edit `/etc/crontab` by adding the following line
-
-```
-*  *    * * *   root    /home/pi/projects/lilybot/rpi_client/restart.sh > /home/pi/restart.log
-```
 
 
 ### Install Camera and Camera Software (Optional)
@@ -239,8 +236,28 @@ To stop streaming use
 
 ```
 
+# For Developers
 
-## Start on ardyh client 
+## The Ardyh Client 
+
+### Starting and Stoppping.
+The ardyh client is ran as a a service command with the name ardyh_clientd. It can be controlled using `/etc/init.d/ardyh_clientd`. By default the installer script will registers this service to start on boot. For debugging you may not want this. To turn it off use
+```
+# Turn off start on boot for ardyh_cleintd
+sudo update-rc.d -f ardyh_clientd remove
+```
+
+To view the current running ardyh_clientd use 
+```
+ps aux | grep ardyh_clientd
+```
+
+To view all threads where <PID> is gotten from the above command.
+```
+ps -e -T | grep <PID>
+```
+
+
 The ardyh client will start two applications. The first application is a web server running on port 9010 to set local settings for the bot. It is available at <IP_ADDRESS>:9010. 
 
 The second is a websocket client that is confugred to connect to the ardyh server at `ws://173.255.213.55:9093/ws`
@@ -282,6 +299,45 @@ sudo netstat -lptu
 sudo netstat -tulpn
 ```
 
+
+
+
+# Appendix
+
+## Installing SSH Keys on Rapsberry Pi
+
+
+See http://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md
+
+Copy local key to the Raspberry Pi
+
+```
+cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys'
+
+```
+
+
+
+
+## Ansible
+
+You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
+
+Check the status of all the ardyh_cliend deamons. 
+```
+ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
+```
+
+Restart all Raspberry Pi's
+```
+
+ansible -i hosts rpi_bots -u pi -m shell -a 'shutdown -r now' --sudo
+```
+
+Shutdown a single bot
+```
+ansible -i hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
+```
 
 
 Helpful Links
