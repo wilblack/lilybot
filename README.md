@@ -49,11 +49,33 @@ On first boot select the Raspbian operating system and click "i". This will take
 
 <div id="step2"></div>
 
-## 2. Initial rasp-config Configuration
+## 2. Raspberry Pi Configuration with rasp-config
 To get to the rasp-config screen type `rasp-config` on the command line. 
 
-**Troubleshooting**
+Once you are in the rasp-config menu, make the following changes.
 
+* Change option 3 to boot to console.
+
+* Change hostname to something more descriptive and unique. This is more import when running multiple RPi's
+
+* Load the SPI kernal
+
+* Enable Camera
+
+
+Finsh and reboot. Once you reboot we will change your keyboard country code.
+
+* Keyboard Country Code
+  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
+
+  To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
+    ```
+    XKBLAYOUT=”us”
+
+    ```
+
+
+**Troubleshooting**
 
 You may get the follwoing error when connecting to the Raspberry Pi over WiFi if you have already connected over ethernet. 
 
@@ -77,29 +99,6 @@ Host key verification failed.
 To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/.ssh/known_hosts` and remove the line whihc points at you Raspberry Pi's IP address.
 
 
-
-
-Install and Update Software
----------------------------
-* Change option 3 to boot to console.
-
-* Change hostname to something ore descriptive and unique. This is more import when running multiple RPi's
-
-* Load the SPI kernal
-
-* Enable Camera
-
-Finsh and reboot. Once you reboot we will change your keyboard country code to what's appropriate for you, for me its US. 
-* Keyboard Country Code
-  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
-
-  To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
-    ```
-    XKBLAYOUT=”us”
-
-    ```
-
-
 ## 3. Configure Wi-Fi
 
 I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
@@ -112,7 +111,6 @@ In the terminal see if your wi-fi dongle is detected with ifconfig.
 sudo ifconfig
 ```
 
-
   * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
 `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
@@ -123,11 +121,8 @@ Follow this guide to set up the console cable
 https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
 
 
-
-
 You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
 info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
-
 
 You can use the interfaces template in the root directory named `interfaces.lilbot` 
 
@@ -179,7 +174,6 @@ Change your default log in shell from sh to bash. Run change shell `chsh` and wh
 Then log out and log back in. 
 
 
-
 Run the following code and grab some coffee, the second command takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
@@ -187,6 +181,8 @@ wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-insta
 chmod 755 apt-get-installer.sh
 ./installer.sh
 ```
+
+
 
 
 ### Install Camera and Camera Software (Optional)
