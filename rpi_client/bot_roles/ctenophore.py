@@ -20,7 +20,7 @@ except:
     print "[WARNING] RPi-LPD8806 bootstrap module not found"
     print sys.exc_info()[0]
 
-PULSE_DT = 10
+PULSE_DT = 30
 
 
 
@@ -40,20 +40,25 @@ class PassiveThread (threading.Thread):
     def run(self):
         print "Starting thread %s" % (self.name)
         while not self.stoprequest.isSet():
-            #self.ctenophore.fillRGB({"color":"#22FF33"})
-            color = ('#%06X' % randint(0, 256**3-1))
-            self.ctenophore.pulse({"color": color})
-
-            reverse = randint(0, 2)
-            if reverse > 0:
-                self.ctenophore.pulse({"color": color, "direction": "reverse"})
-
             PULSE_DT = randint(8, 12)
+            color = ('#%06X' % randint(0, 256**3-1))
+
+            # reverse = randint(0, 2)
+            # if reverse == 0:
+            #     self.ctenophore.pulse({"color": color})
+            # elif reverse == 1: 
+            #     self.ctenophore.pulse({"color": color, "direction": "reverse"})
+            self.ctenophore.pulse({"color": color})
             time.sleep(PULSE_DT)              # sleep for 200 ms
+
+        if self.stoprequest.isSet():
+            print "******** STOP IT ************"
+
+
 
     def join(self, timeout=None):
         self.stoprequest.set()  # Turns off the thread if it already started
-        super(WorkerThread, self).join(timeout)
+        super(PassiveThread, self).join(timeout)
 
 
 class BlinkThread (PassiveThread):
@@ -64,22 +69,30 @@ class BlinkThread (PassiveThread):
     def run(self):
         print "Starting thread %s" %(self.name)
         while not self.stoprequest.isSet():
-            #self.ctenophore.fillRGB({"color":"#22FF33"})
             color = ('#%06X' % randint(0,256**3-1))
             index = randint(0,self.nleds)
 
             self.ctenophore.setRGB({"color":color, "index":index})
-            time.sleep(randint(1,3))
+            time.sleep(randint(3,20))
             self.ctenophore.setRGB({"color":"#000000", "index":index})
 
             DT = randint(2, 4)
-            time.sleep(DT)              # sleep for 200 ms
+            #time.sleep(DT)              # sleep for 200 ms
 
 
 class CommandThread(threading.Thread):
     """
     A thread to handle responses to commands and sensor_values.
     It runs the command once and shuts down.
+
+    Usage:
+    myTrhead = CommandThread("Blink Thread 1", ctenphore, output_queue, nleds)
+
+    Params: 
+        - ctenphore instance of eather Ctenophore or MagicMushroom
+        - output_queue - Not really sure what this is used for
+         nleds - The number of LEDS to use for lighting.
+
 
     kwargs['duration'] to set a duration in seconds to wait until calling
     kwargs['command2']
@@ -93,12 +106,15 @@ class CommandThread(threading.Thread):
         self.kwargs = kwargs
 
     def run(self):
-        print "\n\n[CommandThread.run(%s)]" % self.command
-        getattr(self.ctenophore, self.command)(self.kwargs)
-        if 'duration' in self.kwargs.keys() and 'command2' in self.kwargs.keys():
-            time.sleep(self.kwargs['duration'])
-            print "runnning command2: %s" % self.kwargs['command2']
-            getattr(self.ctenophore, self.kwargs['command2'])(self.kwargs['kwargs2'])
+        while not self.stoprequest.isSet():
+            self.ctenophore.set_state({'state':'#off'})
+
+            print "\n\n[CommandThread.run(%s)]" % self.command
+            getattr(self.ctenophore, self.command)(self.kwargs)
+            if 'duration' in self.kwargs.keys() and 'command2' in self.kwargs.keys():
+                time.sleep(self.kwargs['duration'])
+                print "runnning command2: %s" % self.kwargs['command2']
+                getattr(self.ctenophore, self.kwargs['command2'])(self.kwargs['kwargs2'])
 
 
 class TimerThread(threading.Thread):
@@ -118,14 +134,11 @@ class TimerThread(threading.Thread):
     def run(self):
         print "\n\n[TimerThread.run())]"
         
-        while True:
+        while not self.stoprequest.isSet():
             inactive_dt = dt.now() - self.ctenophore.last_state_change
             if inactive_dt.seconds > 20:
                 self.ctenophore.set_state({'state':'#random'})
-
             time.sleep(5)
-        
-
 
 
 
@@ -138,6 +151,7 @@ class Ctenophore(object):
         # Initialize Lights, this does not belong here.
         self.NLEDS = NLEDS
         self.ALL_STOP = False
+        #self.PLENGTH = 15 # Number of LEDS to use on a pulse. If > NLEDS, NELDS is used.
         self.led = LEDStrip(self.NLEDS)
         self.led.all_off()
         self.history = [255, 255, 255]
@@ -226,24 +240,8 @@ class Ctenophore(object):
         
             self.led.all_off()
 
-    def pulse(self, kwargs):
-        # Should move this to a thread
-        DT = 0.005
-        color = kwargs['color']
-        direction = kwargs.get('direction', 'forward')
+    
 
-        if direction == 'forward':
-            seq = range(self.NLEDS)
-        elif direction == 'reverse':
-            seq = range(self.NLEDS, 0, -1)
-
-        for i in seq:
-            self.setRGB({"color":color, "index":i})
-            time.sleep(DT)
-
-        for i in seq:
-            self.setOff({"index":i})
-            time.sleep(DT)
 
 
     def clearTarget(self, kwargs):
@@ -342,6 +340,8 @@ class MagicMushroom(Ctenophore):
         # Initialize Lights, this does not belong here.
         self.NLEDS = NLEDS
         self.STOCK_HEIGHT = 0
+        self.PLENGTH = 15 # Number of LEDS to use on a pulse. If > NLEDS, NELDS is used.
+
         self.ALL_STOP = False
         self.led = LEDStrip(self.NLEDS)
         self.led.all_off()
@@ -356,23 +356,24 @@ class MagicMushroom(Ctenophore):
         self.dist_history = [0, 0, 0, 0, 0]  # Initial values
         self.dist_threshold = 100
 
+        self.currentThread = None
         self.blinkThreads = []
         self.soundThread = None
         self.timerThread = []
 
 
-        # output_queue = Queue.Queue()
-        # thread = TimerThread(self)
-        # thread.start()
-        # self.timerThread = thread
-
         if VERBOSE: print "Initializing %s LEDS" % (self.NLEDS)
-        for i in range(0, self.NLEDS):
+        for i in range(self.NLEDS/2 - 12, self.NLEDS/2 + 12):
             self.led.setRGB(i, 0, 255, 255)
             self.led.setRGB(self.NLEDS - i, 255, 255, 0)
             self.led.update()
             sleep(0.01)
             self.led.all_off()
+
+        # Initially set stat to the random state.
+        self.state = ''
+        kwargs = {'state':'#random'}
+        self.set_state(kwargs)
 
     def grovebot_sensor_callback(self, sensor_values):
         # Check the distance values
@@ -451,32 +452,83 @@ class MagicMushroom(Ctenophore):
         # if sensor_values['light'] >= 200:
         #     self.all_off()
 
+    def pulse(self, kwargs):
+        # Should move this to a thread
+        old_state = self.state
+        self.set_state({'state':'#off'})
+        color = kwargs['color']
+        direction = kwargs.get('direction', 'forward')
+
+        if self.PLENGTH > self.NLEDS: self.PLENGTH = self.NLEDS
+
+        if direction == 'forward':
+            seq = range(self.NLEDS + self.PLENGTH )
+        elif direction == 'reverse':
+            seq = range(self.NLEDS, 0, -1)
+
+        
+        for i in seq:
+            #Turn on LED
+            if i < self.NLEDS:
+                self.setRGB({"color":color, "index":i})
+            
+            # Turn off LEDS
+            j = (i-self.PLENGTH) % self.NLEDS
+            print "turn on %s and turn off %s" % (i, j)
+            self.setOff({"index":j})
+
+        #self.set_state({'state':old_state})
+        # for i in seq:
+        #     self.setOff({"index":i})
+
     def set_state(self, kwargs):
         """
+        Accepts a dict called kwargs
+
+        Starts threads based on the kwargs['state']. 
+
+
         kwargs:
-         - state : '#off', ,'#random', '#red-white-blue', '#FF0000', '#00FF00'
+         - state [String] String, it must start with '#'. Possible states are
+             '#off', 
+             '#random', 
+             '#red-white-blue', 
+             '#green-purple'
+             '#glow-warm',
+
+             '#<HEXCOLOR>',
+
         """
 
         state = kwargs['state']
         print "[MagicMushroom.set_state()] with state", state
-        if state == '#off':
-            self.allOff({})
-            for thread in self.blinkThreads:
-                thread.stoprequest.set()
+        
+        
+        print "[set_state] Turning everything off"
+        self.allOff({})
+        
+        if self.currentThread:
+            self.currentThread.stoprequest.set()
+        
+        for thread in self.blinkThreads:
+            thread.stoprequest.set()
+        self.blinkThread = []
 
-            self.blinkThread = []
+        if state == '#off':
+            return
 
         elif state == '#random':
-            for i in range(0, 12):
+            for i in range(0, 20):
                 output_queue = Queue.Queue()
                 thread = BlinkThread("Blink Thread %s" %i, self, output_queue, self.NLEDS)
                 thread.start()
                 self.blinkThreads.append(thread)
 
-            output_queue = Queue.Queue()
-            thread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
-            thread.start()
-            self.blinkThreads.append(thread)
+            # output_queue = Queue.Queue()
+            # self.currentThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
+            # self.currentThread.start()
+            # self.blinkThreads.append(thread)
+
 
         elif state == '#red-white-blue':
             for i in range(0, self.NLEDS):
@@ -489,8 +541,20 @@ class MagicMushroom(Ctenophore):
                 r, g, b = hex2rgb(color)
 
                 self.setRGB({"color": color, "index": i})
-
             self.led.update()
+
+
+        elif state == '#xmas':
+            for i in range(0, self.NLEDS):
+                if i % 2 == 0:
+                    color = "#FF0000"
+                elif i % 2 == 1:
+                    color = "#00FF00"
+                r, g, b = hex2rgb(color)
+
+                self.setRGB({"color": color, "index": i})
+            self.led.update()
+
 
         elif state == '#green-purple':
             for i in range(0, self.NLEDS):
@@ -505,6 +569,12 @@ class MagicMushroom(Ctenophore):
             self.led.update()
 
 
+        elif state == '#glow-warm':
+
+            self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
+            self.led.update()
+
+
         else:
             # Assume is a hex-color
             print "Looking for color %s" % state
@@ -513,4 +583,5 @@ class MagicMushroom(Ctenophore):
             self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
             self.led.update()
 
+        self.state = state
         self.last_state_change = dt.now()
