@@ -1,3 +1,5 @@
+
+
 #lilybot
 
 The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics, primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
@@ -28,11 +30,14 @@ An LED Strip controller. This exposes a web api to control these https://www.ada
 ### GrovePi
 A lilbary to interface with the GrovePi and its sensors.
 
+### Magic Mushroom
+An LED Strip web app that comes with serveral preset colors and light patterns. 
+
 
 # Getting Started
 
 ## 1. Install the Raspbian Operating System
-If you already have a Raspberry Pi up and running you can skip to step 2.
+If you already have a Raspberry Pi up and running you can skip to step 2. If is best to start with a freshly installed version of Rasbian.
 
 We will set up a new Raspberry Pi model B with the Rasbian distribution. I followed the instructions here http://www.raspberrypi.org/help/noobs-setup/. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
 
@@ -40,8 +45,7 @@ Once you have NOOBS installed on the SD Card, connect the wi-fi dongle, entherne
 
 On first boot select the Raspbian operating system and click "i". This will takes a while. On successfult install the Rpi will reboot and you will find yourself at the rasp-conf screen. 
 
-
-### Links
+### Related Links
 
 * NOOBS Download (Use NOOBS Lite if you have a ethernet network connection to the pi) `http://www.raspberrypi.org/downloads/`
 
@@ -49,23 +53,28 @@ On first boot select the Raspbian operating system and click "i". This will take
 
 <div id="step2"></div>
 
+
+----
 ## 2. Raspberry Pi Configuration with rasp-config
+At this point you should have a fresh version of Rasbian installed and you should be either be directly connected to the raspberry Pi or have access over SSH on an ethernet cable. We will configure Wi-Fi in the next step. 
+
+
+
 To get to the rasp-config screen type `rasp-config` on the command line. 
 
 Once you are in the rasp-config menu, make the following changes.
 
-* Change option 3 to boot to console.
+* Change option 3 to boot to console. Choose option 3 and select "Console Text console, requiring login (default)"
 
-* Change hostname to something more descriptive and unique. This is more import when running multiple RPi's
+* Under *Advanced Options* change the hostname to something more descriptive and unique. This is more import when running multiple RPi's. I use rpi1, rpi2, etc...
 
-* Load the SPI kernal
+* Under *Advanced Options * enable the SPI kernal. This is used for ????
 
 * Enable Camera
 
+If you are not from the UK you may wnat to change the country code of the Raspberry Pi at this time. If so select <Finish> but do not reboot and follow the instruction below. If you do not want to change the country code, simply Finish and reboot.
 
-Finsh and reboot. Once you reboot we will change your keyboard country code.
-
-* Keyboard Country Code
+* (Optional) Keyboard Country Code
   By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
 
   To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
@@ -99,91 +108,34 @@ Host key verification failed.
 To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/.ssh/known_hosts` and remove the line whihc points at you Raspberry Pi's IP address.
 
 
-## 3. Configure Wi-Fi
+----
+## 3. Install and Update Software
 
-I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
-http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
-
-Check here for a list of compatible wi-fi dongles http://elinux.org/RPi_USB_Wi-Fi_Adapters
-
-In the terminal see if your wi-fi dongle is detected with ifconfig.
-```
-sudo ifconfig
-```
-
-  * With Ethernet Cable
-Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with 
-`ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
-
-
-  * With console cable
-Follow this guide to set up the console cable
-https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
-
-
-You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
-info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
-
-You can use the interfaces template in the root directory named `interfaces.lilbot` 
-
-Plug in the wifi dongle
-
+Download and run the installer script. Grab some coffee this takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
-// Back up the file first
-sudo cp /etc/network/interfaces /etc/network/interfaces.bkp
-
-sudo cp interfaces.lilybot /etc/network/interfaces
-
-sudo vi /etc/network/interfaces
-
-// After editing the file restart
-sudo shutdown -r now
+source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/staging/installer.sh)
 ```
 
-Change the file to read, where you enter your own ssid and password. 
+After all that is done plug a Wi-Fi dongle in to the Raspberry Pi (if you have not already done so) and reboot. The Raspberry will by default look for a network named *ardyhnet* with passkey *ardyhnet*. You can edit `/etc/network/interfaces` to change that. 
 
+
+## 4. Configre the rpi_client with the bot package you are using
+
+* Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
+
+TDO Show Example.
+
+This is an example local_settings.py file. It is the bare minimum required.
 ```
-auto lo
+settings= {
+    "bot_name":"rp4.solalla.ardyh",
+    "bot_roles":"bot",
+    "bot_packages":[],
+    "subscriptions":[],
 
-iface lo inet loopback
-iface eth0 inet dhcp
-
-auto wlan0
-allow-hotplug wlan0
-
-iface wlan0 inet dhcp
-    wpa-ssid "YOUR_SSID"
-    wpa-psk "YOUR_PASSKEY"
+}
 ```
-
-
-After you edit the `interfaces` file, restart the wlan0 adapter. 
-```
-sudo ifdown wlan0
-sudo ifup wlan0
-```
-
-If succesful you can check the RPi's IP address on your router or do a ifconfig. The IP address will have changed. 
-You should now be able to ssh in over Wi-Fi. Note you may need to reboot before you can access the Internet.
-
-
-## 4. Install and Update Software
-
-Change your default log in shell from sh to bash. Run change shell `chsh` and when prompted enter `/bin/bash`. 
-Then log out and log back in. 
-
-
-Run the following code and grab some coffee, the second command takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
-
-```
-wget https://raw.githubusercontent.com/wilblack/lilybot/ctenophore/apt-get-installer.sh
-chmod 755 apt-get-installer.sh
-./installer.sh
-```
-
-
-
 
 ### Install Camera and Camera Software (Optional)
 
@@ -236,6 +188,7 @@ To stop streaming use
 
 ```
 
+----
 # For Developers
 
 ## The Ardyh Client 
@@ -304,6 +257,18 @@ sudo netstat -tulpn
 
 # Appendix
 
+## How to SSH in to a Raspberry Pi
+* With Ethernet Cable
+Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
+
+
+  * With console cable
+Follow this guide to set up the console cable
+https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/overview
+
+
+
+
 ## Installing SSH Keys on Rapsberry Pi
 
 
@@ -311,6 +276,8 @@ See http://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md
 
 Copy local key to the Raspberry Pi
 
+
+From your regular computer run (you may need to create .ssh/authorized_keys in the Pi first)
 ```
 cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys'
 
@@ -318,7 +285,70 @@ cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys
 
 
 
+----
+## Wi-Fi Dongles and Configuring Wi-Fi
 
+I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
+http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
+
+Check here for a list of compatible wi-fi dongles http://elinux.org/RPi_USB_Wi-Fi_Adapters
+
+In the terminal see if your wi-fi dongle is detected with ifconfig.
+```
+sudo ifconfig
+```
+
+
+
+You will need to configure your Pi for WiFi by editing the `/etc/network/interfaces` file. See here for more 
+info http://learn.adafruit.com/adafruits-raspberry-pi-lesson-3-network-setup/setting-up-wifi-with-occidentalis
+
+You can use the interfaces template in the root directory named `interfaces.lilbot` 
+
+Plug in the wifi dongle
+
+
+```
+// Back up the file first
+sudo cp /etc/network/interfaces /etc/network/interfaces.bkp
+
+sudo cp interfaces.lilybot /etc/network/interfaces
+
+sudo vi /etc/network/interfaces
+
+// After editing the file restart
+sudo shutdown -r now
+```
+
+Change the file to read, where you enter your own ssid and password. 
+
+```
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto wlan0
+allow-hotplug wlan0
+
+iface wlan0 inet dhcp
+    wpa-ssid "YOUR_SSID"
+    wpa-psk "YOUR_PASSKEY"
+```
+
+
+After you edit the `interfaces` file, restart the wlan0 adapter. 
+```
+sudo ifdown wlan0
+sudo ifup wlan0
+```
+
+If succesful you can check the RPi's IP address on your router or do a ifconfig. The IP address will have changed. 
+You should now be able to ssh in over Wi-Fi. Note you may need to reboot before you can access the Internet.
+
+
+
+----
 ## Ansible
 
 You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
