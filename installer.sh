@@ -1,5 +1,56 @@
 #!/bin/sh
 
+#!/bin/bash
+
+function get_bot_info
+{
+    echo "Enter a bot name (rpi1): " 
+    read botName
+
+    if [ -z $botName ] ; then
+        botName="rpi1"
+    fi
+
+
+    selection=
+    until [ "$selection" = "0" ]; do
+        echo ""
+        echo "Choose a bot package"
+        echo "1 - none"
+        echo "2 - jjbot"
+        echo "3 - ctenophore"
+        echo "4 - grovebot"
+        echo "5 - magic_mushroom"
+        echo ""
+        echo -n "Enter selection: "
+        read selection
+        case $selection in
+            1 ) botPackage="" ; selection=0 ; ;;
+            2 ) botPackage="jjbot" ; selection=0 ; ;;
+            3 ) botPackage="ctenophore" ; selection=0 ; ;;
+            4 ) botPackage="grovebot" ; selection=0 ; ;;
+            5 ) botPackage="magic_mushroom" ; selection=0 ; ;;
+            * ) echo "Please enter a value between 1 and 5"
+        esac
+    done
+}
+
+get_bot_info
+
+echo "Your bot name is \"$botName\""
+echo "Your bot package is \"$botPackage\""
+echo "Is this correct? [y/n]"
+read isCorrect
+
+if [ $isCorrect = "n" ] ; then
+    get_bot_info
+fi
+
+echo "**********************************************"
+echo " STARTING INSTALLATION. THIS MAY TAKE A WHILE "
+echo "**********************************************"
+
+
 LILYBOT_PATH=/home/pi/projects/lilybot/
 
 sudo apt-get update -y
@@ -27,15 +78,20 @@ echo "\n*****************************\n"
 
 git clone https://github.com/wilblack/lilybot.git
 
-# Install this if using the Brick Pi
-git clone https://github.com/DexterInd/BrickPi_Python.git
+if [ $botPackge = "jjbot" ] ; then
+    echo "Cloning BrickPi_Python repo"
+    git clone https://github.com/DexterInd/BrickPi_Python.git
+fi
 
-# Install this is using LED lights
-git clone https://github.com/adammhaile/RPi-LPD8806
+if [ "$botPackage" == "ctenophore" ] || [ "$botPackage" == "magic_mushroom" ] ; then
+    echo "Cloning RPi-LPD8806 for LED lights"
+    git clone https://github.com/adammhaile/RPi-LPD8806
+fi 
 
-# Install GroverPi
-git clone https://github.com/DexterInd/GrovePi
-
+if [ $botPackage == "grovepi" ] ; then 
+    echo "Cloning GroverPi"
+    git clone https://github.com/DexterInd/GrovePi
+fi
 echo "\n\n*****************************\n"
 echo "Installing lilybot pip requirements"
 echo "\n*****************************\n"

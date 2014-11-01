@@ -37,9 +37,9 @@ An LED Strip web app that comes with serveral preset colors and light patterns.
 # Getting Started
 
 ## 1. Install the Raspbian Operating System
-If you already have a Raspberry Pi up and running you can skip to step 2. If is best to start with a freshly installed version of Rasbian.
+If you already have a Raspberry Pi up and running you can skip to step 2. It is best to start with a freshly installed version of Rasbian.
 
-We will set up a new Raspberry Pi model B with the Rasbian distribution. I followed the instructions here http://www.raspberrypi.org/help/noobs-setup/. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
+Set up a new Raspberry Pi model B with the Raspbian distribution. I followed the instructions here http://www.raspberrypi.org/help/noobs-setup/. The guide has you install NOOBS. NOOBS is a startup program that let's you install different OS's on the Raspberry Pi. In this repo I use the Raspbian version unless otherwise noted (JJBOT uses a different version).  You will need an 8GB or bigger SD card to install Raspbian. 
 
 Once you have NOOBS installed on the SD Card, connect the wi-fi dongle, enthernet cable, (monitor and keyboard if you have one) and finally boot up by connecting the power.
 
@@ -56,26 +56,21 @@ On first boot select the Raspbian operating system and click "i". This will take
 
 ----
 ## 2. Raspberry Pi Configuration with rasp-config
-At this point you should have a fresh version of Rasbian installed and you should be either be directly connected to the raspberry Pi or have access over SSH on an ethernet cable. We will configure Wi-Fi in the next step. 
+At this point you should have a fresh version of Rasbian installed and you should either be directly connected to the raspberry Pi or have access over SSH on an ethernet cable. We will configure Wi-Fi in the next step. 
 
-
-
-To get to the rasp-config screen type `rasp-config` on the command line. 
-
-Once you are in the rasp-config menu, make the following changes.
+* Open the raspi-config menu. From the terminal type `rasp-config` on the command line. 
 
 * Change option 3 to boot to console. Choose option 3 and select "Console Text console, requiring login (default)"
 
 * Under *Advanced Options* change the hostname to something more descriptive and unique. This is more import when running multiple RPi's. I use rpi1, rpi2, etc...
 
-* Under *Advanced Options * enable the SPI kernal. This is used for ????
+* Under *Advanced Options* enable the SPI kernal. This is used for ????
 
 * Enable Camera
 
-If you are not from the UK you may wnat to change the country code of the Raspberry Pi at this time. If so select <Finish> but do not reboot and follow the instruction below. If you do not want to change the country code, simply Finish and reboot.
+If you are not from the UK you may want to change the country code of the Raspberry Pi at this time. If so select *Finish* but **do not reboot** then follow the instruction below. If you do not want to change the country code, simply Finish and reboot.
 
-* (Optional) Keyboard Country Code
-  By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
+* **(Optional) Keyboard Country Code** - By default the Raspberry py will be set with a keyboard country code of "gb" for Great Britian. You should change this to your country code. For me in the US of A its "us".
 
   To change this edit the `/etc/default/keyboard` file. Change the line to the appropriate country code.
     ```
