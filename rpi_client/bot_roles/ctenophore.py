@@ -6,6 +6,8 @@ from random import randint
 from time import sleep
 from math import floor
 
+from bot_roles.core import Core
+
 from settings import *
 from utils import hex2rgb
 
@@ -142,7 +144,7 @@ class TimerThread(threading.Thread):
 
 
 
-class Ctenophore(object):
+class Ctenophore(Core):
     
     def __init__(self):
 

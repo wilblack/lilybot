@@ -109,17 +109,17 @@ To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/
 Download and run the installer script. Grab some coffee this takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
-source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/staging/installer.sh)
+source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
 ```
 
 After all that is done plug a Wi-Fi dongle in to the Raspberry Pi (if you have not already done so) and reboot. The Raspberry will by default look for a network named *ardyhnet* with passkey *ardyhnet*. You can edit `/etc/network/interfaces` to change that. 
 
 
-## 4. Configre the rpi_client with the bot package you are using
+## 4. Configure the rpi_client with the bot package you are using
 
 * Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
 
-TDO Show Example.
+TODO Show Example.
 
 This is an example local_settings.py file. It is the bare minimum required.
 ```

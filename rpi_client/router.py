@@ -1,5 +1,5 @@
 """
-A Mdule to handle routing of commands and messages to the 
+A module to handle routing of commands and messages to the 
 various bot_roles and defined in bot_roles/.
 
 """
@@ -7,8 +7,6 @@ import json, ast
 from settings import VERBOSE, settings
 
 from bot_roles.core import Core
-from bot_roles.ctenophore import Ctenophore, MagicMushroom
-from bot_roles.jjbot import JJBot
 
 
 class Router(object):
@@ -23,12 +21,15 @@ class Router(object):
 
         self.core = Core()
         if 'ctenophore' in bot_packages:
+            from bot_roles.ctenophore import Ctenophore
             self.ctenophore = Ctenophore()
 
         if 'jjbot' in bot_packages:
+            from bot_roles.jjbot import JJBot
             self.jjbot = JJBot()
 
         if 'magic_mushroom' in bot_packages:
+            from bot_roles.magic_mushroom import MagicMushroom
             self.magic_mushroom = MagicMushroom()
 
         if 'grovebot' in bot_packages:

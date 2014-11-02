@@ -1,6 +1,8 @@
 import sys
 from settings import SENSORS
 
+from bot_roles.core import Core
+
 sys.path.append("/home/pi/projects/GrovePi/Software/Python")
 
 from grovepi import *
@@ -119,7 +121,7 @@ class GrovePiSensorValues:
 grovePiSensorValues = GrovePiSensorValues()
 
 
-class Grovebot(object):
+class Grovebot(Core):
 
     def __init__(self):
         self.commands = []

@@ -8,7 +8,7 @@ except:
     pass
 
 
-class JJBot(object):
+class JJBot(Core):
     pass
 
     def __init__(self):
