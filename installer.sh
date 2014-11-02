@@ -1,5 +1,3 @@
-#!/bin/sh
-
 #!/bin/bash
 
 function get_bot_info

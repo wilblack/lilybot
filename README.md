@@ -27,8 +27,15 @@ are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connec
 ### Ctenophore
 An LED Strip controller. This exposes a web api to control these https://www.adafruit.com/products/306
 
-### GrovePi
+### GroveBot
+bot_package: groverbot
 A lilbary to interface with the GrovePi and its sensors.
+
+#### Hardware
+* 1 GrovePi 
+* 1 Grove Temperature and Humidity Pro plugged into port D4 on the GrovePi.
+
+
 
 ### Magic Mushroom
 An LED Strip web app that comes with serveral preset colors and light patterns. 
@@ -112,8 +119,6 @@ Download and run the installer script. Grab some coffee this takes awhile. This 
 source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
 ```
 
-After all that is done plug a Wi-Fi dongle in to the Raspberry Pi (if you have not already done so) and reboot. The Raspberry will by default look for a network named *ardyhnet* with passkey *ardyhnet*. You can edit `/etc/network/interfaces` to change that. 
-
 
 ## 4. Configure the rpi_client with the bot package you are using
 
@@ -122,6 +127,7 @@ After all that is done plug a Wi-Fi dongle in to the Raspberry Pi (if you have n
 TODO Show Example.
 
 This is an example local_settings.py file. It is the bare minimum required.
+
 ```
 settings= {
     "bot_name":"rp4.solalla.ardyh",
@@ -132,13 +138,18 @@ settings= {
 }
 ```
 
+## 4 Attach hardware and reboot.
+
+After all that is done we are finally ready to attach the bot package specific hardware and a Wi-Fi dongle. Omce you attach the appropraite hardware and Wi-Fi dongle reboot the Raspberry Pi (`sudo shutdown -r now`). Once rebotted the Raspberry Pi will look for a Wi-Fi network named *ardyhnet* with passkey *ardyhnet*. To change this you can edit `/etc/network/interfaces`.
+
+
+----
 ### Install Camera and Camera Software (Optional)
 
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
 
-Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi 
-to install the software on the RPi. They are summarized below
+Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi to install the software on the RPi. They are summarized below
 
 **NOTE** First make sure the camera is enabled. Run `sudo raspi-config` and enable the camera.
 
@@ -177,11 +188,6 @@ LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n
 
 ```
 
-To stop streaming use
-
-```
-
-```
 
 ----
 # For Developers
