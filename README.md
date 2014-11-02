@@ -11,6 +11,8 @@ The software components of lilybot consist of three main functions.
 
 2. The ~ardyh~ real-time socket web server
   This server attacks as a pub/sub server for lilybot clients. The rpi_client will automatically try to establish a web socket connection to a server running this application at `ws://173.255.213.55:9093/ws`. You can use this server or run your own instance.
+  See a demo here http://ardyh.solalla.com
+
 
 3. Web application clients. 
 
@@ -36,10 +38,9 @@ A lilbary to interface with the GrovePi and its sensors.
 * 1 Grove Temperature and Humidity Pro plugged into port D4 on the GrovePi.
 
 
-
 ### Magic Mushroom
-An LED Strip web app that comes with serveral preset colors and light patterns. 
-
+An LED Strip web app that comes with serveral preset colors and light patterns. Demo URL
+See demo here http://ctenophore.solalla.com/#/magic-mushroom 
 
 # Getting Started
 
@@ -137,6 +138,42 @@ settings= {
 
 }
 ```
+
+
+### Troubleshooting
+
+If you are having trouble with the SMBus you can user `sudo i2cdetect 0` to debug.
+
+```
+# Query for the device. You may need to check 0 also. 
+sudo i2cdetect 1
+
+# Not sure what this does.
+sudo modprobe i2c-bcm2708
+
+sudo modprobe i2c-dev
+lsmod
+```
+
+
+If you are installing a grovebot and get the following error then just reboot the Raspberry Pi manually `sudo shutdown -r now`.
+
+```
+All Done.
+Check and reboot now to apply changes.
+ 
+Restarting
+3
+2
+1
+shutdown: you must be root to do that!
+```
+
+
+
+### Links 
+I2C documentation. The Raspberry Pi talks to the GrovePi using the SMBus and I2c.
+http://www.lm-sensors.org/wiki/i2cToolsDocumentation
 
 ## 4 Attach hardware and reboot.
 

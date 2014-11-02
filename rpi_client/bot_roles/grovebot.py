@@ -85,10 +85,12 @@ class GrovePiSensorValues:
         if 'temp' in self.sensors_types and 'humidity' in self.sensors_types:
             try:
                 [self.temp, self.humidity] = dht(4, 1)
+                print "temp: %s, humidity" % (self.temp, self.humidity)
             except IOError:
                 print "dht IOError"
             except ValueError:
                 print "dht ValueError"
+
 
         # This is the acc_xyy Accelerometer sensor, use port I2C-1
         if 'acc_xyz' in self.sensors_types:

@@ -61,6 +61,7 @@ sudo apt-get install ipython -y
 sudo apt-get install python-pip -y
 sudo apt-get install bluez -y
 sudo apt-get install python-bluetooth -y
+sudo apt-get install python-smbus -y
 
 echo "\n\n*****************************\n"
 echo "Creating /home/projects/"
@@ -70,11 +71,36 @@ cd /home/pi
 mkdir projects
 cd projects 
 
+
+echo "\n\n*****************************\n"
+echo "Installing lilybot pip requirements"
+echo "\n*****************************\n"
+
+cd $LILYBOT_PATH
+sudo pip install -r requirements.txt
+
+
 echo "\n\n*****************************\n"
 echo "Cloning git repos /home/projects/"
 echo "\n*****************************\n"
 
 git clone https://github.com/wilblack/lilybot.git
+
+
+echo "\n\n*****************************\n"
+echo "Setting ardyh_client to start on boot."
+echo "\n*****************************\n"
+
+sudo cp rpi_client/lilybotd /etc/init.d/.
+sudo update-rc.d lilybotd defaults
+
+
+echo "Copying interfaces file for Wi-Fi\n"
+echo "The will look for a newtowrk named ardyhnet with passkey ardyhnet.\n"
+echo "To change this edit /etc/network/interfaces"
+sudo cp interfaces.lilybot /etc/network/interfaces
+
+
 
 if [ $botPackge = "jjbot" ] ; then
     echo "Cloning BrickPi_Python repo"
@@ -86,25 +112,26 @@ if [ "$botPackage" == "ctenophore" ] || [ "$botPackage" == "magic_mushroom" ] ; 
     git clone https://github.com/adammhaile/RPi-LPD8806
 fi 
 
-if [ $botPackage == "grovepi" ] ; then 
+if [ $botPackage == "grovebot" ] ; then 
     echo "Cloning GroverPi"
+    echo "You are about to launch the GrovePi installer from Dexter Industries."
+    echo "You will need to start the SMBus after this reboots. See the lilybot"
+    echo "README.md for instructions https://github.com/wilblack/lilybot"
+    echo "It boils down to running 2c-bcm2708 and i2c-dev then checking the device"
+    echo "with i2cdetect 1."
+    echo ""
+    echo "Press any key to continue."
+    read tmp
+
     git clone https://github.com/DexterInd/GrovePi
+
+    chmod 755 GrovePi/Script/install.sh
+    GrovePi/Script/install.sh
+
+
 fi
-echo "\n\n*****************************\n"
-echo "Installing lilybot pip requirements"
-echo "\n*****************************\n"
 
-cd $LILYBOT_PATH
-sudo pip install -r requirements.txt
 
-echo "\n\n*****************************\n"
-echo "Setting ardyh_client to start on boot."
-echo "\n*****************************\n"
 
-sudo cp rpi_client/ardyh_clientd /etc/init.d/.
-sudo update-rc.d ardyh_clientd defaults
 
-echo "Copying interfaces file for Wi-Fi\n"
-echo "The will look for a newtowrk named ardyhnet with passkey ardyhnet.\n"
-echo "To change this edit /etc/network/interfaces"
-sudo cp interfaces.lilybot /etc/network/interfaces
+
