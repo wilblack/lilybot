@@ -82,23 +82,26 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def send(self, message):
         """
-        Message should be of the form {MESSAGE_OBJ}
-
-        - message
-        -- bot_name
-        -- from
-        -- message
-        -- command
-        -- channel
-        -- ardyh_timestamp - May not be present
+        
+        Messages should be of the form 
+        data : {
+            timestamp : "",
+            bot_name : "",
+            message : {
+                command
+                kwargs
+            }
+        }
 
         """
         if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message)
-        channel = settings['bot_name']
+        timestamp = now = dt.now().strftime(self.LOG_DTFORMAT)
         message.update({
             "bot_name":self.bot_name,
-            "channel":self.channel
+            "timestamp": timestamp
         })
+        
+        
         message = json.dumps(message)
 
         if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
@@ -125,14 +128,13 @@ class ArdyhClient(TornadoWebSocketClient):
         out = {}
         if "jjbot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
-            out = {"message": {"sensor_values":sensor_values, "sensor_package":"jjbot"} }
+            kwargs.update({'bot_package':'jjbot'})
 
         if "grovebot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
-            out = {"message": {"sensor_values":sensor_values, "sensor_package":"grovebot"} }
+            kwargs.update({'bot_package':'grovebot'})
 
-        timestamp = now = dt.now().strftime(self.LOG_DTFORMAT)
-        out.update({'timestamp': timestamp})
+        out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
         if out: self.send(out)
 
 

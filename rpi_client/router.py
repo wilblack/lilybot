@@ -37,6 +37,21 @@ class Router(object):
             self.grovebot = Grovebot
 
     def received_message(self, message):
+        """
+        Messages should be a JSON object with the following keywords
+
+        data : {
+            timestamp : "",
+            bot_name : "",
+            message : {
+                command
+                kwargs
+            }
+        }
+        
+
+        """
+
         if VERBOSE: print "[Router.received_message] Received message: %s" % (message)
         # Try to JSON deconde it
 
