@@ -36,7 +36,7 @@ A lilbary to interface with the GrovePi and its sensors.
 #### Hardware
 * 1 GrovePi 
 * 1 Grove Temperature and Humidity Pro plugged into port D4 on the GrovePi.
-
+* 1 Grove Light Sensor plugged into port A2 on the GrovePi.
 
 ### Magic Mushroom
 An LED Strip web app that comes with serveral preset colors and light patterns. Demo URL

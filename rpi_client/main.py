@@ -51,7 +51,7 @@ class ArdyhClient(TornadoWebSocketClient):
         rs = super(ArdyhClient, self).__init__(uri, protocols)
 
         self.ARDYH_URI = uri
-        self.LOG_DTFORMAT = "%H:%M:%S"
+        self.LOG_DTFORMAT = "%Y-%m-%dT%H:%M:%SZ"
         self.channel = settings['bot_name']
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
@@ -128,11 +128,11 @@ class ArdyhClient(TornadoWebSocketClient):
         out = {}
         if "jjbot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
-            kwargs.update({'bot_package':'jjbot'})
+            sensor_values.update({'bot_package':'jjbot'})
 
         if "grovebot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
-            kwargs.update({'bot_package':'grovebot'})
+            sensor_values.update({'bot_package':'grovebot'})
 
         out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
         if out: self.send(out)
