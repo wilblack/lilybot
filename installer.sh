@@ -117,7 +117,7 @@ if [ $botPackage == "grovebot" ] ; then
     echo "You are about to launch the GrovePi installer from Dexter Industries."
     echo "You will need to start the SMBus after this reboots. See the lilybot"
     echo "README.md for instructions https://github.com/wilblack/lilybot"
-    echo "It boils down to running 2c-bcm2708 and i2c-dev then checking the device"
+    echo "It boils down to running i2c-bcm2708 and i2c-dev then checking the device"
     echo "with i2cdetect 1."
     echo ""
     echo "Press any key to continue."
