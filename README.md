@@ -295,7 +295,7 @@ sudo netstat -tulpn
 
 # Appendix
 
-## How to SSH in to a Raspberry Pi
+## 1. How to SSH in to a Raspberry Pi
 * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
@@ -306,9 +306,21 @@ https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable
 
 
 
+## Adding SSH Key to GitHub
 
-## Installing SSH Keys on Rapsberry Pi
+See [Generating SSH Keys](https://help.github.com/articles/generating-ssh-keys/) for more info.
 
+```
+ssh-keygen -t rsa -C "your_email@example.com"
+
+# Add the public key to GtiHub Settings-->Deploy keys
+
+# test with
+ssh -T git@github.com
+```
+
+
+## 2. Adding passwordless login with authorized_keys on Rapsberry Pi
 
 See http://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md
 
@@ -324,7 +336,7 @@ cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys
 
 
 ----
-## Wi-Fi Dongles and Configuring Wi-Fi
+## 3. Wi-Fi Dongles and Configuring Wi-Fi
 
 I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
 http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
