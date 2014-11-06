@@ -34,6 +34,8 @@ import tornado.web
 import tornado.websocket
 import tornado.template
 
+from backends.apigee import ApiGeeClient
+
 # Settings
 VERBOSE = True
 PORT = 9093
@@ -176,6 +178,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.portA_fifo = collections.deque(5*[255], 5)
         self.busy = False # Tells the ardyh to stop sending messages to listener, useful while executing a command
         self.operationa_mode = "user_controlled"
+        self.api = ApiGeeClient()
 
     def open(self):
         print 'connection opened...'
@@ -197,32 +200,42 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             listeners.append( bot )
 
 
-    def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
+    def on_message(self, envelope):      # receives the data from the webpage and is stored in the variabe message
         """
         Messages should come as a JSON Object string.
 
+        envelope contains meta data plus a message. Once converted to json as data
+        the message is available at data['message']
+
         """
-        if VERBOSE: print "recieved message: \n", message
+        if VERBOSE: print "recieved message: \n", envelope
         try:
-            messageObj = ast.literal_eval(message)
+            data = ast.literal_eval(envelope)
         except ValueError, e:
             try:
-                messageObj = json.loads(message)
+                data = json.loads(envelope)
             except:
                 print sys.exc_info()[0]
                 if VERBOSE: print "Message is not JSON"
                 return
 
-        if 'handshake' in messageObj.keys():
-            print "Updating %s's subscriptions to %s" %(messageObj['bot_name'], messageObj['subscriptions'])
-            bot = get_bot_listener(messageObj['bot_name'])
-            bot.update({'subscriptions':messageObj['subscriptions']})
+        if 'handshake' in data.keys():
+            print "Updating %s's subscriptions to %s" %(data['bot_name'], data['subscriptions'])
+            bot = get_bot_listener(data['bot_name'])
+            bot.update({'subscriptions':data['subscriptions']})
             return
+
+
+        if 'message' in data.keys():
+            message = data['message']
+            if 'command' in message and message['command'] == 'sensor_values':
+                self.api.post('sensor_values', data)
+
 
         # save message to redis
         now = dt.utcnow()
         ts = time.mktime(now.timetuple()) + now.microsecond * 1e-6
-        rstore = messageObj
+        rstore = data
         
         # try:
         #     bot_name = rstore.pop("bot_name")
@@ -231,7 +244,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         # except:
         #     pass
 
-        self.broadcast(messageObj)
+        self.broadcast(data)
 
 
     def on_close(self):
