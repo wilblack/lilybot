@@ -64,7 +64,6 @@ class Router(object):
             message = json.loads(message.data)
 
         if "command" in message.keys():
-
             cmd = message['command']
             kwargs = message.get('kwargs', {})
 
