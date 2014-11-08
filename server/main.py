@@ -219,6 +219,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 if VERBOSE: print "Message is not JSON"
                 return
 
+        if 'heartbeat' in data.keys():
+            self.write_message(data)
+            return
+
         if 'handshake' in data.keys():
             print "Updating %s's subscriptions to %s" %(data['bot_name'], data['subscriptions'])
             bot = get_bot_listener(data['bot_name'])
