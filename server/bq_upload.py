@@ -43,7 +43,7 @@ def rp3_to_bq():
             obj = json.loads(item)
             sensor_values = obj['message']['sensor_values']
         except:
-            print "Could not parse ", item
+            print "[rp3_to_bq()]Could not parse ", item
             continue
 
         acc_x, acc_y, acc_z = sensor_values.pop('acc_xyz')

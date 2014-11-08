@@ -139,6 +139,12 @@ settings= {
 }
 ```
 
+## 5. (Optional) Set the Raspberry Pi to reconnect if it looses connection to ardyh
+Add the following line to `/etc/crontab`
+
+```
+*    * * *   root    /home/pi/projects/lilybot/rpi_client/restart.sh > /home/pi/restart.log
+```
 
 ### Troubleshooting
 

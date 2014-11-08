@@ -1,7 +1,7 @@
 window.bot_colormap = {
     'rp1.solalla.ardyh':'#FF0000',
     'rp2.solalla.ardyh':'#00FF00',
-    'rp3.solalla.ardyh':'#3366FF',
+    'rpi3.solalla.ardyh':'#3366FF',
     'monitor.solalla.ardyh':'#FFFF00',
     'ctenophore.solalla.ardyh':'#FF00FFf',
     'default':'#FFFFFF'
@@ -229,7 +229,8 @@ Ardyh = function(handshake_message){
                 - sensor_values
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
-               
+                
+
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
@@ -238,10 +239,11 @@ Ardyh = function(handshake_message){
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
-                    self._log("Could not parse message")
-                    self._log(typeof(data))
+                    self._log("[Ardyh.onmossage()] Message in the wrong format.")
+                    self._log(msg.data)
                 }
                 
+
                 if(!LOG_PAUSED){
                      self._log(msg.data,bot_name);
                 }

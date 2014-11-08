@@ -86,7 +86,6 @@ echo "\n*****************************\n"
 
 git clone https://github.com/wilblack/lilybot.git
 
-
 echo "\n\n*****************************\n"
 echo "Setting ardyh_client to start on boot."
 echo "\n*****************************\n"
