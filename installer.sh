@@ -64,12 +64,17 @@ sudo apt-get install python-bluetooth -y
 sudo apt-get install python-smbus -y
 
 echo "\n\n*****************************\n"
-echo "Creating /home/projects/"
+echo "Creating ~/projects/ and ~/.ssh/"
 echo "\n*****************************\n"
 
+mkdir ~/,ssh
 cd /home/pi
 mkdir projects
-cd projects 
+cd projects
+
+
+
+
 
 
 echo "\n\n*****************************\n"
