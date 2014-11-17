@@ -42,7 +42,8 @@ class GrovePiSensorValues:
                 pass
             if raw < 10000:
                 self.light = raw
-            else self.light = None
+            else:
+                self.light = None
 
         # This is the slider switch sensor
         if 'slider' in self.sensors_types:
