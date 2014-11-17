@@ -233,7 +233,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         if 'message' in data.keys():
             message = data['message']
             if 'command' in message and message['command'] == 'sensor_values':
-                self.api.post('sensor_values', data)
+                res = self.api.post('sensor_values', data)
+                
+                    
 
 
         # save message to redis
