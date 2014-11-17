@@ -59,8 +59,8 @@ class ArdyhClient(TornadoWebSocketClient):
         self.core = Core()
         self.router = Router()
 
-    def opened(self):
-        print "Connection to ardh is open"
+    def send_handshake(self):
+        
         message = {
             'bot_name': self.bot_name,
             'bot_roles': self.bot_roles,
@@ -69,8 +69,12 @@ class ArdyhClient(TornadoWebSocketClient):
             'subscriptions': settings['subscriptions'],
             'sensors': SENSORS
         }
-
+        print "Sending handshake"
         self.send(message)
+
+    def opened(self):
+        print "Connection to ardh is open"
+        self.send_handshake()
 
         if ["jjbot", "grovebot"] and settings["bot_packages"]:
             print "Registering IO Loop callback"
@@ -112,8 +116,9 @@ class ArdyhClient(TornadoWebSocketClient):
             print sys.exc_info()[0]
 
     def closed(self, code, reason=None):
-        print "Closed down", code, reason
-
+        print "Closed down"
+        #import pdb; pdb.set_trace()
+        #self.connect()
         ioloop.IOLoop.instance().stop()
         #ioloop.IOLoop.instance().start()
 
