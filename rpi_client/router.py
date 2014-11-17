@@ -11,30 +11,31 @@ from bot_roles.core import Core
 
 class Router(object):
 
-    def __init__(self):
+    def __init__(self, socket):
 
+        self.socket = socket
         self.ctenophore = False
         self.jjbot = False
         self.magic_mushroom = False
         self.grovebot = False
         bot_packages = settings['bot_packages']
 
-        self.core = Core()
+        self.core = Core(self.socket)
         if 'ctenophore' in bot_packages:
             from bot_roles.ctenophore import Ctenophore
-            self.ctenophore = Ctenophore()
+            self.ctenophore = Ctenophore(socket)
 
         if 'jjbot' in bot_packages:
             from bot_roles.jjbot import JJBot
-            self.jjbot = JJBot()
+            self.jjbot = JJBot(socket)
 
         if 'magic_mushroom' in bot_packages:
             from bot_roles.magic_mushroom import MagicMushroom
-            self.magic_mushroom = MagicMushroom()
+            self.magic_mushroom = MagicMushroom(socket)
 
         if 'grovebot' in bot_packages:
             from bot_roles.grovebot import Grovebot
-            self.grovebot = Grovebot
+            self.grovebot = Grovebot(socket)
 
     def received_message(self, message):
         """
@@ -83,6 +84,10 @@ class Router(object):
 
             if self.magic_mushroom and cmd in self.magic_mushroom.commands:
                 getattr(self.magic_mushroom, cmd)(kwargs)
+                received = True
+
+            if self.grovebot and cmd in self.grovebot.commands:
+                getattr(self.grovebot, cmd)(kwargs)
                 received = True
 
             if not received:

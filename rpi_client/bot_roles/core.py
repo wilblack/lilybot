@@ -4,7 +4,8 @@ class Core(object):
     """
     Commands must take the kwargs argument
     """
-    def __init__(self):
+    def __init__(self, socket):
+        self.socket = socket
         self.commands = ['shutdown', 'restart']
 
 

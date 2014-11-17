@@ -56,8 +56,8 @@ class ArdyhClient(TornadoWebSocketClient):
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
 
-        self.core = Core()
-        self.router = Router()
+        #self.core = Core(self)
+        self.router = Router(self)
 
     def send_handshake(self):
         
@@ -135,12 +135,15 @@ class ArdyhClient(TornadoWebSocketClient):
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
             sensor_values.update({'bot_package':'jjbot'})
 
-        if "grovebot" in settings["bot_packages"]:
-            sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
-            sensor_values.update({'bot_package':'grovebot'})
+            out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
+            if out: self.send(out)
 
-        out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
-        if out: self.send(out)
+        if "grovebot" in settings["bot_packages"]:
+            self.router.grovebot.read_sensors({})
+            # sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
+            # sensor_values.update({'bot_package':'grovebot'})
+
+
 
 
     def get_sensors_values(self, bot_package):

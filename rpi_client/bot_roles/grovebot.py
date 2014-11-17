@@ -18,15 +18,11 @@ class GrovePiSensorValues:
             setattr(self, sensor['type'], sensor['default'])
 
     def update(self):
-        # if 'temp' in self.sensors_types:
-        #     try:
-        #         self.temp = temp(0)
-        #     except IOError:
-        #         print "--"
-        #     except ValueError:
-        #         print self.temp
-        #     except ZeroDivisionError:
-        #         print "temp ZeroDivisionError"
+        """
+        Updates all sensor values, making them available at 
+        self.SENSOR_NAME
+
+        """
 
         if 'sound' in self.sensors_types:
             try:
@@ -39,11 +35,14 @@ class GrovePiSensorValues:
         # This is the light sensor
         if 'light' in self.sensors_types:
             try:
-                self.light = analogRead(2)
+                raw = analogRead(2)
             except IOError:
                 pass
             except ValueError:
                 pass
+            if raw < 10000:
+                self.light = raw
+            else self.light = None
 
         # This is the slider switch sensor
         if 'slider' in self.sensors_types:
@@ -125,5 +124,19 @@ grovePiSensorValues = GrovePiSensorValues()
 
 class Grovebot(Core):
 
-    def __init__(self):
-        self.commands = []
+    def __init__(self, socket):
+        super(Grovebot, self).__init__(socket)
+        self.commands.append('read_sensors')
+        self.commands.append('set_sampling_frequency')
+
+        self.sensors = grovePiSensorValues
+
+    def read_sensors(self, kwargs=None):
+        print "in read_sensors"
+        sensor_values = self.sensors.toDict()
+        sensor_values.update({'bot_package':'grovebot'})
+        out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
+        self.socket.send(out)
+
+    def set_sampling_frequency(self, kwargs=None):
+        print "In set set_sampling_frequency"
