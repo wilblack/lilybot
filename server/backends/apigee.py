@@ -15,6 +15,11 @@ import requests, json
 
 APIGEE_USERNAME = "wilblack"
 APIGEE_TOKEN = "YWMtFQOvnGVBEeSybiMsBDBtogAAAUmmRresAXzSPcMeMhi-IroLVeqlNoexalA"
+
+APIGEE_CLIENT_ID = "YXA6URl94E0TEeSCwuPO0mAKgw"
+APIGEE_CLIENT_SECRECT = "YXA6wd-UdXgImKXHBRk-6ZyTzT46UwM"
+
+#APIGEE_TOKEN = "YXA6wd-UdXgImKXHBRk-6ZyTzT46UwM"
 APIGEE_BASE_URI = "https://api.usergrid.com/%s/sandbox/" %(APIGEE_USERNAME)
 
 
@@ -35,21 +40,25 @@ class ApiClientBase(object):
         if resp.status_code >= 300: 
             print res.text
             self.bad_responses.append(resp)
-        return resp
+        return content
 
 
     def post(self, resource, data):
         uri = "%s%s?access_token=%s" %(self.base_uri, resource, self.token)
 
-        data = json.dumps(data)
-        resp = requests.post(uri, data=data)
+        resp = requests.post(uri, data=json.dumps(data))
         content = json.loads(resp.text)
         
         if resp.status_code >= 300: 
             print "ERROR: %s" % (resp.status_code)
             print resp.text
             self.bad_responses.append(resp)
-        return resp
+            
+            if (content['error'] == 'expired_token'):
+                self.reset_access_token()
+                self.post(resource, data)
+
+        return content
 
 
 
@@ -72,6 +81,18 @@ class ApiGeeClient(ApiClientBase):
 
         super(ApiGeeClient, self).__init__()
 
-
+    def reset_access_token(self):
+        uri = "%s%s" %(self.base_uri, 'token')
+        data = {
+            'grant_type':'client_credentials',
+            'client_id': APIGEE_CLIENT_ID,
+            'client_secret': APIGEE_CLIENT_SECRECT
+        }
+        resp = requests.post(uri, data=data)
+        
+        content = json.loads(resp.text)
+        self.token = content['access_token']
+        print self.token
+        return self.token
 
 
