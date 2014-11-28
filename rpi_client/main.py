@@ -102,15 +102,15 @@ class ArdyhClient(TornadoWebSocketClient):
         }
 
         """
-        if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message)
+        
         timestamp = now = dt.now().strftime(self.LOG_DTFORMAT)
         message.update({
             "bot_name":self.bot_name,
             "timestamp": timestamp
         })
-
+        #if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message)
         message = json.dumps(message)
-        if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
+        #if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
         except:
@@ -135,7 +135,34 @@ class ArdyhClient(TornadoWebSocketClient):
         out = {}
         if "jjbot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
-            
+            # Compute if button is turned off.
+            # if sensor_values['PORT_2'] < 200 or sensor_values['PORT_4'] < 200:
+            #     print "!!!! BUTTONS ARE TOUCHED !!!!"
+            #     print sensor_values['PORT_2'] < 200
+            #     print sensor_values['PORT_4'] < 200
+            #     message = {
+            #         'timestamp':"",
+            #         'bot_name':self.bot_name,
+            #         'message' : {'command':'stop', 'kwargs': {}}
+            #     }
+            #     self.router.received_message(message)
+
+                # message = {
+                #     'timestamp':"",
+                #     'bot_name':self.bot_name,
+                #     'message' : {'command':'steer_left', 'kwargs': {}}
+                # }
+                # self.router.received_message(message)
+
+                # message = {
+                #     'timestamp':"",
+                #     'bot_name':self.bot_name,
+                #     'message' : {'command':'forward', 'kwargs': {}}
+                # }
+                # self.router.received_message(message)
+
+
+
             sensor_values.update({'bot_package':'jjbot'})
 
             out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
@@ -181,7 +208,7 @@ if ["jjbot", "grovebot"] and settings["bot_packages"]:
             print "Starting thread %s" %(self.threadID)
             while sensor_thread_running:
                 if 'jjbot' in settings['bot_packages']:
-                    result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
+                    BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
                 if 'grovebot' in settings['bot_packages']:
                     grovePiSensorValues.update()
 

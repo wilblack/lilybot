@@ -56,19 +56,23 @@ class Router(object):
         if VERBOSE: print "[Router.received_message] Received message: %s" % (message)
         # Try to JSON deconde it
 
-        try:
-            # Using literal_eval to ahndle the unicoded keyword porblem.
-            message = ast.literal_eval(message.data)
-        except:
-            # If that fails use the good old json.loads()
-            print "[Router.recieved_message()] Could not load message.data"
-            message = json.loads(message.data)
+        if not message.__class__ == {}.__class__:
+            try:
+                # Using literal_eval to handle the unicoded keyword porblem.
+                message = ast.literal_eval(message.data)
+            except:
+                # If that fails use the good old json.loads()
+                print "[Router.recieved_message()] Could not load message.data"
+                message = json.loads(message.data)
+        else:
+
+            message = message['message'] # This is when it is already an object.
 
         if "command" in message.keys():
             cmd = message['command']
             kwargs = message.get('kwargs', {})
 
-            # if VERBOSE: print "command: %s\n" %(cmd), kwargs
+            if VERBOSE: print "command: %s\n" %(cmd), kwargs
             received = False
             if cmd in self.core.commands:
                 getattr(self.core, cmd)(kwargs)
@@ -93,20 +97,3 @@ class Router(object):
             if not received:
                 print "%s not recognized as a valid command" % (cmd)
             return
-
-        if 'sensor_values' in message['message'].keys():
-            received = False
-            if self.jjbot:
-                getattr(self.jjbot, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
-                received = True
-
-            if self.ctenophore:
-                getattr(self.ctenophore, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
-                received = True
-
-            if self.magic_mushroom:
-                getattr(self.magic_mushroom, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
-                received = True
-
-            if not received:
-                print "Senor values ignored. No bot_packge found"

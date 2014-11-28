@@ -266,19 +266,19 @@ class Ctenophore(Core):
         return rs or False
 
 
-    def sensor_callback(self, sensor_package, sensor_values):
+    def sensor_callbackOLD(self, sensor_package, sensor_values):
         
         STAGE1 = 15
         STAGE2 = 30
         #self.led.all_off()
         
         try:
-            getattr(self, "%s_sensor_callback" %sensor_package)(sensor_values)
+            getattr(self, "%s_sensor_callbackOLD" %sensor_package)(sensor_values)
         except:
             pass
 
 
-    def grovebot_sensor_callback(self, sensor_values):
+    def grovebot_sensor_callbackOLD(self, sensor_values):
         #import pdb; pdb.set_trace()
         if sensor_values['slider'] == 1:
             self.led.fillRGB(255, 0, 255, 0, self.NLEDS)
@@ -295,7 +295,7 @@ class Ctenophore(Core):
             self.all_off()
 
 
-    def jjbot_sensor_callback(self, sensor_values):
+    def jjbot_sensor_callbackOLD(self, sensor_values):
         
         val1 = sensor_values[0][1]
         val2 = sensor_values[2][1]
@@ -377,13 +377,13 @@ class MagicMushroom(Ctenophore):
         kwargs = {'state':'#random'}
         self.set_state(kwargs)
 
-    def grovebot_sensor_callback(self, sensor_values):
+    def grovebot_sensor_callbackOLD(self, sensor_values):
         # Check the distance values
         self.dist_history.pop(0)
         self.dist_history.append(sensor_values['dist'])
 
         dist_count = len([ 1 for val in self.dist_history if val > self.dist_threshold])
-        print "In grovebot_sensor_callback() with ", self.dist_history
+        print "In grovebot_sensor_callbackOLD() with ", self.dist_history
         print dist_count
 
         if dist_count > 3: # We are above the threshld, so that meand nobody is near by
