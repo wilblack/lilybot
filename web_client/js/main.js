@@ -8,7 +8,7 @@ window.bot_colormap = {
 }
 window.LOG_PAUSED=false;
 
-function updateSensorValues(sensor_values, sensor_package){
+function updateSensorValues(sensor_values){
     /*
     Input
     sensor_values - A list of lists with each inner of the from [PORTNAME, VALUE]
@@ -16,6 +16,7 @@ function updateSensorValues(sensor_values, sensor_package){
 
     */
 
+    var sensor_package = sensor_values.bot_package // This needs to be fixed.
     
     $el = $("#sensor-values");
     for (var key in sensor_values){
