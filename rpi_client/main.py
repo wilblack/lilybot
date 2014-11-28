@@ -7,6 +7,8 @@ Written by Wil Black wilblack21@gmail.com Apr, 5 2014
 import json, urllib, sys, ast
 import threading
 
+import commands
+
 from datetime import datetime as dt
 
 from ws4py.client.tornadoclient import TornadoWebSocketClient
@@ -56,21 +58,27 @@ class ArdyhClient(TornadoWebSocketClient):
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
 
-        self.core = Core()
-        self.router = Router()
+        #self.core = Core(self)
+        self.router = Router(self)
 
-    def opened(self):
-        print "Connection to ardh is open"
+    def send_handshake(self):
+        local_ip = commands.getoutput("hostname -I")
+
         message = {
             'bot_name': self.bot_name,
             'bot_roles': self.bot_roles,
             'mac': get_mac_address(),
             'handshake': True,
             'subscriptions': settings['subscriptions'],
-            'sensors': SENSORS
+            'sensors': SENSORS,
+            'local_ip': local_ip
         }
-
+        print "Sending handshake"
         self.send(message)
+
+    def opened(self):
+        print "Connection to ardh is open"
+        self.send_handshake()
 
         if ["jjbot", "grovebot"] and settings["bot_packages"]:
             print "Registering IO Loop callback"
@@ -100,10 +108,8 @@ class ArdyhClient(TornadoWebSocketClient):
             "bot_name":self.bot_name,
             "timestamp": timestamp
         })
-        
-        
-        message = json.dumps(message)
 
+        message = json.dumps(message)
         if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
@@ -112,8 +118,9 @@ class ArdyhClient(TornadoWebSocketClient):
             print sys.exc_info()[0]
 
     def closed(self, code, reason=None):
-        print "Closed down", code, reason
-
+        print "Closed down"
+        #import pdb; pdb.set_trace()
+        #self.connect()
         ioloop.IOLoop.instance().stop()
         #ioloop.IOLoop.instance().start()
 
@@ -128,24 +135,33 @@ class ArdyhClient(TornadoWebSocketClient):
         out = {}
         if "jjbot" in settings["bot_packages"]:
             sensor_values = self.get_sensors_values('jjbot') # This is where to sensor values get sent to ardyh
+            
             sensor_values.update({'bot_package':'jjbot'})
 
-        if "grovebot" in settings["bot_packages"]:
-            sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
-            sensor_values.update({'bot_package':'grovebot'})
+            out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
+            if out: self.send(out)
 
-        out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
-        if out: self.send(out)
+        if "grovebot" in settings["bot_packages"]:
+            self.router.grovebot.read_sensors({})
+            # sensor_values = self.get_sensors_values('grovebot') # This is where to sensor values get sent to ardyh
+            # sensor_values.update({'bot_package':'grovebot'})
+
+
 
 
     def get_sensors_values(self, bot_package):
+        """
+        Returns a dict with sensors values.
+
+        """
+
         if bot_package == 'jjbot':
-            out = [
-                ['PORT_1', BrickPi.Sensor[PORT_1]],
-                ['PORT_2', BrickPi.Sensor[PORT_2]],
-                ['PORT_3', BrickPi.Sensor[PORT_3]],
-                ['PORT_4', BrickPi.Sensor[PORT_4]],
-              ]
+            out = {
+                'PORT_1': BrickPi.Sensor[PORT_1],
+                'PORT_2': BrickPi.Sensor[PORT_2],
+                'PORT_3': BrickPi.Sensor[PORT_3],
+                'PORT_4': BrickPi.Sensor[PORT_4],
+            }
         if bot_package == 'grovebot':
             out = grovePiSensorValues.toDict()
         return out

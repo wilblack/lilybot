@@ -196,42 +196,65 @@ Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and
 
 **NOTE** First make sure the camera is enabled. Run `sudo raspi-config` and enable the camera.
 
-```
-cd ~/
-sudo apt-get install libjpeg8-dev imagemagick libv4l-dev
-sudo ln -s /usr/include/linux/videodev2.h /usr/include/linux/videodev.h
+1. Install software packages. 
+	```sh
+	cd ~/
+	sudo apt-get install libjpeg8-dev imagemagick libv4l-dev
+	sudo ln -s /usr/include/linux/videodev2.h /usr/include/linux/videodev.h
+	
+	```
+2. Then make a temp directory to download the MJPEG-Streamer zip file
 
-```
-Then make a temp directory to download the MJPEG-Streamer zip file
+	```sh
+	mkdir ~/temp
+	cd ~/temp
+	wget http://sourceforge.net/code-snapshots/svn/m/mj/mjpg-streamer/code/mjpg-streamer-code-182.zip
+	unzip mjpg-streamer-code-182.zip
+	cd mjpg-streamer-code-182/mjpg-streamer
+	make mjpg_streamer input_file.so output_http.so
+	
+	sudo cp mjpg_streamer /usr/local/bin
+	sudo cp output_http.so input_file.so /usr/local/lib/
 
-```
-mkdir ~/temp
-cd ~/temp
-wget http://sourceforge.net/code-snapshots/svn/m/mj/mjpg-streamer/code/mjpg-streamer-code-182.zip
-unzip mjpg-streamer-code-182.zip
-cd mjpg-streamer-code-182/mjpg-streamer
-make mjpg_streamer input_file.so output_http.so
+	cp -R www ~/projects/lilybot/rpi_client/camera_stream/  # This is what I did but I don't think its right.
+	
+	```
 
-sudo cp mjpg_streamer /usr/local/bin
-sudo cp output_http.so input_file.so /usr/local/lib/
-# sudo cp -R www /usr/local/www # This is what the tutorial says, i didn't do it becuase /usr/local/www does not exist.
-cp -R www ~/Projects/lilybot/jjbot/  # This is what I did but I don't think its right.
-
-```
-
-Now we should be able to  start the camera. The code below will start 
+3. Now we should be able to  start the camera. The code below will start 
 the camera and a webserver on port 8080 that will stream the video. 
 To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:8080`
 
+	```sh
+	mkdir /tmp/stream
+	raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
+	
+	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
+	
+	```
+####Troubleshooting
+
+If you try to start the camera service with `start_server_camera.sh` and get the following error.
+
+```sh
+mkdir: cannot create directory `/tmp/stream': File exists
+MJPG Streamer Version: svn rev: 
+ i: folder to watch...: /tmp/stream/
+ i: forced delay......: 0
+ i: delete file.......: no, do not delete
+ i: filename must be..: pic.jpg
+ o: www-folder-path...: /home/pi/projects/lilybot/rpi_client/camera_stream/www/
+ o: HTTP TCP port.....: 8081
+ o: username:password.: disabled
+ o: commands..........: enabled
+mmal: mmal_vc_component_enable: failed to enable component: ENOSPC
+mmal: camera component couldn't be enabled
+mmal: main: Failed to create camera component
+mmal: Failed to run camera app. Please check for firmware updates
 ```
-mkdir /tmp/stream
-raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
+The command that is failing is the `raspistill`. 
+To fix this reboot? There is a thread here http://raspberrypi.stackexchange.com/questions/13764/what-causes-enospc-error-when-using-the-raspberry-pi-camera-module
 
-LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
-
-```
-
-
+ 
 ----
 # For Developers
 
