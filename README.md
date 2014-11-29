@@ -231,7 +231,23 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
 	
 	```
+#### Websockets streaming
+
 	
+1. Install the stream-server.js script from [ffmpeg](http://ffmpeg.org/) and install it's dependency
+	```
+	npm install ws
+	node stream-server.js yourpassword
+	```
+
+2. Install ffmpeg on Raspberry Pi. Point it at ardyh.
+	```
+	ffmpeg -s 640x480 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://example.com:8082/yourpassword/640/480/
+	```
+
+3. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
+
+
 #### Links
 Post on Raspberry Pi forums. 
 http://www.raspberrypi.org/forums/viewtopic.php?f=43&t=74949
@@ -244,6 +260,9 @@ http://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets
 
 FFmpeg
 http://ffmpeg.org/
+
+jsmpeg - A javscript stream decoder for websockets
+https://github.com/phoboslab/jsmpeg
 
 ####Troubleshooting
 
