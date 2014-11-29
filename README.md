@@ -181,13 +181,13 @@ shutdown: you must be root to do that!
 I2C documentation. The Raspberry Pi talks to the GrovePi using the SMBus and I2c.
 http://www.lm-sensors.org/wiki/i2cToolsDocumentation
 
-## 4 Attach hardware and reboot.
+## 4. Attach hardware and reboot.
 
 After all that is done we are finally ready to attach the bot package specific hardware and a Wi-Fi dongle. Omce you attach the appropraite hardware and Wi-Fi dongle reboot the Raspberry Pi (`sudo shutdown -r now`). Once rebotted the Raspberry Pi will look for a Wi-Fi network named *ardyhnet* with passkey *ardyhnet*. To change this you can edit `/etc/network/interfaces`.
 
 
 ----
-### 6. Install Camera and Camera Software (Optional)
+## 6. Install Camera and Camera Software (Optional)
 
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
@@ -242,6 +242,8 @@ http://picamera.readthedocs.org/en/release-1.3/index.html
 A tutorial showing how to stream video with web sockets.
 http://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets
 
+FFmpeg
+http://ffmpeg.org/
 
 ####Troubleshooting
 
