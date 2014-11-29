@@ -17,7 +17,7 @@ The software components of lilybot consist of three main functions.
 3. Web application clients. 
 
 
-## Hardware Packages
+## 1. Hardware Packages
 
 To configure a hardware package you need to edit `rpi_client/local_settings.py`
 
@@ -187,7 +187,7 @@ After all that is done we are finally ready to attach the bot package specific h
 
 
 ----
-### Install Camera and Camera Software (Optional)
+### 6. Install Camera and Camera Software (Optional)
 
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
@@ -231,6 +231,18 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
 	
 	```
+	
+#### Links
+Post on Raspberry Pi forums. 
+http://www.raspberrypi.org/forums/viewtopic.php?f=43&t=74949
+
+PiCamera
+http://picamera.readthedocs.org/en/release-1.3/index.html
+
+A tutorial showing how to stream video with web sockets.
+http://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets
+
+
 ####Troubleshooting
 
 If you try to start the camera service with `start_server_camera.sh` and get the following error.
