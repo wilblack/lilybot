@@ -196,6 +196,8 @@ Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and
 
 **NOTE** First make sure the camera is enabled. Run `sudo raspi-config` and enable the camera.
 
+#### Streaming with mjpg-streamer
+
 1. Install software packages. 
 	```sh
 	cd ~/
@@ -231,7 +233,7 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
 	
 	```
-#### Websockets streaming
+#### Websockets streaming with ffmpeg
 
 
 1. Build and configure [ffmpeg](http://ffmpeg.org/) on the Rapsberry Pi. It takes a while. I followed the instructions [here](http://sirlagz.net/2012/08/04/how-to-stream-a-webcam-from-the-raspberry-pi/). It takes a while. Below are the steps from that link.
@@ -296,30 +298,16 @@ make: *** [install-man] Error 1
 
 ```
 
-Then I got this error `Cannot open video device /dev/video0: No such file or directory`. Checking config.log It looks like there were build errors. Almost like it was not configured from the Raspberry pi.
+Then I got this error `Cannot open video device /dev/video0: No such file or directory`. Checking config.log It looks like there were build errors. Almost like it was not configured from the Raspberry pi. So after searching the internet I found a [part 3](http://sirlagz.net/2013/01/07/how-to-stream-a-webcam-from-the-raspberry-pi-part-3/) to the orignal tutorial. In it it said there maybe some errors to the original source so use the github repo instead.
 
 ```
-/usr/lib/gcc/arm-linux-gnueabihf/4.6/include/arm_neon.h:32:2: error: #error You must enable NEON instructions (e.g. -mfloat-abi=softfp -mfpu=neon) to use arm_neon.h
+git clone git://source.ffmpeg.org/ffmpeg.git
+cd ffmpeg
+./configure
+make && make install
+
 ```
 
-
-#### Links
-Post on Raspberry Pi forums. 
-http://www.raspberrypi.org/forums/viewtopic.php?f=43&t=74949
-
-PiCamera
-http://picamera.readthedocs.org/en/release-1.3/index.html
-
-A tutorial showing how to stream video with web sockets.
-http://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets
-
-FFmpeg
-http://ffmpeg.org/
-
-jsmpeg - A javscript stream decoder for websockets
-https://github.com/phoboslab/jsmpeg
-
-#### Troubleshooting
 *ffmpeg*
 You can install `v4l2-ctl` to help troubleshoot with 
 ```
@@ -347,6 +335,26 @@ mmal: Failed to run camera app. Please check for firmware updates
 ```
 The command that is failing is the `raspistill`. 
 To fix this reboot? There is a thread here http://raspberrypi.stackexchange.com/questions/13764/what-causes-enospc-error-when-using-the-raspberry-pi-camera-module
+
+
+
+#### Links
+Post on Raspberry Pi forums. 
+http://www.raspberrypi.org/forums/viewtopic.php?f=43&t=74949
+
+PiCamera
+http://picamera.readthedocs.org/en/release-1.3/index.html
+
+A tutorial showing how to stream video with web sockets.
+http://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets
+
+FFmpeg
+http://ffmpeg.org/
+
+jsmpeg - A javscript stream decoder for websockets
+https://github.com/phoboslab/jsmpeg
+
+#### Troubleshooting
 
  
 ----
