@@ -319,7 +319,13 @@ http://ffmpeg.org/
 jsmpeg - A javscript stream decoder for websockets
 https://github.com/phoboslab/jsmpeg
 
-####Troubleshooting
+#### Troubleshooting
+*ffmpeg*
+You can install `v4l2-ctl` to help troubleshoot with 
+```
+apt-get install v4l-utils v4l-conf
+```
+
 
 If you try to start the camera service with `start_server_camera.sh` and get the following error.
 
