@@ -236,17 +236,17 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 1. Build and configure [ffmpeg](http://ffmpeg.org/) on the Rapsberry Pi.
 	
   * It takes a while. I followed the instructions [here](http://sirlagz.net/2012/08/04/how-to-stream-a-webcam-from-the-raspberry-pi/). It takes a while. Below are the steps from that link.
-  1. Add the following lines into /etc/apt/sources.list
+    1. Add the following lines into /etc/apt/sources.list
 	```
 	deb-src http://www.deb-multimedia.org sid main
 	deb http://www.deb-multimedia.org wheezy main non-free
-    ```
-	2. Run `apt-get update`
+        ```
+    2. Run `apt-get update`
     3. Run `apt-get install deb-multimedia-keyring`
     4. Remove the second line from `/etc/apt/sources.list`
-    ```
-    deb http://www.deb-multimedia.org wheezy main non-free
-    ```
+       ```
+       deb http://www.deb-multimedia.org wheezy main non-free
+       ```
     5. Make and directory for your project and cd into it then run `apt-get source ffmpeg-dmo`
     6. You should now have a folder called ffmpeg-dmo-0.11 <-- The version will change as time goes by.
     7. Change the directory to the folder containing the source. e.g. cd ffmpeg-dmo-0.11
@@ -254,21 +254,20 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
     9. Run `make && make install` to compile and install ffmpeg
 if you are not running as root like I am, then you will need to run the above command with sudo
 
-
- * On the socket server (the one running ardyh) install 
+ 
      
-1. Install the stream-server.js script from https://github.com/phoboslab/jsmpeg
+2. On the socket server install the stream-server.js script from https://github.com/phoboslab/jsmpeg
 	
     ```
-	npm install ws
-	node stream-server.js yourpassword
-	```
-2. Install ffmpeg on Raspberry Pi. Point it at ardyh.
+    npm install ws
+    node stream-server.js yourpassword
+    ```
+3. Install ffmpeg on Raspberry Pi. Point it at ardyh.
 	```
 	ffmpeg -s 640x480 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://example.com:8082/yourpassword/640/480/
 	```
 
-3. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
+4. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
 
 
 #### Links
