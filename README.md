@@ -296,6 +296,12 @@ make: *** [install-man] Error 1
 
 ```
 
+Then I got this error `Cannot open video device /dev/video0: No such file or directory`. Checking config.log It looks like there were build errors. Almost like it was not configured from the Raspberry pi.
+
+```
+/usr/lib/gcc/arm-linux-gnueabihf/4.6/include/arm_neon.h:32:2: error: #error You must enable NEON instructions (e.g. -mfloat-abi=softfp -mfpu=neon) to use arm_neon.h
+```
+
 
 #### Links
 Post on Raspberry Pi forums. 
