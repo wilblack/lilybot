@@ -314,6 +314,24 @@ You can install `v4l2-ctl` to help troubleshoot with
 apt-get install v4l-utils v4l-conf
 ```
 
+Could not get anything on /dev/video0/ even after running modprobe so I tried installing uv4l and uv4l-raspicam as per here http://www.linux-projects.org/modules/sections/index.php?op=viewarticle&artid=14. But got the following error:
+
+```
+Setting up uv4l (1.9.5-1) ...
+libkmod: ERROR ../libkmod/libkmod.c:554 kmod_search_moddep: could not open moddep file '/lib/modules/3.6.11+/modules.dep.bin'
+dpkg: error processing uv4l (--configure):
+ subprocess installed post-installation script returned error exit status 1
+Setting up raspberrypi-bootloader (1.20140908-1) ...
+Memory split is now set in /boot/config.txt.
+You may want to use raspi-config to set it
+.
+.
+.
+.
+dpkg: dependency problems prevent configuration of uv4l-raspicam:
+ uv4l-raspicam depends on uv4l (>= 1.9.5); however:
+  Package uv4l is not configured yet.
+```
 
 If you try to start the camera service with `start_server_camera.sh` and get the following error.
 
