@@ -190,13 +190,15 @@ After all that is done we are finally ready to attach the bot package specific h
 ## 6. Install Camera and Camera Software (Optional)
 
 
+
+
+#### Method 1 - Streaming with mjpg-streamer (only works on your local network)
+
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
 
 Follow the instruction here http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi to install the software on the RPi. They are summarized below
 
 **NOTE** First make sure the camera is enabled. Run `sudo raspi-config` and enable the camera.
-
-#### Streaming with mjpg-streamer
 
 1. Install software packages. 
 	```sh
@@ -233,35 +235,31 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
 	
 	```
-#### Websockets streaming with ffmpeg
+#### Method 2 - Websockets streaming with ffmpeg
 
 
-1. Build and configure [ffmpeg](http://ffmpeg.org/) on the Rapsberry Pi. It takes a while. I followed the instructions [here](http://sirlagz.net/2012/08/04/how-to-stream-a-webcam-from-the-raspberry-pi/). It takes a while. Below are the steps from that link.
-
-  1. Add the following lines into /etc/apt/sources.list
-    
-    ```
-    deb-src http://www.deb-multimedia.org sid main
-    deb http://www.deb-multimedia.org wheezy main non-free
-    ```
-  
-  2. Run `apt-get update`
-  3. Run `apt-get install deb-multimedia-keyring`
-  4. Remove the second line from `/etc/apt/sources.list`
-    
-    ```
-    deb http://www.deb-multimedia.org wheezy main non-free
-    ```
-  
-  5. Make and directory for your project and cd into it then run `apt-get source ffmpeg-dmo`
-  6. You should now have a folder called ffmpeg-dmo-0.11 <-- The version will change as time goes by.
-  7. Change the directory to the folder containing the source. e.g. cd ffmpeg-dmo-0.11
-  8. Run `./configure` to setup the source.
-  9. Run `make && make install` to compile and install ffmpeg
-if you are not running as root like I am, then you will need to run the above command with sudo
-
+1. On the Raspberry Pi Build and configure [ffmpeg](http://ffmpeg.org/) on the Rapsberry Pi. It takes a while. I followed the instructions [here](http://sirlagz.net/2012/08/04/how-to-stream-a-webcam-from-the-raspberry-pi/). It takes a while. Below are the steps from that link.
  
-     
+  0. Make sure the camera is enabled on the Pi.
+  
+  ```
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo raspi-config
+  # Then follow the menu to enable the camera.
+  ```
+
+  1. Clone the repo and and build the binaries.
+    ```
+    cd /usr/src/
+    git clone git://source.ffmpeg.org/ffmpeg.git
+    sudo chown -R pi:users ffmpeg
+    cd ffmpeg
+    ./configure
+    make
+    make install
+    ```
+
 2. On the socket server install the stream-server.js script from https://github.com/phoboslab/jsmpeg
 	
     ```
@@ -371,6 +369,10 @@ http://ffmpeg.org/
 
 jsmpeg - A javscript stream decoder for websockets
 https://github.com/phoboslab/jsmpeg
+
+
+http://www.slickstreamer.info/2013/06/use-raspberrypi-csi-camera-module-to.html
+
 
 #### Troubleshooting
 
