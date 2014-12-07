@@ -255,9 +255,9 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
     git clone git://source.ffmpeg.org/ffmpeg.git
     sudo chown -R pi:users ffmpeg
     cd ffmpeg
-    ./configure
-    make
-    make install
+    ./configure    # This takes a minute or so. 
+    make           # This takes about 20 -30 mins
+    make install   # This takes several hours.
     ```
 
 2. On the socket server install the stream-server.js script from https://github.com/phoboslab/jsmpeg
