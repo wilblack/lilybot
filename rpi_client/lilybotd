@@ -6,11 +6,11 @@
 
 DAEMON_PATH="/home/pi/projects/lilybot/rpi_client"
 
-DAEMON=start_ardyh_client.sh
+DAEMON=start_lilybot.sh
 DAEMONOPTS=""
 
-NAME=ardyh_client
-DESC="This starts the ardyh_client"
+NAME=lilybot
+DESC="This starts the lilybot client"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 PORT=9010

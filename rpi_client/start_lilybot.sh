@@ -11,8 +11,9 @@ cd  /home/pi/projects/lilybot/rpi_client
 #sudo chmod 755 RPi_Server_Code.py
 
 NOW=$(date +"%Y-%m-%dT%T %Z")
-echo "[$NOW] Starting and arddyh client"
+echo "[$NOW] Starting and ardyh client"
 
-python ardyh_client.py
+modprobe i2c-bcm2708
+modprobe i2c-dev
 
-
+python main.py

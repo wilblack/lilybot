@@ -4,8 +4,8 @@ VERBOSE = True
 
 
 # The sensor reading DT in seconds. 
-UPDATE_SENSOR_DT = 0.5
-LOOP_CALLBACK_DT = 0.4
+UPDATE_SENSOR_DT = 1
+LOOP_CALLBACK_DT = 2
 
 SENSORS = []
 

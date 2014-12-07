@@ -12,3 +12,4 @@ pygame==1.9.1release
 tornado==3.2
 ws4py==0.3.4
 wsgiref==0.1.2
+httplib2==0.9

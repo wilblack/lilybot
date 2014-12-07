@@ -1,5 +1,5 @@
 """
-A Mdule to handle routing of commands and messages to the 
+A module to handle routing of commands and messages to the 
 various bot_roles and defined in bot_roles/.
 
 """
@@ -7,35 +7,52 @@ import json, ast
 from settings import VERBOSE, settings
 
 from bot_roles.core import Core
-from bot_roles.ctenophore import Ctenophore, MagicMushroom
-from bot_roles.jjbot import JJBot
 
 
 class Router(object):
 
-    def __init__(self):
+    def __init__(self, socket):
 
+        self.socket = socket
         self.ctenophore = False
         self.jjbot = False
         self.magic_mushroom = False
         self.grovebot = False
         bot_packages = settings['bot_packages']
 
-        self.core = Core()
+        self.core = Core(self.socket)
         if 'ctenophore' in bot_packages:
-            self.ctenophore = Ctenophore()
+            from bot_roles.ctenophore import Ctenophore
+            self.ctenophore = Ctenophore(socket)
 
         if 'jjbot' in bot_packages:
-            self.jjbot = JJBot()
+            from bot_roles.jjbot import JJBot
+            self.jjbot = JJBot(socket)
 
         if 'magic_mushroom' in bot_packages:
-            self.magic_mushroom = MagicMushroom()
+            from bot_roles.magic_mushroom import MagicMushroom
+            self.magic_mushroom = MagicMushroom(socket)
 
         if 'grovebot' in bot_packages:
             from bot_roles.grovebot import Grovebot
-            self.grovebot = Grovebot
+            self.grovebot = Grovebot(socket)
 
     def received_message(self, message):
+        """
+        Messages should be a JSON object with the following keywords
+
+        data : {
+            timestamp : "",
+            bot_name : "",
+            message : {
+                command
+                kwargs
+            }
+        }
+        
+
+        """
+
         if VERBOSE: print "[Router.received_message] Received message: %s" % (message)
         # Try to JSON deconde it
 
@@ -48,7 +65,6 @@ class Router(object):
             message = json.loads(message.data)
 
         if "command" in message.keys():
-
             cmd = message['command']
             kwargs = message.get('kwargs', {})
 
@@ -68,6 +84,10 @@ class Router(object):
 
             if self.magic_mushroom and cmd in self.magic_mushroom.commands:
                 getattr(self.magic_mushroom, cmd)(kwargs)
+                received = True
+
+            if self.grovebot and cmd in self.grovebot.commands:
+                getattr(self.grovebot, cmd)(kwargs)
                 received = True
 
             if not received:

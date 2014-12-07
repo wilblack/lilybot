@@ -1,6 +1,7 @@
 import time
 import subprocess
 
+from bot_roles.core import Core
 
 try:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
@@ -8,10 +9,12 @@ except:
     pass
 
 
-class JJBot(object):
-    pass
+class JJBot(Core):
 
-    def __init__(self):
+
+    def __init__(self, socket):
+        super(JJBot, self).__init__(socket)
+
         self.commands = ['forward', 
                          'stop', 
                          'reverse', 

@@ -51,6 +51,7 @@ The server listens on port 9093 by default
 1. Got to `lilybot/server`
 2. Run `python main.js`
 
+You can start the server in a screen session and then detach the screen.
 
 Stop Server
 ===========
