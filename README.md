@@ -250,16 +250,19 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
   ```
 
   1. Clone the repo and and build the binaries.
-    ```
-    cd /usr/src/
-    git clone git://source.ffmpeg.org/ffmpeg.git
-    sudo chown -R pi:users ffmpeg
-    cd ffmpeg
-    ./configure    # This takes a minute or so. 
-    make           # This takes about 20 -30 mins
-    make install   # This takes several hours.
-    ```
+    
+   ```
+   cd /usr/src/
+   git clone git://source.ffmpeg.org/ffmpeg.git
+   sudo chown -R pi:users ffmpeg
+   cd ffmpeg
+   ./configure    # This takes a minute or so. 
+   make           # This takes about 20 -30 mins
+   make install   # This takes several hours.
+   ```
 
+  To test this run `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | /usr/src/ffmpeg/ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv`. NOTE: Still need to add `ffmpeg` to the path.
+  
 2. On the socket server install the stream-server.js script from https://github.com/phoboslab/jsmpeg
 	
     ```
@@ -370,7 +373,7 @@ http://ffmpeg.org/
 jsmpeg - A javscript stream decoder for websockets
 https://github.com/phoboslab/jsmpeg
 
-
+Used this to install the second time.
 http://www.slickstreamer.info/2013/06/use-raspberrypi-csi-camera-module-to.html
 
 A post about stream at 30fps using rtmp. And a command to help debug `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv` 
