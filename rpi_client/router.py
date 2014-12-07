@@ -30,7 +30,7 @@ class Router(object):
             self.jjbot = JJBot(socket)
 
         if 'magic_mushroom' in bot_packages:
-            from bot_roles.magic_mushroom import MagicMushroom
+            from bot_roles.ctenophore import MagicMushroom
             self.magic_mushroom = MagicMushroom(socket)
 
         if 'grovebot' in bot_packages:

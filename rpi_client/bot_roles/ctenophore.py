@@ -146,7 +146,8 @@ class TimerThread(threading.Thread):
 
 class Ctenophore(Core):
     
-    def __init__(self):
+    def __init__(self, socket):
+        super(Ctenophore, self).__init__(socket)
 
         self.commands = ['setRGB', 'fillRGB', 'target', 'allOff' ]
 
@@ -242,9 +243,6 @@ class Ctenophore(Core):
         
             self.led.all_off()
 
-    
-
-
 
     def clearTarget(self, kwargs):
         self.ALL_STOP = False
@@ -259,7 +257,7 @@ class Ctenophore(Core):
 
         print test
         print self.history
-        if rs: 
+        if rs:
             print "PISSED"
         else:
             print "NOT PISSED"
@@ -271,7 +269,7 @@ class Ctenophore(Core):
         STAGE1 = 15
         STAGE2 = 30
         #self.led.all_off()
-        
+
         try:
             getattr(self, "%s_sensor_callback" %sensor_package)(sensor_values)
         except:
@@ -282,7 +280,7 @@ class Ctenophore(Core):
         #import pdb; pdb.set_trace()
         if sensor_values['slider'] == 1:
             self.led.fillRGB(255, 0, 255, 0, self.NLEDS)
-        
+
         if sensor_values['touch'] == 1:
             self.led.fillRGB(0, 255, 255, 0, self.NLEDS)
 
@@ -333,9 +331,9 @@ class MagicMushroom(Ctenophore):
     ctenophore in that its first STOCK_HEIGHT leds are used in the mushroom 
     'stock', the remaing are used in the mushroom 'cap'  
     """
-    
-    
-    def __init__(self):
+
+    def __init__(self, socket):
+        super(MagicMushroom, self).__init__(socket)
 
         self.commands = ['setRGB', 'fillRGB', 'target', 'allOff', 'color_cap', 'set_state' ]
 
