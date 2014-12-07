@@ -373,6 +373,10 @@ https://github.com/phoboslab/jsmpeg
 
 http://www.slickstreamer.info/2013/06/use-raspberrypi-csi-camera-module-to.html
 
+A post about stream at 30fps using rtmp. And a command to help debug `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv` 
+http://www.raspberrypi.org/forums/viewtopic.php?t=45368
+
+
 
 #### Troubleshooting
 
