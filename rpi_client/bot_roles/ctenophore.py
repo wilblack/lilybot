@@ -85,6 +85,35 @@ class BlinkThread (PassiveThread):
             print "******** STOP IT ************ %s" % self.name
 
 
+class MotionThread (PassiveThread):
+    """
+    To stop the thread set thread.stoprequest.set()
+    """
+
+    def run(self):
+        dt = 0.1
+        print "Starting thread %s" % (self.name)
+        offset = 0
+        while not self.stoprequest.isSet():
+            for i in range(0, self.ctenophore.NLEDS):
+                val = (i + offset) % self.ctenophore.NLEDS
+                if i % 3 == 0:
+                    color = "#AA0000"
+                elif i % 3 == 1:
+                    color = "#00AA00"
+                elif i % 3 == 2:
+                    color = "#AAAAAA"
+                r, g, b = hex2rgb(color)
+
+                self.ctenophore.led.setRGB(val, r, g, b)
+                offset = (offset + 1) % 3
+            self.ctenophore.led.update()
+            time.sleep(0.1)
+
+        if self.stoprequest.isSet():
+            print "******** STOP IT ************ %s" % self.name
+
+
 class XmasFadeThread (PassiveThread):
     """
     A thread the blinks every so often
@@ -98,16 +127,16 @@ class XmasFadeThread (PassiveThread):
         dt = 0.1
         print "Starting thread %s" % (self.name)
         while not self.stoprequest.isSet():
-            for i in range(15, 256, 5):
+            for i in range(20, 256, 5):
                 r, g, b = [c*i for c in colors[colorIndex]]
                 self.ctenophore.led.fillRGB(r, g, b, 0, self.ctenophore.NLEDS)
                 self.ctenophore.led.update()
                 if self.stoprequest.isSet(): break
                 time.sleep(dt)
-            
+
             if self.stoprequest.isSet(): break
 
-            for i in range(250, 14, -5):
+            for i in range(250, 19, -5):
                 r, g, b = [c*i for c in colors[colorIndex]]
                 self.ctenophore.led.fillRGB(r, g, b, 0, self.ctenophore.NLEDS)
                 self.ctenophore.led.update()
@@ -201,23 +230,23 @@ class Ctenophore(Core):
         self.start_sequence()
 
         # Create a single input and a single output queue for all threads.
-        output_queue = Queue.Queue()
+        #output_queue = Queue.Queue()
         # Start passive thread
-        self.passiveThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
+        #self.passiveThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
         #self.passiveThread.setDaemon(True)
-        self.passiveThread.start()
+        #self.passiveThread.start()
 
-        output_queue2 = Queue.Queue()
-        self.blinkThread = BlinkThread("Blink Thread", self, output_queue, self.NLEDS)
-        self.blinkThread.start()
+        #output_queue2 = Queue.Queue()
+        #self.blinkThread = BlinkThread("Blink Thread", self, output_queue, self.NLEDS)
+        #self.blinkThread.start()
 
-        output_queue3 = Queue.Queue()
-        self.blinkThread2 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
-        self.blinkThread2.start()
+        # output_queue3 = Queue.Queue()
+        # self.blinkThread2 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
+        # self.blinkThread2.start()
 
-        output_queue4 = Queue.Queue()
-        self.blinkThread3 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
-        self.blinkThread3.start()
+        # output_queue4 = Queue.Queue()
+        # self.blinkThread3 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
+        # self.blinkThread3.start()
 
     def start_sequence(self):
         if VERBOSE: print "Initializing %s LEDS" % (self.NLEDS)
@@ -572,15 +601,21 @@ class MagicMushroom(Ctenophore):
         elif state == '#xmas':
             for i in range(0, self.NLEDS):
                 if i % 3 == 0:
-                    color = "#FF0000"
+                    color = "#AA0000"
                 elif i % 3 == 1:
-                    color = "#00FF00"
+                    color = "#00AA00"
                 elif i % 3 == 2:
-                    color = "#FFFFFF"
+                    color = "#AAAAAA"
                 r, g, b = hex2rgb(color)
 
                 self.setRGB({"color": color, "index": i})
             self.led.update()
+
+        elif state == '#xmas-motion':
+            output_queue = Queue.Queue()
+            thread = MotionThread("Motion Thread", self, output_queue, self.NLEDS)
+            thread.start()
+            self.currentThread = thread
 
         elif state == '#xmas-fade':
             output_queue = Queue.Queue()
