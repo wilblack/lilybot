@@ -9,7 +9,7 @@ from math import floor
 from bot_roles.core import Core
 
 from settings import *
-from utils import hex2rgb
+from utils import hex2rgb, rgb2hex
 
 try:
     print "Loading RPi-LPD8806"
@@ -66,20 +66,58 @@ class PassiveThread (threading.Thread):
 class BlinkThread (PassiveThread):
     """
     A thread the blinks every so often
+
+    To stop the thread set thread.stoprequest.set()
     """
 
     def run(self):
-        print "Starting thread %s" %(self.name)
+        print "Starting thread %s" % (self.name)
         while not self.stoprequest.isSet():
-            color = ('#%06X' % randint(0,256**3-1))
-            index = randint(0,self.nleds)
+            color = ("#%06X" % randint(0, 256**3-1))
+            index = randint(0, self.nleds)
 
-            self.ctenophore.setRGB({"color":color, "index":index})
-            time.sleep(randint(3,20))
-            self.ctenophore.setRGB({"color":"#000000", "index":index})
+            self.ctenophore.setRGB({"color": color, "index": index})
+            time.sleep(randint(3, 20))
+            if not self.stoprequest.isSet():
+                self.ctenophore.setRGB({"color": "#000000", "index": index})
 
-            DT = randint(2, 4)
-            #time.sleep(DT)              # sleep for 200 ms
+        if self.stoprequest.isSet():
+            print "******** STOP IT ************ %s" % self.name
+
+
+class XmasFadeThread (PassiveThread):
+    """
+    A thread the blinks every so often
+
+    To stop the thread set thread.stoprequest.set()
+    """
+
+    def run(self):
+        colors = [[1,0,0], [0,1,0], [1,1,1]]
+        colorIndex = 0;
+        dt = 0.1
+        print "Starting thread %s" % (self.name)
+        while not self.stoprequest.isSet():
+            for i in range(15, 256, 5):
+                r, g, b = [c*i for c in colors[colorIndex]]
+                self.ctenophore.led.fillRGB(r, g, b, 0, self.ctenophore.NLEDS)
+                self.ctenophore.led.update()
+                if self.stoprequest.isSet(): break
+                time.sleep(dt)
+            
+            if self.stoprequest.isSet(): break
+
+            for i in range(250, 14, -5):
+                r, g, b = [c*i for c in colors[colorIndex]]
+                self.ctenophore.led.fillRGB(r, g, b, 0, self.ctenophore.NLEDS)
+                self.ctenophore.led.update()
+                if self.stoprequest.isSet(): break
+                time.sleep(dt)
+
+            colorIndex = (colorIndex + 1) % (len(colors))
+
+        if self.stoprequest.isSet():
+            print "******** STOP IT ************ %s" % self.name
 
 
 class CommandThread(threading.Thread):
@@ -90,7 +128,7 @@ class CommandThread(threading.Thread):
     Usage:
     myTrhead = CommandThread("Blink Thread 1", ctenphore, output_queue, nleds)
 
-    Params: 
+    Params:
         - ctenphore instance of eather Ctenophore or MagicMushroom
         - output_queue - Not really sure what this is used for
          nleds - The number of LEDS to use for lighting.
@@ -135,7 +173,7 @@ class TimerThread(threading.Thread):
 
     def run(self):
         print "\n\n[TimerThread.run())]"
-        
+
         while not self.stoprequest.isSet():
             inactive_dt = dt.now() - self.ctenophore.last_state_change
             if inactive_dt.seconds > 20:
@@ -145,7 +183,7 @@ class TimerThread(threading.Thread):
 
 
 class Ctenophore(Core):
-    
+
     def __init__(self, socket):
         super(Ctenophore, self).__init__(socket)
 
@@ -159,14 +197,8 @@ class Ctenophore(Core):
         self.led.all_off()
         self.history = [255, 255, 255]
         if VERBOSE: print "Initializing %s LEDS" %(self.NLEDS)
-        
-        for i in range(0, self.NLEDS):
-            self.led.setRGB(i, 0,0,255)
-            self.led.setRGB(self.NLEDS - i, 0, 255, 0)
-            self.led.update()
-            sleep(0.01)
-            self.led.all_off()
 
+        self.start_sequence()
 
         # Create a single input and a single output queue for all threads.
         output_queue = Queue.Queue()
@@ -186,6 +218,15 @@ class Ctenophore(Core):
         output_queue4 = Queue.Queue()
         self.blinkThread3 = BlinkThread("Blink Thread 2", self, output_queue, self.NLEDS)
         self.blinkThread3.start()
+
+    def start_sequence(self):
+        if VERBOSE: print "Initializing %s LEDS" % (self.NLEDS)
+        for i in range(self.NLEDS/2 - 12, self.NLEDS/2 + 12):
+            self.led.setRGB(i, 0, 255, 255)
+            self.led.setRGB(self.NLEDS - i, 255, 255, 0)
+            self.led.update()
+            sleep(0.01)
+            self.led.all_off()
 
     def setRGB(self, kwargs):
         r, g, b = hex2rgb(kwargs["color"])
@@ -223,13 +264,13 @@ class Ctenophore(Core):
         self.led.all_off()
         nrepeat = 4
         dt = 0.2
-        
+
         width = int(kwargs.get('width', '5'))   # Total length will be 2 8 width + 1
         index = int(kwargs["index"])
 
 
         for j in range(nrepeat):
-            
+
             for i in range(width, 0, -1):
                 lefti = index - i
                 righti = index + i
@@ -240,7 +281,6 @@ class Ctenophore(Core):
                     self.led.setRGB(lefti, 255,  0, 0)
                 self.led.update()
                 sleep(dt)
-        
             self.led.all_off()
 
 
@@ -362,17 +402,9 @@ class MagicMushroom(Ctenophore):
         self.timerThread = []
 
 
-        if VERBOSE: print "Initializing %s LEDS" % (self.NLEDS)
-        for i in range(self.NLEDS/2 - 12, self.NLEDS/2 + 12):
-            self.led.setRGB(i, 0, 255, 255)
-            self.led.setRGB(self.NLEDS - i, 255, 255, 0)
-            self.led.update()
-            sleep(0.01)
-            self.led.all_off()
-
         # Initially set stat to the random state.
         self.state = ''
-        kwargs = {'state':'#random'}
+        kwargs = {'state': DEFAULT_STATE}
         self.set_state(kwargs)
 
     def grovebot_sensor_callback(self, sensor_values):
@@ -502,17 +534,17 @@ class MagicMushroom(Ctenophore):
 
         state = kwargs['state']
         print "[MagicMushroom.set_state()] with state", state
-        
-        
+
         print "[set_state] Turning everything off"
         self.allOff({})
-        
+
         if self.currentThread:
             self.currentThread.stoprequest.set()
-        
+
         for thread in self.blinkThreads:
+            print "[set_state] setting stoprequest on %s" % thread
             thread.stoprequest.set()
-        self.blinkThread = []
+        self.blinkThreads = []
 
         if state == '#off':
             return
@@ -523,12 +555,6 @@ class MagicMushroom(Ctenophore):
                 thread = BlinkThread("Blink Thread %s" %i, self, output_queue, self.NLEDS)
                 thread.start()
                 self.blinkThreads.append(thread)
-
-            # output_queue = Queue.Queue()
-            # self.currentThread = PassiveThread("Passive Thread", self, output_queue, self.NLEDS)
-            # self.currentThread.start()
-            # self.blinkThreads.append(thread)
-
 
         elif state == '#red-white-blue':
             for i in range(0, self.NLEDS):
@@ -543,18 +569,24 @@ class MagicMushroom(Ctenophore):
                 self.setRGB({"color": color, "index": i})
             self.led.update()
 
-
         elif state == '#xmas':
             for i in range(0, self.NLEDS):
-                if i % 2 == 0:
+                if i % 3 == 0:
                     color = "#FF0000"
-                elif i % 2 == 1:
+                elif i % 3 == 1:
                     color = "#00FF00"
+                elif i % 3 == 2:
+                    color = "#FFFFFF"
                 r, g, b = hex2rgb(color)
 
                 self.setRGB({"color": color, "index": i})
             self.led.update()
 
+        elif state == '#xmas-fade':
+            output_queue = Queue.Queue()
+            thread = XmasFadeThread("Xmas Fade Thread", self, output_queue, self.NLEDS)
+            thread.start()
+            self.currentThread = thread
 
         elif state == '#green-purple':
             for i in range(0, self.NLEDS):
@@ -568,12 +600,10 @@ class MagicMushroom(Ctenophore):
 
             self.led.update()
 
-
         elif state == '#glow-warm':
 
             self.led.fillRGB(r, g, b, self.STOCK_HEIGHT+1, self.NLEDS)
             self.led.update()
-
 
         else:
             # Assume is a hex-color

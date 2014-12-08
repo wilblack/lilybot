@@ -21,3 +21,11 @@ def get_mac_address():
 def hex2rgb(hex):
     return [ord(c) for c in hex[1:].decode("hex")]
 
+def rgb2hex(rgb):
+  """
+  Inputs:
+  rgb - A tuple or list of length 3 with each item an iteger between
+        0 and 255.
+
+  """
+  return "#%02X%02X%02X" % rgb
