@@ -26,7 +26,7 @@ from utils import get_mac_address
 
 if "jjbot" in settings["bot_packages"]:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
-    
+
 
 if 'grovebot' in settings["bot_packages"]:
     from bot_roles.grovebot import *
@@ -35,14 +35,14 @@ if 'grovebot' in settings["bot_packages"]:
 class ArdyhClient(TornadoWebSocketClient):
     """
     Web Socket client to connect to ardyh on start up.
-    
-    Data is passed back and forth using a message object. 
+
+    Data is passed back and forth using a message object.
     the message object is a JSON Object with the following keywords
 
     - message
     -- name
     -- from
-    -- channel 
+    -- channel
     -- message
     -- command
     -- ardyh_timestamp - May not be present
@@ -50,15 +50,13 @@ class ArdyhClient(TornadoWebSocketClient):
     """
 
     def __init__(self, protocols, uri='ws://173.255.213.55:9093/ws?'):
-        rs = super(ArdyhClient, self).__init__(uri, protocols)
+        super(ArdyhClient, self).__init__(uri, protocols)
 
         self.ARDYH_URI = uri
         self.LOG_DTFORMAT = "%Y-%m-%dT%H:%M:%SZ"
         self.channel = settings['bot_name']
         self.bot_name = settings['bot_name']
         self.bot_roles = settings['bot_roles']
-
-        #self.core = Core(self)
         self.router = Router(self)
 
     def send_handshake(self):
@@ -90,8 +88,8 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def send(self, message):
         """
-        
-        Messages should be of the form 
+
+        Messages should be of the form
         data : {
             timestamp : "",
             bot_name : "",
