@@ -284,6 +284,16 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	```
 	[video4linux2,v4l2 @ 0x1f6e450] Cannot open video device /dev/video0: No such file or directory /dev/video0: No such file or directory
 	```
+	
+	Trying this to resolve it by installing [uv4l and uvl4l-raspicam](http://www.linux-projects.org/modules/sections/index.php?op=viewarticle&artid=14). Be sure and install the uv4l-raspicam-extras
+	
+	After that I got the follwoing error
+	```
+	[video4linux2,v4l2 @ 0x1b07450] The device does not support the streaming I/O method. 
+	/dev/video0: Function not implemented
+	```
+	
+	
 4. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
 
 ##### Troubleshooting
