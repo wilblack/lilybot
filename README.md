@@ -233,8 +233,9 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
 	
 	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
-	
+
 	```
+
 #### Method 2 - Websockets streaming with ffmpeg
 
 
@@ -257,11 +258,14 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
    sudo chown -R pi:users ffmpeg
    cd ffmpeg
    ./configure    # This takes a minute or so. 
-   make           # This takes about 20 -30 mins
-   make install   # This takes several hours.
+   make           # This takes about 3+ hours
+   make install
    ```
 
-  To test this run `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | /usr/src/ffmpeg/ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv`. NOTE: Still need to add `ffmpeg` to the path.
+  To test this run 
+  `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | /usr/src/ffmpeg/ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv`. 
+  
+  NOTE: Still need to add `ffmpeg` to the path.
   
 2. On the socket server install the stream-server.js script from https://github.com/phoboslab/jsmpeg
 	
@@ -269,9 +273,53 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
     npm install ws
     node stream-server.js yourpassword
     ```
-3. Install ffmpeg on Raspberry Pi. Point it at ardyh.
+3. Then on the Raspberry Pi start the camera.
 	```
-	ffmpeg -s 640x480 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://example.com:8082/yourpassword/640/480/
+	ffmpeg -s 320x240 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://localhost:8082/password/320/240/
+
+	```
+	
+	I got this error 
+	
+	```
+	[video4linux2,v4l2 @ 0x1f6e450] Cannot open video device /dev/video0: No such file or directory /dev/video0: No such file or directory
+	```
+	
+	Trying this to resolve it by installing [uv4l and uvl4l-raspicam](http://www.linux-projects.org/modules/sections/index.php?op=viewarticle&artid=14). Be sure and install the uv4l-raspicam-extras
+	
+	After that I got the follwoing error
+	```
+	[video4linux2,v4l2 @ 0x1b07450] The device does not support the streaming I/O method. 
+	/dev/video0: Function not implemented
+	```
+	
+	So this fixed that, see [here](http://www.raspberrypi.org/forums/viewtopic.php?t=50639)
+	```
+	uv4l --driver raspicam --auto-video_nr --extension-presence=1
+	```
+	
+	But now I get this output
+	```
+	ffmpeg version N-68269-g74080de Copyright (c) 2000-2014 the FFmpeg developers
+  	built on Dec  7 2014 03:31:56 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+  	configuration: 
+  	libavutil      54. 15.100 / 54. 15.100
+  	libavcodec     56. 14.100 / 56. 14.100
+  	libavformat    56. 15.102 / 56. 15.102
+  	libavdevice    56.  3.100 / 56.  3.100
+  	libavfilter     5.  2.103 /  5.  2.103
+  	libswscale      3.  1.101 /  3.  1.101
+  	libswresample   1.  1.100 /  1.  1.100
+	[video4linux2,v4l2 @ 0x2c91450] Time per frame unknown
+	[video4linux2,v4l2 @ 0x2c91450] mmap: No such device
+	/dev/video1: No such device
+	```
+	
+	A reboot seems to fix that, but I had to run `uv4l --driver raspicam --auto-video_nr --extension-presence=1` on reboot.
+	Now I am getting
+	
+	```
+	
 	```
 
 4. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
