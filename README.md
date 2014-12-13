@@ -275,7 +275,7 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
     ```
 3. Then on the Raspberry Pi start the camera.
 	```
-	ffmpeg -s 640x480 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://localhost:8082/password/640/480/
+	ffmpeg -s 320x240 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://localhost:8082/password/320/240/
 
 	```
 	
@@ -298,7 +298,7 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	uv4l --driver raspicam --auto-video_nr --extension-presence=1
 	```
 	
-	But no I get this output
+	But now I get this output
 	```
 	ffmpeg version N-68269-g74080de Copyright (c) 2000-2014 the FFmpeg developers
   	built on Dec  7 2014 03:31:56 with gcc 4.6 (Debian 4.6.3-14+rpi1)
@@ -315,6 +315,13 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	/dev/video1: No such device
 	```
 	
+	A reboot seems to fix that, but I had to run `uv4l --driver raspicam --auto-video_nr --extension-presence=1` on reboot.
+	Now I am getting
+	
+	```
+	
+	```
+
 4. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
 
 ##### Troubleshooting
