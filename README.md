@@ -293,6 +293,27 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	/dev/video0: Function not implemented
 	```
 	
+	So this fixed that, see [here](http://www.raspberrypi.org/forums/viewtopic.php?t=50639)
+	```
+	uv4l --driver raspicam --auto-video_nr --extension-presence=1
+	```
+	
+	But no I get this output
+	```
+	ffmpeg version N-68269-g74080de Copyright (c) 2000-2014 the FFmpeg developers
+  	built on Dec  7 2014 03:31:56 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+  	configuration: 
+  	libavutil      54. 15.100 / 54. 15.100
+  	libavcodec     56. 14.100 / 56. 14.100
+  	libavformat    56. 15.102 / 56. 15.102
+  	libavdevice    56.  3.100 / 56.  3.100
+  	libavfilter     5.  2.103 /  5.  2.103
+  	libswscale      3.  1.101 /  3.  1.101
+  	libswresample   1.  1.100 /  1.  1.100
+	[video4linux2,v4l2 @ 0x2c91450] Time per frame unknown
+	[video4linux2,v4l2 @ 0x2c91450] mmap: No such device
+	/dev/video1: No such device
+	```
 	
 4. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
 
