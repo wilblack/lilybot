@@ -273,14 +273,27 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
     npm install ws
     node stream-server.js yourpassword
     ```
-3. Then on the Raspberry Pi start the camera.
-	```
-	ffmpeg -s 320x240 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://localhost:8082/password/320/240/
 
-	```
-	
-	I got this error 
-	
+3. Then on the Raspberry Pi start the camera. You will need to change `<server-domain>` to the appropriate streaming server. 
+  
+
+  ```sh
+  # This command is necessary to start the Raspberry Pi camera
+  raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | /usr/src/ffmpeg/ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv
+
+  # This starts the camera in the appropriate mode for streaming
+  uv4l --driver raspicam --auto-video_nr --extension-presence=1
+
+  # This command actually starts ffmpeg which encodes the video to mpeg1 format and streams the output to a streaming server.
+  ffmpeg -s 320x240 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://<server-domina>:8082/password/320/240/
+
+  ```
+  
+
+
+  ### Troubleshooting.
+  I got this error 
+  
 	```
 	[video4linux2,v4l2 @ 0x1f6e450] Cannot open video device /dev/video0: No such file or directory /dev/video0: No such file or directory
 	```
