@@ -644,3 +644,5 @@ Helpful Links
 
 * Port Diagram http://www.dexterindustries.com/BrickPi/getting-started/attaching-lego/
 * Articles on batteirs for the Rapsberry Pi
+* L298N Motor Control wiring diagram http://explainingcomputers.com/rasp_pi_robotics.html
+*  Model B+ (40 pin) GPIO Diagram http://www.rs-online.com/designspark/electronics/eng/blog/introducing-the-raspberry-pi-b-plus
