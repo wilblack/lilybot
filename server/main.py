@@ -76,7 +76,7 @@ class MainHandler(ArdyhWebRequestHandler):
                 row = {
                     'bot_name': l['bot_name'],
                     'bot_roles': l['bot_roles'],
-                    'mac': l['mac'],
+                    'mac': l.get('mac', ''),
                     'local_ip': l.get('local_ip', ''),
                     'subscriptions': l.get('subscriptions', ''),
                     'sensors': l.get('sensors', []),
@@ -259,7 +259,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
             bot.update({
                 'subscriptions':data['subscriptions'],
-                'mac': data['mac'],
+                'mac': data.get('mac', ''),
                 'local_ip': local_ip,
                 'sensors': sensors,
                 'bot_roles': data['bot_roles']
