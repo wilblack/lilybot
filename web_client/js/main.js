@@ -1,28 +1,27 @@
 window.bot_colormap = {
     'rp1.solalla.ardyh':'#FF0000',
     'rp2.solalla.ardyh':'#00FF00',
-    'rp3.solalla.ardyh':'#3366FF',
+    'rpi3.solalla.ardyh':'#3366FF',
     'monitor.solalla.ardyh':'#FFFF00',
     'ctenophore.solalla.ardyh':'#FF00FFf',
     'default':'#FFFFFF'
 }
 window.LOG_PAUSED=false;
 
-function updateSensorValues(sensor_values, sensor_package){
+function updateSensorValues(sensor_values){
     /*
     Input
     sensor_values - A list of lists with each inner of the from [PORTNAME, VALUE]
                     PORTNAME in 'PORT_1',..., 'PORT_4'
 
     */
-    
 
-    if (sensor_package === 'jjbot'){
-        $el = $("#sensor-values");
-        for (var i in sensor_values){
-           var port = sensor_values[i][0]
-           $el.find("."+port).html(sensor_values[i][1]);
-        }
+    var sensor_package = sensor_values.bot_package // This needs to be fixed.
+    
+    $el = $("#sensor-values");
+    for (var key in sensor_values){
+       var val = sensor_values[key]
+       $el.find("."+key).html(val);
     }
 
     if (sensor_package === 'grovebot') {
@@ -199,7 +198,7 @@ Ardyh = function(handshake_message){
     var self = this;
     this.handshake_message = handshake_message;
     this.DOMAIN = "162.243.146.219:9093"
-    this.camera_url = "http://192.168.1.140:8081"
+    this.camera_url = "http://192.168.1.103:8081"
     this.lilybot = new Lilybot();
     this.host = "";
     this.socket = null;
@@ -229,19 +228,21 @@ Ardyh = function(handshake_message){
                 - sensor_values
                 - new - This should have a camera IP address un the keyword 'camera_url'. 
                 */
-               
+                
+
                 try {
                   var data = JSON.parse(msg.data);
                   message = data.message;
                   bot_name = data.bot_name
-                  if ('sensor_values' in message) updateSensorValues(message.sensor_values, message.sensor_package)
+                  if ('sensor_values' === message.command) updateSensorValues(message.kwargs, message.sensor_package)
                   if ('new' in data) self.newConnection(data);
 
                 } catch (e) {
-                    self._log("Could not parse message")
-                    self._log(typeof(data))
+                    self._log("[Ardyh.onmossage()] Message in the wrong format.")
+                    self._log(msg.data)
                 }
                 
+
                 if(!LOG_PAUSED){
                      self._log(msg.data,bot_name);
                 }
@@ -494,13 +495,16 @@ function resize(){
     $("#secondary").height(secondaryH);
     
 
-
     // camera-content stuff.
     var W = $("#content").outerWidth();
     aspect_ratio = 640/480;
+    videoW = (0.7*W);
+    videoH = videoW/aspect_ratio;
 
-    $("#camera-1").width(0.7*W);
-    $("#camera-1").height(H - $(".top-bar").height() );
+    $("#camera-1").width(videoW);
+    $("#camera-1").height(videoH);
+
+    //$("#camera-1").height(H - $(".top-bar").height() );
     
     $("#log-wrapper").css("top", $(".top-bar").height() + $("#sensor-values").height());
     $("#log-wrapper, #sensor-values").width(0.7*W);

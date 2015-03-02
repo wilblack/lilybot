@@ -64,12 +64,17 @@ sudo apt-get install python-bluetooth -y
 sudo apt-get install python-smbus -y
 
 echo "\n\n*****************************\n"
-echo "Creating /home/projects/"
+echo "Creating ~/projects/ and ~/.ssh/"
 echo "\n*****************************\n"
 
+mkdir ~/,ssh
 cd /home/pi
 mkdir projects
-cd projects 
+cd projects
+
+
+
+
 
 
 echo "\n\n*****************************\n"
@@ -85,7 +90,6 @@ echo "Cloning git repos /home/projects/"
 echo "\n*****************************\n"
 
 git clone https://github.com/wilblack/lilybot.git
-
 
 echo "\n\n*****************************\n"
 echo "Setting ardyh_client to start on boot."
@@ -117,7 +121,7 @@ if [ $botPackage == "grovebot" ] ; then
     echo "You are about to launch the GrovePi installer from Dexter Industries."
     echo "You will need to start the SMBus after this reboots. See the lilybot"
     echo "README.md for instructions https://github.com/wilblack/lilybot"
-    echo "It boils down to running 2c-bcm2708 and i2c-dev then checking the device"
+    echo "It boils down to running i2c-bcm2708 and i2c-dev then checking the device"
     echo "with i2cdetect 1."
     echo ""
     echo "Press any key to continue."

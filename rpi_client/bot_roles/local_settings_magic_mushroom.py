@@ -10,3 +10,6 @@ settings= {
     
 }
 NLEDS = 32
+DEFAULT_STATE = "#xmas"
+UPDATE_SENSOR_DT = 5
+LOOP_CALLBACK_DT = 0.2

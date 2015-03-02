@@ -13,4 +13,7 @@ cd  /home/pi/projects/lilybot/rpi_client
 NOW=$(date +"%Y-%m-%dT%T %Z")
 echo "[$NOW] Starting and ardyh client"
 
+modprobe i2c-bcm2708
+modprobe i2c-dev
+
 python main.py
