@@ -37,7 +37,7 @@ class Router(object):
             from bot_roles.grovebot import Grovebot
             self.grovebot = Grovebot(socket)
 
-    def received_message(self, message):
+    def received_message(self, raw_message):
         """
         Messages should be a JSON object with the following keywords
 
@@ -53,17 +53,30 @@ class Router(object):
 
         """
 
-        if VERBOSE: print "[Router.received_message] Received message: %s" % (message)
+        
+        if VERBOSE: print "[Router.received_message] Received message: %s" % (raw_message)
         # Try to JSON deconde it
-
+        parsed = False
         try:
             # Using literal_eval to ahndle the unicoded keyword porblem.
-            message = ast.literal_eval(message.data)
+            message = ast.literal_eval(raw_message.data)
+            parsed = True
         except:
             # If that fails use the good old json.loads()
-            print "[Router.recieved_message()] Could not load message.data"
-            message = json.loads(message.data)
+            print "[Router.recieved_message()] Could not load raw_message.data with ast.literal_eval"
+        
+        if not parsed:
+            try:
+                message = json.loads(raw_message.data)
+                parsed = True
+            except:
+                print "[Router.recieved_message()] Could not load message.data with json.loads"
+                print "Ignoring message"
+                
+                print raw_message
+                return
 
+        
         if "command" in message.keys():
             cmd = message['command']
             kwargs = message.get('kwargs', {})
@@ -94,7 +107,8 @@ class Router(object):
                 print "%s not recognized as a valid command" % (cmd)
             return
 
-        if 'sensor_values' in message['message'].keys():
+        
+        if 'sensor_values' in message.keys():
             received = False
             if self.jjbot:
                 getattr(self.jjbot, 'sensor_callback')(message['message']['sensor_package'], message['message']['sensor_values'])
