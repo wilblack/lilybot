@@ -38,7 +38,7 @@ from backends.apigee import ApiGeeClient
 # Settings
 VERBOSE = True
 PORT = 9093
-LOG_DTFORMAT = "%Y-%m-%d %H:%M:%S"
+LOG_DTFORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 IP = "173.255.213.55"
 ARDYH_MONITOR = 'monitor.solalla.ardyh'
 
@@ -46,7 +46,7 @@ ARDYH_MONITOR = 'monitor.solalla.ardyh'
 listeners = []
 
 def get_bot_listener(bot_name):
-    return next( (bot for bot in listeners if bot['bot_name'] == bot_name), [] )
+    return next( ([i,bot] for i, bot in enumerate(listeners) if bot['bot_name'] == bot_name), [None, None] )
 
 
 class ArdyhWebRequestHandler(tornado.web.RequestHandler):
@@ -203,7 +203,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print "this is %s" %bot_name
 
         self.bot_name = bot_name
-        old_socket = get_bot_listener(bot_name)
+        i, old_socket = get_bot_listener(bot_name)
         if old_socket:
             old_socket.update({'socket':self})
         else:
@@ -252,8 +252,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             return
 
         if 'handshake' in data.keys():
+            print "*** HANDSHAKE ***"
             print "Updating %s's subscriptions to %s" %(data['bot_name'], data['subscriptions'])
-            bot = get_bot_listener(data['bot_name'])
+            i, bot = get_bot_listener(data['bot_name'])
             local_ip = data.get("local_ip", "")
             sensors = data.get("sensors", "")
 
@@ -264,7 +265,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 'sensors': sensors,
                 'bot_roles': data['bot_roles']
             })
-            self.broadcast(data['bot_name'], [], data)
+            listeners[i] = bot
+            self.to_subscribers(data['bot_name'], [], data)
             return
 
 
@@ -279,7 +281,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         ts = time.mktime(now.timetuple()) + now.microsecond * 1e-6
         rstore = data
 
-        self.broadcast(self.bot_name, [], data)
+        self.to_subscribers(self.bot_name, [], data)
 
     def on_close(self):
         print 'Lost a %s. connection closed.' % self.bot_name
@@ -288,65 +290,49 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
         self.log("Connection closed to %s" %(bot['bot_name']))
 
-    def broadcast(self, from_bot_name, channels, message):
+    def to_subscribers(self, from_bot_name, channels, message):
         """
         This will broadcast to all subscribers and monitors.
 
         Inputs
-        from - [String] the bot_name the message is coing from or 'ardyh'
+        from_bot_name - [String] the bot_name the message is coing from or 'ardyh'
         channels - [List] a list of channels to broadcast to, these are 
                    generally bot_names. These channels are in addtion to
                    the bots subscribers.
         message - [Dict] A message dict. A timestamp and the bot_name will be attached. 
+                    messages must have keys, command, kwargs.
 
-        A command message. 
-        -- command
-        -- kwargs
 
 
         """
 
-        bot = get_bot_listener(from_bot_name)
+        i, bot = get_bot_listener(from_bot_name)
         if not bot:
             self.log("bot %s not found." % from_bot_name)
 
-
         out = message
-
         timestamp = dt.now().strftime(LOG_DTFORMAT)
         out.update({
-            'timestamp': timestamp,
+            'ardyh_timestamp': timestamp,
             'bot_name': from_bot_name,
             'channels': channels
         })
 
-        
         # Get the subscribing bots and send the message
-        print "About to broadcast ", out
-        for sub in self.get_subscribers(from_bot_name):
-            try:
-                print "Broadcasting to %s" %(sub['bot_name'])
-                sub['socket'].write_message(out)
-            except AttributeError:
-                print "No socket found ", sub
-
-
-    def get_subscribers(self, channel):
-        """
-
-        Checks listeners for a bots with channel in their subscription list.
-        channel is usually a bot_name.
-
-        Returns:
-            If channel is falsy then the all listeners are returned else
-            returns a lit of listerns.
-
-        """
         
-        if channel:
-            return [bot for bot in listeners if channel in bot['subscriptions'] ]
-        else:
-            return listeners
+        subscribers = bot.get('subscriptions',[])
+        print "About to broadcast ", out
+        print "subscribers ", subscribers
+        for sub in subscribers:
+            try:
+                i, sub_listener = get_bot_listener(sub)
+                if sub_listener:
+                    print "Broadcasting to %s" %(sub_listener['bot_name'])
+                    sub_listener['socket'].write_message(out)
+                else:
+                    print "Listener not found for %s" %(sub)
+            except AttributeError:
+                print "No socket found ", sub_listener
 
 
     def log(self, message, mode=None):
@@ -371,13 +357,15 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if VERBOSE: print "message is a string"
             message = {"message":message, "ardyh_timestamp": "%s" %(now) }
 
-        bot = get_bot_listener(ARDYH_MONITOR)
+        i, bot = get_bot_listener(ARDYH_MONITOR)
         
         try:
             print "sending to %s" % (bot['bot_name'])
             bot['socket'].write_message(message)
         except AttributeError:
             print "No socket found ", bot
+        except:
+            print "Unkown error"
 
     def loopCallback(self):
       now = dt.now().strftime(LOG_DTFORMAT)
