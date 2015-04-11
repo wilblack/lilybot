@@ -7,6 +7,7 @@ VERBOSE = True
 UPDATE_SENSOR_DT = 1
 LOOP_CALLBACK_DT = 2
 
+ISO_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 SENSORS = []
 
 try:

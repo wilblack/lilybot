@@ -1,6 +1,7 @@
 import sys
-from settings import SENSORS
+from datetime import datetime as dt
 
+from settings import SENSORS, ISO_FORMAT
 from bot_roles.core import Core
 
 sys.path.append("/home/pi/projects/GrovePi/Software/Python")
@@ -135,7 +136,13 @@ class Grovebot(Core):
     def read_sensors(self, kwargs=None):
         print "in read_sensors"
         sensor_values = self.sensors.toDict()
-        sensor_values.update({'bot_package':'grovebot'})
+        timestamp = dt.now().strftime(ISO_FORMAT)
+        sensor_values.update({
+            'bot_package':'grovebot',
+            'timestamp': timestamp
+
+        })
+
         out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
         self.socket.send(out)
 

@@ -85,6 +85,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def received_message(self, message):
         self.router.received_message(message)
+        print "[main.received_message]"
 
     def send(self, message):
         """
@@ -100,7 +101,7 @@ class ArdyhClient(TornadoWebSocketClient):
         }
 
         """
-        if VERBOSE: print "[ArdyhClient.send] Trying to send message:\n\n%s" %(message)
+        
         timestamp = now = dt.now().strftime(self.LOG_DTFORMAT)
         message.update({
             "bot_name":self.bot_name,
@@ -108,7 +109,7 @@ class ArdyhClient(TornadoWebSocketClient):
         })
 
         message = json.dumps(message)
-        if VERBOSE: print "[ArdyhClient.send] Send message:\n\n%s" %(message) 
+        if VERBOSE: print "[ArdyhClient.send] Sending message:\n\n%s" %(message) 
         try:
             super(ArdyhClient, self).send(message)
         except:
@@ -117,6 +118,7 @@ class ArdyhClient(TornadoWebSocketClient):
 
     def closed(self, code, reason=None):
         print "Closed down"
+        print reason
         #import pdb; pdb.set_trace()
         #self.connect()
         ioloop.IOLoop.instance().stop()
