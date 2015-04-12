@@ -33,7 +33,7 @@ import tornado.web
 import tornado.websocket
 import tornado.template
 
-from backends.apigee import ApiGeeClient
+from backends.sqlite_api import Api
 
 # Settings
 VERBOSE = True
@@ -182,6 +182,38 @@ class MagicMushroomHandler(ArdyhWebRequestHandler):
         self.write("Received action %s with kwargs %s" % (action, kwargs))
 
 
+class SensorValuesHandler(ArdyhWebRequestHandler):
+    """
+    
+    /sensor-values/<bot_name>/?limit=500
+
+    /sensor-values/<bot_name>/?limit=500&start=ISO_TIMESTAMP&end=ISO_TIMESTAMP
+    
+    """
+    # def set_default_headers(self):
+    #     self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
+    #     self.set_header("Access-Control-Allow-Origin", "http://ctenophore.solalla.com")
+
+    def get(self, action):
+        self.set_allow_origin(self.request)
+
+        
+        bot_name = action.strip("/")
+        
+        params = {}
+        pieces = self.request.query.split("&")
+        for piece in pieces:
+            key, val = piece.split('=')
+            params.update({key: val})
+        self.api = Api()
+
+        filters = {
+            "bot_name": bot_name,
+        }
+        
+        res = self.api.get("", filters)
+        
+        self.write(json.dumps(res))
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, uri, protocols):
@@ -191,7 +223,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.portA_fifo = collections.deque(5*[255], 5)
         self.busy = False # Tells the ardyh to stop sending messages to listener, useful while executing a command
         self.operationa_mode = "user_controlled"
-        self.api = ApiGeeClient()
+        self.api = Api()
 
     def open(self):
         print 'connection opened...'
@@ -267,6 +299,12 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             })
             listeners[i] = bot
             self.to_subscribers(data['bot_name'], [], data)
+
+            # Get or create the api resource.
+            self.api.create_table(bot['bot_name'])
+
+
+
             return
 
 
@@ -274,6 +312,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             message = data['message']
             if 'command' in message and message['command'] == 'sensor_values':
                 res = self.api.post('sensor_values', data)
+
 
 
         # save message to redis
@@ -411,6 +450,7 @@ application = tornado.web.Application([
       (r'/(bots-list)', MainHandler),
       (r'/twine/(.*)', TwineHandler),
       (r'/magic-mushroom/(.*)', MagicMushroomHandler),
+      (r'/sensor-values/(.*)/', SensorValuesHandler),
       (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
     ])
 
@@ -418,10 +458,11 @@ application = tornado.web.Application([
 if __name__ == "__main__":
     r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
+    
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(PORT) 
     #application.listen(PORT)
     
-    print "Starting server at %s:%s" %(IP, PORT)          #starts the websockets connection
+    print "Starting HTTP server at %s:%s" %(IP, PORT)          #starts the websockets connection
     tornado.ioloop.IOLoop.instance().start()
   
