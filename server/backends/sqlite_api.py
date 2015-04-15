@@ -41,7 +41,10 @@ class Api(ApiClientBase):
         """
 
         bot_name = filters['bot_name'].replace(".", "_")
-        qs = 'SELECT * FROM %s' %(bot_name)
+        limit = filters.get("limit", 10);
+        qs = 'SELECT * FROM  %s ORDER BY datetime("timestamp") DESC LIMIT %s' %(bot_name, limit)
+
+
         self.cursor.execute(qs)
         raw = self.cursor.fetchall()
         self.conn.commit()

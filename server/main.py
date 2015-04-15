@@ -52,10 +52,12 @@ def get_bot_listener(bot_name):
 class ArdyhWebRequestHandler(tornado.web.RequestHandler):
 
     def set_allow_origin(self, request):
-        origin_domain = self.request.headers.get("Origin", None)        
+        origin_domain = self.request.headers.get("Origin", None)
+        
         if origin_domain:
             self.set_header("Access-Control-Allow-Origin", origin_domain)
-
+        else:
+            self.set_header("Access-Control-Allow-Origin", "*")
 
 class MainHandler(ArdyhWebRequestHandler):
 
@@ -196,20 +198,19 @@ class SensorValuesHandler(ArdyhWebRequestHandler):
 
     def get(self, action):
         self.set_allow_origin(self.request)
-
         
         bot_name = action.strip("/")
         
-        params = {}
+        filters = {}
         pieces = self.request.query.split("&")
         for piece in pieces:
             key, val = piece.split('=')
-            params.update({key: val})
+            filters.update({key: val})
         self.api = Api()
 
-        filters = {
+        filters.update({
             "bot_name": bot_name,
-        }
+        })
         
         res = self.api.get("", filters)
         
