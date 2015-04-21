@@ -1,4 +1,6 @@
-import sqlite3, json
+import sqlite3
+
+import simplejson as json
 
 from backends import ApiClientBase
 
@@ -91,6 +93,13 @@ class Api(ApiClientBase):
 
         self.cursor.execute(qs)
         self.conn.commit()
+
+    def remove_old_entries(self, timeframe):
+        now = dt.now()
+        if timeframe == '7days':
+            ts = now - timedelta(days=7)
+        
+
 
 
     def _remove_table(self, bot_name):

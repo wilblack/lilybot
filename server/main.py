@@ -19,7 +19,7 @@ Oct. 26, 2013
 
 
 """
-import sys, json, ast
+import sys, json, ast, math
 import time 
 import collections
 import datetime
@@ -211,9 +211,22 @@ class SensorValuesHandler(ArdyhWebRequestHandler):
         filters.update({
             "bot_name": bot_name,
         })
-        
+
         res = self.api.get("", filters)
-        
+
+        for row  in res:
+            temp = row['data']['temp']
+            if math.isnan(temp):
+                print "Changing nan to None"
+                row['data']['temp'] = None
+
+            humidity = row['data']['humidity']
+            if math.isnan(humidity):
+                print "Changing nan to None"
+                row['data']['humidity'] = None
+
+
+
         self.write(json.dumps(res))
 
 class WSHandler(tornado.websocket.WebSocketHandler):
