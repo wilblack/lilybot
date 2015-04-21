@@ -1,4 +1,4 @@
-import sys
+import sys, traceback
 from datetime import datetime as dt
 
 from settings import SENSORS, ISO_FORMAT
@@ -81,6 +81,9 @@ class GrovePiSensorValues:
                 pass
             except ValueError:
                 pass
+            except:
+                print "Error in pir read."
+                traceback.print_exc(file=sys.stdout)
 
         # This is the dht sensor port
         if 'temp' in self.sensors_types and 'humidity' in self.sensors_types:
