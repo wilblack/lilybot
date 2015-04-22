@@ -2,7 +2,7 @@
 
 #lilybot
 
-The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics, primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
+The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics and Internet of Things (IoT) projects. This is primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
 
 The software components of lilybot consist of three main functions.
 
@@ -30,13 +30,25 @@ are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connec
 An LED Strip controller. This exposes a web api to control these https://www.adafruit.com/products/306
 
 ### GroveBot
-bot_package: groverbot
-A lilbary to interface with the GrovePi and its sensors.
+*bot_package*: groverbot
 
-#### Hardware
-* 1 GrovePi 
-* 1 Grove Temperature and Humidity Pro plugged into port D4 on the GrovePi.
-* 1 Grove Light Sensor plugged into port A2 on the GrovePi.
+A lilbary to interface with the GrovePi and its sensors.
+Curently supported sensors. You will need a GrovePi and various sensors for this.
+ 
+
+| Sensor                | Port |
+|-----------------------|------|
+| Temp and Humidity Pro | D4   |
+| Light                 | A2   |
+| Sound                 | A1   |
+| Touch                 | D7   |
+| PIR                   | D3   |
+
+
+If you have problems see [troublshooting](#GrovePi Troubleshooting)
+
+
+
 
 ### Magic Mushroom
 An LED Strip web app that comes with serveral preset colors and light patterns. Demo URL
@@ -146,19 +158,46 @@ Add the following line to `/etc/crontab`
 *    * * *   root    /home/pi/projects/lilybot/rpi_client/restart.sh > /home/pi/restart.log
 ```
 
-### Troubleshooting
+###GrovePi Troubleshooting
 
-If you are having trouble with the SMBus you can user `sudo i2cdetect 0` to debug.
+*On Grovebot the PIR sensor does not work.*
+If you are having trouble with the SMBus (for the light sensor on Grovebot for instance) you can user `i2cdetect` to debug.
 
 ```
 # Query for the device. You may need to check 0 also. 
 sudo i2cdetect 1
+```
 
+You should get something that looks like below, if you don't, try a different device number.
+
+
+```
+pi@rpi2 ~ $ sudo i2cdetect 1
+WARNING! This program can confuse your I2C bus, cause data loss and worse!
+I will probe file /dev/i2c-1.
+I will probe address range 0x03-0x77.
+Continue? [Y/n] Y
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:          -- 04 -- -- -- -- -- -- -- -- -- -- -- 
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+70: -- -- -- -- -- -- -- --           
+```
+
+Then run the following
+
+```
 # Not sure what this does.
 sudo modprobe i2c-bcm2708
-
 sudo modprobe i2c-dev
 lsmod
+
+# Then reboot
+sudo shutdown -r now
 ```
 
 
