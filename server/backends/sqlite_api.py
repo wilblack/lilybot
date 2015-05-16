@@ -37,14 +37,24 @@ class Api(ApiClientBase):
         - resource - [String] not used
         - filters: [Dict] keywords
             - bot_name: [String]
-            - start: [ISO 8601 datetime string]
-            - end: [ISO 8601 datetime string]
+            - timestamp_gte: [ISO 8601 datetime string]
+
+
+
+        Examples 
+        api.get("",{"bot_name":"rpi2_solalla_ardyh", 'timestamp_gte':'2015-05-15T01:00:00.0Z'})
 
         """
 
         bot_name = filters['bot_name'].replace(".", "_")
-        limit = filters.get("limit", 10);
-        qs = 'SELECT * FROM  %s ORDER BY datetime("timestamp") DESC LIMIT %s' %(bot_name, limit)
+        limit = filters.get("limit", 5000);
+        qs = 'SELECT * FROM  %s' %(bot_name)
+
+        if 'timestamp_gte' in filters.keys():
+            qs = qs + ' WHERE DATETIME("timestamp") > "%s"' %(filters['timestamp_gte'])
+
+        qs = qs + ' ORDER BY datetime("timestamp") DESC LIMIT %s' %(limit)
+        print qs
 
 
         self.cursor.execute(qs)

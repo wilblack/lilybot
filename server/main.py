@@ -206,8 +206,8 @@ class SensorValuesHandler(ArdyhWebRequestHandler):
         for piece in pieces:
             key, val = piece.split('=')
             filters.update({key: val})
+        
         self.api = Api()
-
         filters.update({
             "bot_name": bot_name,
         })
