@@ -89,7 +89,7 @@ class GrovePiSensorValues:
         if 'temp' in self.sensors_types and 'humidity' in self.sensors_types:
             try:
                 [self.temp, self.humidity] = dht(4, 1)
-                print "temp: %s, humidity %s" % (self.temp, self.humidity)
+                #print "temp: %s, humidity %s" % (self.temp, self.humidity)
             except IOError:
                 print "dht IOError"
             except ValueError:
@@ -118,6 +118,10 @@ class GrovePiSensorValues:
         out = {}
         for sensor in self.sensors:
             val = getattr(self, sensor['type'])
+            print "********************"
+            print sensor
+            print val
+            
             out.update({sensor['type']: val})
 
         print "toDict: ", out
