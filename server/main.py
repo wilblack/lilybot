@@ -240,13 +240,13 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.api = Api()
 
     def open(self):
-        print 'connection opened...'
-
+        self.log("Connection opened...")
         try:
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
-        print "this is %s" %bot_name
+        self.log("Hello from %s" %bot_name
+
 
         self.bot_name = bot_name
         i, old_socket = get_bot_listener(bot_name)
@@ -260,6 +260,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             }
 
             listeners.append( bot )
+            self.log('Sucessfully established socket connection')
+
 
 
     def on_message(self, envelope):      # receives the data from the webpage and is stored in the variabe message
@@ -317,6 +319,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             # Get or create the api resource.
             self.api.create_table(bot['bot_name'])
 
+            self.log("Received handshake from %s" %(data['bot_name']))
+
 
 
             return
@@ -372,10 +376,12 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         })
 
         # Get the subscribing bots and send the message
-        
+    
         subscribers = bot.get('subscriptions',[])
         print "About to broadcast ", out
         print "subscribers ", subscribers
+        self.log("Broadcasting from %s to %s" %(from_bot_name, subscribers)
+
         for sub in subscribers:
             try:
                 i, sub_listener = get_bot_listener(sub)
