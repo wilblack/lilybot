@@ -44,7 +44,8 @@ Curently supported sensors. You will need a GrovePi and various sensors for this
 | Touch                 | D7   |
 | PIR                   | D3   |
 
-For set instructions see [Grovebot Setup](rpi_client/bot_roles/grovebot.md)
+For set instructions see [Grovebot Setup](rpi_client/bot_roles/grovebot.md).
+
 If you have problems see [troublshooting](#GrovePi Troubleshooting)
 
 
@@ -136,7 +137,6 @@ source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/insta
 
 ```
 sudo apt-get install vim-gui-common
-sudo apt-get install vim-runtime
 ```
 
 Then create or edit `~/.vimrc` to look like
