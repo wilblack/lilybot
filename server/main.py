@@ -245,7 +245,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             bot_name = self.request.uri.split("?")[1]
         except:
             bot_name = ""
-        self.log("Hello from %s" %bot_name
+        self.log("Hello from %s" %bot_name)
 
 
         self.bot_name = bot_name
@@ -331,7 +331,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if 'command' in message and message['command'] == 'sensor_values':
                 res = self.api.post('sensor_values', data)
 
-
+        self.log("Received message from %s" %(data['bot_name']))
+        self.log(data)
 
         # save message to redis
         now = dt.utcnow()
@@ -380,7 +381,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         subscribers = bot.get('subscriptions',[])
         print "About to broadcast ", out
         print "subscribers ", subscribers
-        self.log("Broadcasting from %s to %s" %(from_bot_name, subscribers)
+        self.log("Broadcasting from %s to %s" %(from_bot_name, subscribers))
 
         for sub in subscribers:
             try:
