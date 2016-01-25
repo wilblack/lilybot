@@ -132,6 +132,23 @@ Download and run the installer script. Grab some coffee this takes awhile. This 
 source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
 ```
 
+### (Optional) Set up vim for python editing
+
+```
+sudo apt-get install vim-gui-common
+sudo apt-get install vim-runtime
+```
+
+Then create or edit `~/.vimrc` to look like
+
+```
+syntax on
+filetype indent plugin on
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+```
 
 ## 4. Configure the rpi_client with the bot package you are using
 
