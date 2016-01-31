@@ -3,6 +3,7 @@ A module to handle routing of commands and messages to the
 various bot_roles and defined in bot_roles/.
 
 """
+
 import json, ast
 from settings import VERBOSE, settings
 
@@ -12,7 +13,7 @@ from bot_roles.core import Core
 class Router(object):
 
     def __init__(self, socket):
-
+        print "Initializing Router"
         self.socket = socket
         self.ctenophore = False
         self.jjbot = False

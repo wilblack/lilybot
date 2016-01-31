@@ -124,7 +124,7 @@ class GrovePiSensorValues:
             
             out.update({sensor['type']: val})
 
-        print "toDict: ", out
+        # print "toDict: ", out
         return out
 
 

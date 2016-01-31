@@ -33,65 +33,6 @@ if 'grovebot' in settings["bot_packages"]:
 
 
 
-class MqttClient():
-    import paho.mqtt.client as mqtt
-
-    def send_handshake(self):
-        local_ip = commands.getoutput("hostname -I")
-
-        message = {
-            'bot_name': self.bot_name,
-            'bot_roles': self.bot_roles,
-            'mac': get_mac_address(),
-            'handshake': True,
-            'subscriptions': settings['subscriptions'],
-            'sensors': SENSORS,
-            'local_ip': local_ip
-        }
-        print "Sending handshake"
-        self.send(message)
-
-    print "Connection to ardh is open"
-        self.send_handshake()
-
-        if ["jjbot", "grovebot"] and settings["bot_packages"]:
-            print "Registering IO Loop callback"
-            sensors = tornado.ioloop.PeriodicCallback(self.loopCallback, LOOP_CALLBACK_DT * 1000)
-            sensors.start()
-
-
-    # The callback for when the client receives a CONNACK response from the server.
-    def on_connect(client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
-
-        # Subscribing in on_connect() means that if we lose the connection and
-        # reconnect then subscriptions will be renewed.
-        client.subscribe("hello/world")
-
-    # The callback for when a PUBLISH message is received from the server.
-    def on_message(client, userdata, msg):
-        print(msg.topic+" "+str(msg.payload))
-
-    def send():
-            timestamp = now = dt.now().strftime(self.LOG_DTFORMAT)
-        message.update({
-            "bot_name":self.bot_name,
-            "timestamp": timestamp
-        })
-
-        message = json.dumps(message)
-
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-
-    client.connect("192.168.0.105", 1883, 60)
-
-    # Blocking call that processes network traffic, dispatches callbacks and
-    # handles reconnecting.
-    # Other loop*() functions are available that give a threaded interface and a
-    # manual interface.
-    client.loop_forever()
 
 class ArdyhClient(TornadoWebSocketClient):
     """
