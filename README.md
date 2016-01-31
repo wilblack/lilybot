@@ -618,10 +618,17 @@ You should now be able to ssh in over Wi-Fi. Note you may need to reboot before 
 
 You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
 
+Test the inventory file with `--list-tasks` and `--list-hosts`.
+
+Ping all bots
+
+    ansible -i hosts bots -m ping -u pi
+
+
 Check the status of all the ardyh_cliend deamons. 
-```
-ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
-```
+
+    ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
+
 
 Restart all Raspberry Pi's
 ```
@@ -642,3 +649,5 @@ Helpful Links
 * Articles on batteirs for the Rapsberry Pi
 * L298N Motor Control wiring diagram http://explainingcomputers.com/rasp_pi_robotics.html
 *  Model B+ (40 pin) GPIO Diagram http://www.rs-online.com/designspark/electronics/eng/blog/introducing-the-raspberry-pi-b-plus
+
+* InFluxDB on a Pi https://www.raspberrypi.org/forums/viewtopic.php?t=81824&p=578524
