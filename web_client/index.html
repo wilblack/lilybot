@@ -114,8 +114,35 @@
     $(document).foundation();
 
     $(document).ready(function(){
-        resize();
+      handshake_message = {
+         'bot_name':'monitor.solalla.ardyh', 
+         'bot_roles':[],
+         'mac':'',
+         'handshake':true,
+         'local_ip': 'ardyh.solalla.com',
+         'subscriptions':['rpi1.solalla.ardyh', 
+                          'rpi2.solalla.ardyh', 
+                          'rpi3.solalla.ardyh',
+                          'rpi4.solalla.ardyh',
+                          'rpi5.solalla.ardyh'
+                          ]
+      }
+
+
+      ardyh = new Ardyh(handshake_message);
+      ardyh.setup();
+
+      controls = new ControlsView();
+      resize();
+      $(window).resize(function(){
+          resize();
+      });
+
+      setupCharts();
+
+
     });
+
   </script>
 </body>
 </html>

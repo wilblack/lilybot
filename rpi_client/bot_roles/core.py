@@ -6,7 +6,7 @@ class Core(object):
     """
     def __init__(self, socket):
         self.socket = socket
-        self.commands = ['shutdown', 'restart']
+        self.commands = ['shutdown', 'restart', 'get_mac_address', 'capture_image']
 
 
     def shutdown(self, kwargs):
@@ -16,4 +16,7 @@ class Core(object):
         restart()
 
     def get_mac_address(self):
-        return get_mac_address() 
+        return get_mac_address()
+
+    def capture_image(slef, kwargs):
+        import camera

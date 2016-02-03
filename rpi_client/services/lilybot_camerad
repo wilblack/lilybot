@@ -31,7 +31,6 @@ start)
             printf "%s\n" "Ok"
         fi
 
-
 ;;
 status)
         printf "%-50s" "Checking $NAME..."

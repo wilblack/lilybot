@@ -2,7 +2,7 @@
 
 #lilybot
 
-The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics, primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
+The goal of lilybot is to provide an easy to use cloud based software system for hobby/ametuer robotics and Internet of Things (IoT) projects. This is primarily focused on the Raspberry Pi. This repo contains samples, demos, and libraries to do things like reading sensor data, control motors, and handling realt-time networking with other lilybots over the Internet.  
 
 The software components of lilybot consist of three main functions.
 
@@ -17,7 +17,7 @@ The software components of lilybot consist of three main functions.
 3. Web application clients. 
 
 
-## Hardware Packages
+## 1. Hardware Packages
 
 To configure a hardware package you need to edit `rpi_client/local_settings.py`
 
@@ -30,13 +30,26 @@ are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connec
 An LED Strip controller. This exposes a web api to control these https://www.adafruit.com/products/306
 
 ### GroveBot
-bot_package: groverbot
-A lilbary to interface with the GrovePi and its sensors.
+*bot_package*: groverbot
 
-#### Hardware
-* 1 GrovePi 
-* 1 Grove Temperature and Humidity Pro plugged into port D4 on the GrovePi.
-* 1 Grove Light Sensor plugged into port A2 on the GrovePi.
+A lilbary to interface with the GrovePi and its sensors.
+Curently supported sensors. You will need a GrovePi and various sensors for this.
+ 
+
+| Sensor                | Port |
+|-----------------------|------|
+| Temp and Humidity Pro | D4   |
+| Light                 | A2   |
+| Sound                 | A1   |
+| Touch                 | D7   |
+| PIR                   | D3   |
+
+For set instructions see [Grovebot Setup](rpi_client/bot_roles/grovebot.md).
+
+If you have problems see [troublshooting](#GrovePi Troubleshooting)
+
+
+
 
 ### Magic Mushroom
 An LED Strip web app that comes with serveral preset colors and light patterns. Demo URL
@@ -120,6 +133,22 @@ Download and run the installer script. Grab some coffee this takes awhile. This 
 source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
 ```
 
+### (Optional) Set up vim for python editing
+
+```
+sudo apt-get install vim-gui-common
+```
+
+Then create or edit `~/.vimrc` to look like
+
+```
+syntax on
+filetype indent plugin on
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+```
 
 ## 4. Configure the rpi_client with the bot package you are using
 
@@ -146,49 +175,20 @@ Add the following line to `/etc/crontab`
 *    * * *   root    /home/pi/projects/lilybot/rpi_client/restart.sh > /home/pi/restart.log
 ```
 
-### Troubleshooting
-
-If you are having trouble with the SMBus you can user `sudo i2cdetect 0` to debug.
-
-```
-# Query for the device. You may need to check 0 also. 
-sudo i2cdetect 1
-
-# Not sure what this does.
-sudo modprobe i2c-bcm2708
-
-sudo modprobe i2c-dev
-lsmod
-```
 
 
-If you are installing a grovebot and get the following error then just reboot the Raspberry Pi manually `sudo shutdown -r now`.
-
-```
-All Done.
-Check and reboot now to apply changes.
- 
-Restarting
-3
-2
-1
-shutdown: you must be root to do that!
-```
-
-
-
-### Links 
-I2C documentation. The Raspberry Pi talks to the GrovePi using the SMBus and I2c.
-http://www.lm-sensors.org/wiki/i2cToolsDocumentation
-
-## 4 Attach hardware and reboot.
+## 4. Attach hardware and reboot.
 
 After all that is done we are finally ready to attach the bot package specific hardware and a Wi-Fi dongle. Omce you attach the appropraite hardware and Wi-Fi dongle reboot the Raspberry Pi (`sudo shutdown -r now`). Once rebotted the Raspberry Pi will look for a Wi-Fi network named *ardyhnet* with passkey *ardyhnet*. To change this you can edit `/etc/network/interfaces`.
 
 
 ----
-### Install Camera and Camera Software (Optional)
+## 6. Install Camera and Camera Software (Optional)
 
+
+
+
+#### Method 1 - Streaming with mjpg-streamer (only works on your local network)
 
 Here is a video showinghow to connect the camera to the Raspberry Pi http://youtu.be/GImeVqHQzsE 
 
@@ -229,9 +229,167 @@ To see run the code and open a browser and point it at `http://RASPBERRYPI_IP:80
 	raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0
 	
 	LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /home/pi/Projects/lilybot/jjbot/www"
+
+	```
+
+#### Method 2 - Websockets streaming with ffmpeg
+
+
+1. On the Raspberry Pi Build and configure [ffmpeg](http://ffmpeg.org/) on the Rapsberry Pi. It takes a while. I followed the instructions [here](http://sirlagz.net/2012/08/04/how-to-stream-a-webcam-from-the-raspberry-pi/). It takes a while. Below are the steps from that link.
+ 
+  0. Make sure the camera is enabled on the Pi.
+  
+  ```
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo raspi-config
+  # Then follow the menu to enable the camera.
+  ```
+
+  1. Clone the repo and and build the binaries.
+    
+   ```
+   cd /usr/src/
+   git clone git://source.ffmpeg.org/ffmpeg.git
+   sudo chown -R pi:users ffmpeg
+   cd ffmpeg
+   ./configure    # This takes a minute or so. 
+   make           # This takes about 3+ hours
+   make install
+   ```
+
+  To test this run 
+  `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | /usr/src/ffmpeg/ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv`. 
+  
+  NOTE: Still need to add `ffmpeg` to the path.
+  
+2. On the socket server install the stream-server.js script from https://github.com/phoboslab/jsmpeg
+	
+    ```
+    npm install ws
+    node stream-server.js yourpassword
+    ```
+
+3. Then on the Raspberry Pi start the camera. You will need to change `<server-domain>` to the appropriate streaming server. 
+  
+
+  ```sh
+  # This command is necessary to start the Raspberry Pi camera
+  raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | /usr/src/ffmpeg/ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv
+
+  # This starts the camera in the appropriate mode for streaming
+  uv4l --driver raspicam --auto-video_nr --extension-presence=1
+
+  # This command actually starts ffmpeg which encodes the video to mpeg1 format and streams the output to a streaming server.
+  ffmpeg -s 320x240 -f video4linux2 -i /dev/video0 -f mpeg1video -b 800k -r 30 http://<server-domina>:8082/password/320/240/
+
+  ```
+  
+
+
+  ### Troubleshooting.
+  I got this error 
+  
+	```
+	[video4linux2,v4l2 @ 0x1f6e450] Cannot open video device /dev/video0: No such file or directory /dev/video0: No such file or directory
+	```
+	
+	Trying this to resolve it by installing [uv4l and uvl4l-raspicam](http://www.linux-projects.org/modules/sections/index.php?op=viewarticle&artid=14). Be sure and install the uv4l-raspicam-extras
+	
+	After that I got the follwoing error
+	```
+	[video4linux2,v4l2 @ 0x1b07450] The device does not support the streaming I/O method. 
+	/dev/video0: Function not implemented
+	```
+	
+	So this fixed that, see [here](http://www.raspberrypi.org/forums/viewtopic.php?t=50639)
+	```
+	uv4l --driver raspicam --auto-video_nr --extension-presence=1
+	```
+	
+	But now I get this output
+	```
+	ffmpeg version N-68269-g74080de Copyright (c) 2000-2014 the FFmpeg developers
+  	built on Dec  7 2014 03:31:56 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+  	configuration: 
+  	libavutil      54. 15.100 / 54. 15.100
+  	libavcodec     56. 14.100 / 56. 14.100
+  	libavformat    56. 15.102 / 56. 15.102
+  	libavdevice    56.  3.100 / 56.  3.100
+  	libavfilter     5.  2.103 /  5.  2.103
+  	libswscale      3.  1.101 /  3.  1.101
+  	libswresample   1.  1.100 /  1.  1.100
+	[video4linux2,v4l2 @ 0x2c91450] Time per frame unknown
+	[video4linux2,v4l2 @ 0x2c91450] mmap: No such device
+	/dev/video1: No such device
+	```
+	
+	A reboot seems to fix that, but I had to run `uv4l --driver raspicam --auto-video_nr --extension-presence=1` on reboot.
+	Now I am getting
 	
 	```
-####Troubleshooting
+	
+	```
+
+4. To view the stream, get the `stream-example.html` and `jsmpg.js` from the [jsmpeg](https://github.com/phoboslab/jsmpeg) project. Change the WebSocket URL in the `stream-example.html` to the one of your server and open it in your favorite browser.
+
+##### Troubleshooting
+
+I got the below error. It looks like it is just some man page stuff. 
+```
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffprobe.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffserver.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-all.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffprobe-all.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffserver-all.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-utils.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-scaler.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-resampler.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-codecs.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-bitstream-filters.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-formats.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-protocols.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-devices.1': Permission denied
+install: cannot create regular file `/usr/local/share/man/man1/ffmpeg-filters.1': Permission denied
+make: *** [install-man] Error 1
+
+```
+
+Then I got this error `Cannot open video device /dev/video0: No such file or directory`. Checking config.log It looks like there were build errors. Almost like it was not configured from the Raspberry pi. So after searching the internet I found a [part 3](http://sirlagz.net/2013/01/07/how-to-stream-a-webcam-from-the-raspberry-pi-part-3/) to the orignal tutorial. In it it said there maybe some errors to the original source so use the github repo instead.
+
+```
+git clone git://source.ffmpeg.org/ffmpeg.git
+cd ffmpeg
+./configure
+make && make install
+
+```
+
+*ffmpeg*
+You can install `v4l2-ctl` to help troubleshoot with 
+```
+apt-get install v4l-utils v4l-conf
+```
+
+Could not get anything on /dev/video0/ even after running modprobe so I tried installing uv4l and uv4l-raspicam as per here http://www.linux-projects.org/modules/sections/index.php?op=viewarticle&artid=14. But got the following error:
+
+```
+Setting up uv4l (1.9.5-1) ...
+libkmod: ERROR ../libkmod/libkmod.c:554 kmod_search_moddep: could not open moddep file '/lib/modules/3.6.11+/modules.dep.bin'
+dpkg: error processing uv4l (--configure):
+ subprocess installed post-installation script returned error exit status 1
+Setting up raspberrypi-bootloader (1.20140908-1) ...
+Memory split is now set in /boot/config.txt.
+You may want to use raspi-config to set it
+.
+.
+.
+.
+dpkg: dependency problems prevent configuration of uv4l-raspicam:
+ uv4l-raspicam depends on uv4l (>= 1.9.5); however:
+  Package uv4l is not configured yet.
+```
 
 If you try to start the camera service with `start_server_camera.sh` and get the following error.
 
@@ -253,6 +411,34 @@ mmal: Failed to run camera app. Please check for firmware updates
 ```
 The command that is failing is the `raspistill`. 
 To fix this reboot? There is a thread here http://raspberrypi.stackexchange.com/questions/13764/what-causes-enospc-error-when-using-the-raspberry-pi-camera-module
+
+
+
+#### Links
+Post on Raspberry Pi forums. 
+http://www.raspberrypi.org/forums/viewtopic.php?f=43&t=74949
+
+PiCamera
+http://picamera.readthedocs.org/en/release-1.3/index.html
+
+A tutorial showing how to stream video with web sockets.
+http://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets
+
+FFmpeg
+http://ffmpeg.org/
+
+jsmpeg - A javscript stream decoder for websockets
+https://github.com/phoboslab/jsmpeg
+
+Used this to install the second time.
+http://www.slickstreamer.info/2013/06/use-raspberrypi-csi-camera-module-to.html
+
+A post about stream at 30fps using rtmp. And a command to help debug `raspivid -t 5000 -w 960 -h 540 -fps 25 -b 500000 -vf -o - | ffmpeg -i - -vcodec copy -an -r 25 -f flv test.flv` 
+http://www.raspberrypi.org/forums/viewtopic.php?t=45368
+
+
+
+#### Troubleshooting
 
  
 ----
@@ -324,7 +510,7 @@ sudo netstat -tulpn
 
 # Appendix
 
-## 1. How to SSH in to a Raspberry Pi
+## A1. How to SSH in to a Raspberry Pi
 * With Ethernet Cable
 Plug in an enternet cable and turn the raspberry on. ssh should be enabled by default. You can log in with `ssh pi@IP_ADDRESS` and use `raspberry` as the password. You will need to check your router to find out the Raspberry Pi's IP address.
 
@@ -349,7 +535,7 @@ ssh -T git@github.com
 ```
 
 
-## 2. Adding passwordless login with authorized_keys on Rapsberry Pi
+## A2. Adding passwordless login with authorized_keys on Rapsberry Pi
 
 See http://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md
 
@@ -365,7 +551,7 @@ cat ~/.ssh/id_rsa.pub | ssh <USERNAME>@<IP-ADDRESS> 'cat >> .ssh/authorized_keys
 
 
 ----
-## 3. Wi-Fi Dongles and Configuring Wi-Fi
+## A3. Wi-Fi Dongles and Configuring Wi-Fi
 
 I use these wi-fi dongles by Gymle based on the Realtek RTL8192 chipset.  
 http://www.amazon.com/gp/product/B004HYHZJY/ref=oh_details_o00_s00_i00 becuase they support wi-fi direct (see this guide http://dishingtech.blogspot.com/2012/01/realtek-wi-fi-direct-programming-guide.html). I have not tested wi-fi direct yet but have plans to in the future. 
@@ -432,10 +618,17 @@ You should now be able to ssh in over Wi-Fi. Note you may need to reboot before 
 
 You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
 
+Test the inventory file with `--list-tasks` and `--list-hosts`.
+
+Ping all bots
+
+    ansible -i hosts bots -m ping -u pi
+
+
 Check the status of all the ardyh_cliend deamons. 
-```
-ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
-```
+
+    ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
+
 
 Restart all Raspberry Pi's
 ```
@@ -454,3 +647,7 @@ Helpful Links
 
 * Port Diagram http://www.dexterindustries.com/BrickPi/getting-started/attaching-lego/
 * Articles on batteirs for the Rapsberry Pi
+* L298N Motor Control wiring diagram http://explainingcomputers.com/rasp_pi_robotics.html
+*  Model B+ (40 pin) GPIO Diagram http://www.rs-online.com/designspark/electronics/eng/blog/introducing-the-raspberry-pi-b-plus
+
+* InFluxDB on a Pi https://www.raspberrypi.org/forums/viewtopic.php?t=81824&p=578524

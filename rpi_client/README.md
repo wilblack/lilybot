@@ -64,19 +64,9 @@ sudo shutdown -r now
 
 ### Start from Command Line
 
-To manually start the server do the following.
-Make sure BrickPi.py is on your python path.
-
-```
-export PYTHONPATH=$PYTHONPATH:/home/pi/Projects/BrickPi_Python
-cd  ~/Projects/BrickPi_Python/Project Examples/Browser Controlled Robot
-sudo chmod 755 RPi_Server_Code.py
-python RPi_Server_Code.py
-```
 
 
-
-### Power
+## Power
 
 I bought a 6-AA 9V pack. I connected the wires and reversed the colors (red to black). This turnd on the red power light on the Pi but it did not boot. I ordered the same thing from Dexter and it worked, I guess I wasn't supposed to reverse the wires. I think I can hook these up in parallel and receive more juice. Look here http://batteryuniversity.com/learn/article/serial_and_parallel_battery_configurations
 

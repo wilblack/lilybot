@@ -1,6 +1,7 @@
-import sys
-from settings import SENSORS
+import sys, traceback
+from datetime import datetime as dt
 
+from settings import SENSORS, ISO_FORMAT
 from bot_roles.core import Core
 
 sys.path.append("/home/pi/projects/GrovePi/Software/Python")
@@ -80,12 +81,15 @@ class GrovePiSensorValues:
                 pass
             except ValueError:
                 pass
+            except:
+                print "Error in pir read."
+                traceback.print_exc(file=sys.stdout)
 
         # This is the dht sensor port
         if 'temp' in self.sensors_types and 'humidity' in self.sensors_types:
             try:
                 [self.temp, self.humidity] = dht(4, 1)
-                print "temp: %s, humidity %s" % (self.temp, self.humidity)
+                #print "temp: %s, humidity %s" % (self.temp, self.humidity)
             except IOError:
                 print "dht IOError"
             except ValueError:
@@ -114,9 +118,13 @@ class GrovePiSensorValues:
         out = {}
         for sensor in self.sensors:
             val = getattr(self, sensor['type'])
+            print "********************"
+            print sensor
+            print val
+            
             out.update({sensor['type']: val})
 
-        print "toDict: ", out
+        # print "toDict: ", out
         return out
 
 
@@ -135,7 +143,13 @@ class Grovebot(Core):
     def read_sensors(self, kwargs=None):
         print "in read_sensors"
         sensor_values = self.sensors.toDict()
-        sensor_values.update({'bot_package':'grovebot'})
+        timestamp = dt.now().strftime(ISO_FORMAT)
+        sensor_values.update({
+            'bot_package':'grovebot',
+            'timestamp': timestamp
+
+        })
+
         out = {"message": {"command":"sensor_values", "kwargs":sensor_values }}
         self.socket.send(out)
 

@@ -42,15 +42,6 @@
 </nav>
 <div id="content">
     <div id="left-panel" class="controls padding">
-        <button class="restartBtn">Restart</button>
-        <button class="shutdownBtn">Shutdown</button>
-        <div>
-          <input name="target_index" type="number" value=5 placeholder="LED position">
-          <button class="targetBtn">Target LED</button>
-          <button class="clearTargetBtn hide">Clear Target</button>
-
-        </div>
-        
         <button class="pauseBtn" >Pause</button>
         <label>Connected bots</label>
         <button class="refreshBotsBtn small" >Refesh</button>
@@ -64,7 +55,7 @@
 
 
   <div id="center-panel">
-      <div id="sensor-values" class="transparent">
+      <!-- <div id="sensor-values" class="transparent">
         
       
         <div class="small-4 columns">
@@ -89,7 +80,7 @@
           <div><small>Dist: <span class="grovebot-dist"></span></small></div>
         </div>
 
-    </div>
+    </div> -->
 
     <div id="log-wrapper" class="full-height small-6 columns">
         <div id="log" class="padded transparent"></div> <!-- End .secondary -->
@@ -98,12 +89,12 @@
 
 
   
-    <div id="right-panel" class="controls padding">
+<!--     <div id="right-panel" class="controls padding">
       <button class="pauseBtn" >Pause</button>
       <label>Connected bots</label>
       <button class="refreshBotsBtn small" >Refesh</button>
       <div id="bots-list"></div>
-      </div>
+      </div> -->
 
 
 </div><!-- end content -->
@@ -161,7 +152,13 @@
          'bot_roles':[],
          'mac':'',
          'handshake':true,
-         'subscriptions':['rp1.solalla.ardyh', 'rp2.solalla.ardyh', 'rp3.solalla.ardyh']
+         'local_ip': 'ardyh.solalla.com',
+         'subscriptions':['rpi1.solalla.ardyh', 
+                          'rpi2.solalla.ardyh', 
+                          'rpi3.solalla.ardyh',
+                          'rpi4.solalla.ardyh',
+                          'rpi5.solalla.ardyh'
+                          ]
       }
 
 

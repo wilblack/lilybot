@@ -127,7 +127,7 @@ Camera Layout Styling
 }
 
 #left-panel {
-    width:15%;
+    width:20%;
     height:100%;
     float:left;
 }
@@ -139,7 +139,7 @@ Camera Layout Styling
 }
 
 #center-panel {
-    width:70%;
+    width:80%;
     float:left;
 }
 

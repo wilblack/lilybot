@@ -215,11 +215,11 @@ Ardyh = function(handshake_message){
         if(self.socket){
             self.socket.onopen = function(){
                 console.log("connection opened....");
-                
-                
                 var out = JSON.stringify(handshake_message);
                 self.socket.send(out);
-            }
+                self._log("Lilybot connected, local IP: " + out.local_ip, out.bot_name);
+
+            };
 
             self.socket.onmessage = function(msg) {
                 /*
@@ -269,7 +269,7 @@ Ardyh = function(handshake_message){
         $log = $("#log");
         if ($log.length === 0) return;
         if(typeof(bot_name)==='undefined'){
-            bot_name = 'default'
+            bot_name = 'default';
         }
         var color = bot_colormap[bot_name]
         $newRow = $("<div style='color:"+color+";'>");
