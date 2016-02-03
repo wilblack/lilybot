@@ -145,7 +145,7 @@ class ArdyhClient(TornadoWebSocketClient):
             #         'bot_name':self.bot_name,
             #         'message' : {'command':'stop', 'kwargs': {}}
             #     }
-            #     self.router.received_message(message)
+                #self.router.received_message(message)
 
                 # message = {
                 #     'timestamp':"",
