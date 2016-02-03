@@ -158,7 +158,7 @@ application = tornado.web.Application([
       (r'/ws', WSHandler),
       (r'/', MainHandler),
       (r'/(bots-list)', MainHandler),
-      (r"/app/(.*)", tornado.web.StaticFileHandler, {'path':os.path.join(PATH, 'www')}),
+      (r"/app/(.*)", tornado.web.StaticFileHandler, {'path':os.path.join(PATH, 'webapp/dist')}),
     ])
 
 
