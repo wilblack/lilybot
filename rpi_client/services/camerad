@@ -4,7 +4,7 @@
 # description: lilybot camera daemon
 # processname: lilybot_cmaera
 
-DAEMON_PATH="/home/pi/Projects/lilybot/rpi_client"
+DAEMON_PATH="/home/pi/projects/lilybot/rpi_client/services"
 
 DAEMON=start_camera.sh
 DAEMONOPTS=""
@@ -22,7 +22,7 @@ start)
 
     cd $DAEMON_PATH
     #PID=`$DAEMON $DAEMONOPTS > /dev/null 2>&1 & echo $!`
-    PID=`./$DAEMON $DAEMONOPTS > /tmp/lilybot_camerad.log  2>&1 & echo $!`
+    PID=`./$DAEMON $DAEMONOPTS > /tmp/camerad.log  2>&1 & echo $!`
     #echo "Saving PID" $PID " to " $PIDFILE
         if [ -z $PID ]; then
             printf "%s\n" "Fail"
@@ -30,6 +30,7 @@ start)
             echo $PID > $PIDFILE
             printf "%s\n" "Ok"
         fi
+
 
 ;;
 status)

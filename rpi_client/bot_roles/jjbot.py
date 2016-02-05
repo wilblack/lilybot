@@ -30,16 +30,18 @@ class JJBot(Core):
         self.NUDGE_DT = 0.3
 
     def forward(self, kwargs):
+        print "!!!!! FORWARD !!!!!"
         BrickPi.MotorSpeed[PORT_A] = 255  #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_D] = 255  #Set the speed of MotorA (-255 to 255)
-        BrickPiUpdateValues()
-            
+        #BrickPiUpdateValues()
+
     def reverse(self, kwargs):
         BrickPi.MotorSpeed[PORT_A] = -255  #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_D] = -255  #Set the speed of MotorA (-255 to 255)
         BrickPiUpdateValues()
 
     def stop(self, kwargs):
+        print "!!!!!STOPPING!!!!!"
         BrickPi.MotorSpeed[PORT_A] = 0
         BrickPi.MotorSpeed[PORT_D] = 0
         BrickPiUpdateValues()
@@ -114,5 +116,4 @@ class JJBot(Core):
             self.bot.stopCamera()
         except Exception, e:
             print e
-            
-    #                         # BrickPi updates the values for the motors
+
