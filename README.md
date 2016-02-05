@@ -620,9 +620,19 @@ You can keep and inventory of your Raspberry Pi robots in the `hosts` file in th
 
 Test the inventory file with `--list-tasks` and `--list-hosts`.
 
+Check connection
+
+     ansible -i hosts bot1 -m shell -a 'ls'
+
+Check disk usage
+
+    ansible -i hosts bots -m shell -a 'df -h | grep rootfs'
+
+
 Ping all bots
 
     ansible -i hosts bots -m ping -u pi
+
 
 
 Check the status of all the ardyh_cliend deamons. 
@@ -640,6 +650,14 @@ Shutdown a single bot
 ```
 ansible -i hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
 ```
+
+Check which hosts areaffected by a playbook
+
+```
+ansible-playbook ansible/hub.yml --list-hosts
+```
+
+
 
 
 Helpful Links

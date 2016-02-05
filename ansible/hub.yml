@@ -1,0 +1,9 @@
+---
+- hosts: hub
+  vars:
+    var1: foo
+  remote_user: pi
+  tasks:
+    git:
+      repo=git@github.com:wilblack/lilybot.git
+      dest=/home/pi/tmp/
