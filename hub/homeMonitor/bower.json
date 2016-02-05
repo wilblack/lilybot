@@ -1,6 +1,6 @@
 {
-  "name": "webapp",
-  "version": "0.0.0",
+  "name": "homeMonitor",
+  "version": "0.1.0",
   "dependencies": {
     "angular": "^1.4.0",
     "bootstrap-sass-official": "^3.2.0",
@@ -17,7 +17,8 @@
     "angular-mocks": "^1.4.0"
   },
   "appPath": "app",
-  "moduleName": "webappApp",
+  "moduleName": "homeMonitor",
+
   "overrides": {
     "bootstrap": {
       "main": [

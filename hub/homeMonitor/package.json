@@ -1,5 +1,5 @@
 {
-  "name": "webapp",
+  "name": "homeMonitor",
   "private": true,
   "devDependencies": {
     "autoprefixer-core": "^5.2.1",
