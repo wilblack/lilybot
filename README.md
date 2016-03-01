@@ -32,10 +32,9 @@ An LED Strip controller. This exposes a web api to control these https://www.ada
 ### GroveBot
 *bot_package*: groverbot
 
-A lilbary to interface with the GrovePi and its sensors.
-Curently supported sensors. You will need a GrovePi and various sensors for this.
- 
+A lilbary to interface with the GrovePi and its sensors. You will need a GrovePi and various sensors for this.
 
+| Curently supported sensors   |
 | Sensor                | Port |
 |-----------------------|------|
 | Temp and Humidity Pro | D4   |
@@ -49,13 +48,19 @@ For set instructions see [Grovebot Setup](rpi_client/bot_roles/grovebot.md).
 If you have problems see [troublshooting](#GrovePi Troubleshooting)
 
 
-
-
-### Magic Mushroom
-An LED Strip web app that comes with serveral preset colors and light patterns. Demo URL
-See demo here http://ctenophore.solalla.com/#/magic-mushroom 
-
 # Getting Started
+
+## 0. TL;DR
+Download and run the installer script. Grab some coffee this takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
+
+```
+source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
+```
+
+Then if you are setting up a client, see the [Rpi Client README](rpi/client/bot_roles/README.md)
+
+If you are setting up a hub, see the [Hub README](hub/README.md)
+
 
 ## 1. Install the Raspbian Operating System
 If you already have a Raspberry Pi up and running you can skip to step 2. It is best to start with a freshly installed version of Rasbian.
@@ -124,14 +129,7 @@ Host key verification failed.
 To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/.ssh/known_hosts` and remove the line whihc points at you Raspberry Pi's IP address.
 
 
-----
-## 3. Install and Update Software
 
-Download and run the installer script. Grab some coffee this takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
-
-```
-source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
-```
 
 ### (Optional) Set up vim for python editing
 
@@ -150,23 +148,7 @@ set softtabstop=4
 set expandtab
 ```
 
-## 4. Configure the rpi_client with the bot package you are using
 
-* Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
-
-TODO Show Example.
-
-This is an example local_settings.py file. It is the bare minimum required.
-
-```
-settings= {
-    "bot_name":"rp4.solalla.ardyh",
-    "bot_roles":"bot",
-    "bot_packages":[],
-    "subscriptions":[],
-
-}
-```
 
 ## 5. (Optional) Set the Raspberry Pi to reconnect if it looses connection to ardyh
 Add the following line to `/etc/crontab`

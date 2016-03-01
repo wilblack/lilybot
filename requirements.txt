@@ -9,7 +9,8 @@ numpy==1.6.2
 pifacecommon==4.0.0
 pifacedigitalio==3.0.4
 pygame==1.9.1release
-tornado==3.2
+paho-mqtt==1.1
+tornado==4.3
 ws4py==0.3.4
 wsgiref==0.1.2
 httplib2==0.9

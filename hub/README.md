@@ -1,6 +1,12 @@
+## Web App
+
+**http://192.168.0.105:9093/index.html**
+
+This is the homeMonitor web app server from `hub/homeMonitor/`
+
 ## Set up
 
-### Start Hub on boot
+### Start Hub on Boot
 
 Copy `/hub/ardyh_hubd` to `/etc/init.d`
 
@@ -11,7 +17,7 @@ Copy `/hub/ardyh_hubd` to `/etc/init.d`
 
 To remove this or disable this
 
-    sudo update-rc.d -f ardyh_clientd remove
+    sudo update-rc.d -f ardyh_hubd remove
 
 
 You may need to do a `chmod 775` to make these executable. You can then start and stop the deamon with 
