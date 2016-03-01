@@ -1,3 +1,5 @@
+# THIS IS DERACATED SEE `rpi_clients/bot_roles/README.md`
+
 ## Install tornado web server
 See http://www.remwebdevelopment.com/blog/python/simple-websocket-server-in-python-144.html for more info.
 

@@ -63,8 +63,7 @@ def start_mqtt_cient(socket):
     # The callback for when a PUBLISH message is received from the server.
     def on_message(client, userdata, msg):
         print(msg.topic+" "+str(msg.payload))
-        print "client ", client
-        socket.write_message(msg.payload)
+        socket.write_message({"topic": msg.topic, "payload": json.loads(msg.payload)})
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -151,14 +150,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
 
-
-
-
 application = tornado.web.Application([
       (r'/ws', WSHandler),
-      (r'/', MainHandler),
+      #(r'/', MainHandler),
       (r'/(bots-list)', MainHandler),
-      (r"/app/(.*)", tornado.web.StaticFileHandler, {'path':os.path.join(PATH, 'www')}),
+      (r"/(.*)", tornado.web.StaticFileHandler, {'path':os.path.join(PATH, 'homeMonitor/dist')}),
     ])
 
 

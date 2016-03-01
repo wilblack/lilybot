@@ -19,6 +19,7 @@ function get_bot_info
         echo "3 - ctenophore"
         echo "4 - grovebot"
         echo "5 - magic_mushroom"
+        echo "6 - hub"
         echo ""
         echo -n "Enter selection: "
         read selection
@@ -28,6 +29,7 @@ function get_bot_info
             3 ) botPackage="ctenophore" ; selection=0 ; ;;
             4 ) botPackage="grovebot" ; selection=0 ; ;;
             5 ) botPackage="magic_mushroom" ; selection=0 ; ;;
+            6 ) botPackage="hub" ; selection=0 ; ;;
             * ) echo "Please enter a value between 1 and 5"
         esac
     done
@@ -101,6 +103,11 @@ echo "The will look for a newtowrk named ardyhnet with passkey ardyhnet.\n"
 echo "To change this edit /etc/network/interfaces"
 sudo cp interfaces.lilybot /etc/network/interfaces
 
+
+if [ "$botPackage" == "hub" ] ; then
+    echo "Install Hub specific packages"
+    sudo apt-get install mosquitto mosquitto-clients -y
+fi 
 
 
 if [ $botPackge = "jjbot" ] ; then
