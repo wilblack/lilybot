@@ -12,15 +12,17 @@ angular.module('ardyhServices', [])
     // AngularJS will instantiate a singleton by calling "new" on this function
 
     console.log('[ardyhServices]');
+
     var obj = this;
     var DOMAIN = "192.168.0.105:9093";
     var SOCKET_URL = "ws://" + DOMAIN + "/ws";
-        
+    obj.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
+
     console.log("opening socket connection to " + SOCKET_URL);
-    
+
     obj.socket = new WebSocket(SOCKET_URL);
 
-        
+
     obj.socket.onopen = function(){
         console.log("connection opened....");
         $rootScope.$broadcast('ardyh-onopen');
@@ -30,16 +32,21 @@ angular.module('ardyhServices', [])
     };
 
     obj.socket.onmessage = function(msg) {
+        /*
+            msg should have a JSON string at msg.data.
+
+            data should have keywords 'topic' and 'payload'
+        */
 
         var data = JSON.parse(msg.data);
-        console.log("['onmessage'] ", data);
+        console.log("['onmessage'] ", msg);
         $rootScope.$broadcast('ardyh-onmessage', data);
     };
 
     obj.socket.onclose = function(){
         //alert("connection closed....");
         console.log("The connection has been closed.");
-        $rootScope.$broadcast('ardyh-onclose');  
+        $rootScope.$broadcast('ardyh-onclose');
     };
 
     obj.socket.onerror = function(e){
@@ -48,5 +55,39 @@ angular.module('ardyhServices', [])
 
     };
 
+
+
+
+    obj.bots = {};
+
+    obj.bots.rpi1 = {
+        botName: "ardyh/bots/rpi1",
+        values: [],
+    };
+    //$rootScope.$on('ardyh-onmessage', function(e, data){
+    //
+    //    if (data.topic !== obj.bots.rpi1.botName) return;
+    //    //$rootScope.$apply(function(){
+    //        //obj.bots.rpi.values.push(data.payload);
+    //    //});
+    //    obj.newValueCallback('rpi1', data.payload);
+    //
+    //});
+
+   obj.newValueCallback = function(bot, values){
+       // This cleans the data and pushes it to the list.
+       var current = {};
+       current.temp = values.temp;
+       current.humidity = values.humidity;
+       current.light = values.light;
+       current.timestamp = new Date(values.timestamp).toString(obj.dtFormat);
+
+       var entity = {
+           timestamp: current.timestamp,
+           data: current
+       };
+       obj.bots[bot].values.push(entity);
+
+    }
 
   });

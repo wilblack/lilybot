@@ -654,7 +654,7 @@ ansible -i hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
 Check which hosts areaffected by a playbook
 
 ```
-ansible-playbook ansible/hub.yml --list-hosts
+ansible-playbook -i hosts ansible/hub.yml --list-hosts
 ```
 
 

@@ -74,9 +74,6 @@ cd projects
 
 
 
-
-
-
 echo "\n\n*****************************\n"
 echo "Installing lilybot pip requirements"
 echo "\n*****************************\n"
@@ -131,8 +128,6 @@ if [ $botPackage == "grovebot" ] ; then
 
     chmod 755 GrovePi/Script/install.sh
     GrovePi/Script/install.sh
-
-
 fi
 
 
