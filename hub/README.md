@@ -9,7 +9,9 @@ The hub runs a message passing server (MQtt), hosts the system control web app, 
 
 This is the homeMonitor web app server from `hub/homeMonitor/`
 
+
 ## Set up
+
 
 ### Start Hub on Boot
 
@@ -49,3 +51,10 @@ To view all threads where <PID> is gotten from the above command.
 ps -e -T | grep <PID>
 ```
 
+## Mosquitto Stuff
+
+Examples of mosquitto_sub
+
+    mosquitto_sub -t "ardyh/bots/rpi1"
+    mosquitto_sub -t "ardyh/bots/+"
+    mosquitto_sub -v -t \$SYS/#

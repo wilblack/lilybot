@@ -56,6 +56,30 @@ angular.module('ardyhServices', [])
     };
 
 
+    obj.send = function(messageObj) {
+        if (obj.socket.readyState === 1){
+            obj.socket.send(JSON.stringify( messageObj));
+        } else {
+            console.log("Could not send message, ready state = "+obj.socket.readyState);
+            if (obj.socket.readyState === 3){
+                // Web socket is closed so try to re-establish connection
+                console.log("I should reconnect here.");
+                $timeout(function(){
+                    obj.init(obj.botName);
+                }, 5*1000);
+            }
+        }
+    };
+
+    obj.sendCommand = function(command, kwargs){
+        kwargs = kwargs || {};
+        obj.send({'command':command, 'kwargs':kwargs});
+    }
+
+
+
+
+
 
 
     obj.bots = {};
@@ -79,7 +103,8 @@ angular.module('ardyhServices', [])
        var current = {};
        current.temp = values.temp;
        current.humidity = values.humidity;
-       current.light = values.light;
+       current.light = values.light || values.lux;
+
        current.timestamp = new Date(values.timestamp).toString(obj.dtFormat);
 
        var entity = {

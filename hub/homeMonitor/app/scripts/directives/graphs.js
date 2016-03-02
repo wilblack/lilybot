@@ -23,15 +23,16 @@ angular.module('homeMonitor')
             $scope.newValueCallback = function(bot, values){
                // This cleans the data and pushes it to the list.
                var current = {};
-               current.temp = values.temp;
-               current.humidity = values.humidity;
-               current.light = values.light;
+               current.temp = !isNaN(values.temp) ? values.temp : null;
+               current.humidity = !isNaN(values.humidity) ? values.humidity : null;
+               current.light = !isNaN(values.light) ? values.light : null;
+               current.lux = !isNaN(values.lux) ? values.lux : null;
                current.timestamp = new Date(values.timestamp);//.toString($scope.dtFormat);
 
                // Process temp
                if (current.temp !== null) {
                     var temp = parseFloat(current.temp, 10);
-                    if (isNaN(temp)) console.log("NaN",val);
+                    if (isNaN(temp)) console.log("NaN",current.temp);
                     $scope.wtf.multiChart[0].values.push({x:current.timestamp, y:temp});
                };
 
@@ -40,14 +41,22 @@ angular.module('homeMonitor')
 
 
                 // Process light
-                if (current.light !== null) $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.light});
+                if ( current.light !== null ) {
+                    console.log("[botGraphs] "+ $scope.botName +" we have light", current.light )
+                    $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.light});
+                } else if (current.lux !== null) {
+                    console.log("[botGraphs] "+ $scope.botName +" we have lux", current.lux )
+                    $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.lux});
+                }
+
 
                //$scope.api.refresh();
 
                //obj.bots[bot].values.push(entity);
                console.log("newValueCallback: ", bot);
-               console.log($scope.wtf.multiChart[0]);
-
+               console.table($scope.wtf.multiChart[0].values);
+                console.table($scope.wtf.multiChart[1].values);
+                console.table($scope.wtf.multiChart[2].values);
                 //$sensorValues.updateGraphs(entity);
             }
 
@@ -86,7 +95,7 @@ angular.module('homeMonitor')
                 },
                 {
                     'key':'Light',
-                    'type':'area',
+                    'type':'line',
                     'yAxis':2,
                     'values': []
                 }

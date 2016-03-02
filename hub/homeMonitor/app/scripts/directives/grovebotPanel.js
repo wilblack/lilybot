@@ -7,13 +7,14 @@
  * # grovebotPanel
  */
 angular.module('homeMonitor')
-.directive('grovebotPanel', [ '$rootScope', function ($rootScope) {
+.directive('grovebotPanel', [ '$rootScope', '$ardyh', function ($rootScope, $ardyh) {
     return {
         templateUrl: 'views/directives/grovebot-panel.html',
         restrict: 'EA',
         scope: {
             botName: "=",
-            values: "="
+            values: "=",
+            location: "="
         },
         link: function postLink(scope, element, attrs) {
             scope.units = {'temp': 'f'};
@@ -29,6 +30,17 @@ angular.module('homeMonitor')
 
             scope.celsius2fahrenheit = function(t){
                 return t*(9/5) + 32;
+            };
+
+            scope.shutdown = function(botName){
+                console.log("[grovebotPanel.shutdown()]");
+                $ardyh.sendCommand('shutdown', {'botName':botName });
+
+            };
+
+            scope.restart = function(botName){
+                console.log("[grovebotPanel.restart()]");
+                $ardyh.sendCommand('restart', {'botName':botName});
             };
         }
     };
