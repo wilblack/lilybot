@@ -8,6 +8,8 @@ The hub runs a message passing server (MQtt), hosts the system control web app, 
 **http://192.168.0.105:9093/index.html**
 
 This is the homeMonitor web app server from `hub/homeMonitor/`
+For developement you should run this server on your local machine. 
+
 
 
 ## Set up
@@ -52,6 +54,7 @@ ps -e -T | grep <PID>
 ```
 
 ## Mosquitto Stuff
+RPI Clients will publish to the channel `ardyh/bots/BOT_NAME`
 
 Examples of mosquitto_sub
 

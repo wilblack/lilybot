@@ -80,7 +80,7 @@ class HubWebRequestHandler(tornado.web.RequestHandler):
 
     def set_allow_origin(self, request):
         origin_domain = self.request.headers.get("Origin", None)
-        
+
         if origin_domain:
             self.set_header("Access-Control-Allow-Origin", origin_domain)
         else:
@@ -137,15 +137,42 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
 
-    def on_message(self, message):      # receives the data from the webpage and is stored in the variabe message
+    def on_message(self, message):
         """
-    
+        Tries to forward commands to the appropruate mqtt channel (botName).
+
+        This receives messages as strings. message is then loaded into python.
+        It will look for a keyword named "command" in the message object.
+
+        If it has a command, it will look for a 'botName', in kwargs. The botName should
+        be the mqtt channel and it will be used to publish an object containing
+        the a command, kwargs key/val pairs. These should be picked up in rpi_client.
+
+
+
         """
-        print message
+        # print "[WSHandler.on_message] message ", message
+        # Need to catch these and route the to the apropriate mqtt channel.
+        message = json.loads(message);
+        if 'command' in message.keys():
+            cmd = message['command']
+            kwargs = message['kwargs']
+            channel = kwargs.get('botName', None)
+            if channel:
+                payload = {
+                    'command': cmd,
+                    'kwargs': kwargs
+                }
+                self.mqtt.publish(channel, json.dumps(payload))
+
+        #channel = message.botName
+        #payload = message.data
+        #
+
 
 
     def on_close(self):
-        print 'Lost a %s. connection closed.' % self.bot_name
+        print 'Lost a %s. connection closed.'
 
 
 
