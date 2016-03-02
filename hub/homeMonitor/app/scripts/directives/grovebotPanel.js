@@ -17,10 +17,12 @@ angular.module('homeMonitor')
         },
         link: function postLink(scope, element, attrs) {
             scope.units = {'temp': 'f'};
+
             $rootScope.$on('ardyh-onmessage', function(e, data){
                 console.log("[ardyh-onmessage]", data);
+                if (data.topic !== scope.botName) return;
                 scope.$apply(function(){
-                    scope.values = data;
+                    scope.values = data.payload;
                 });
                 console.log(scope.messages);
             });

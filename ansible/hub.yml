@@ -1,9 +1,13 @@
 ---
-- hosts: hub
+- hosts: bot4
   vars:
     var1: foo
   remote_user: pi
   tasks:
-    git:
-      repo=git@github.com:wilblack/lilybot.git
-      dest=/home/pi/tmp/
+    - name: download lilybot github repo
+      git: repo=git@github.com:wilblack/lilybot.git
+           version=master
+           accept_hostkey=yes
+           dest=/home/pi/tmp/
+           key_file=/home/pi/.ssh/lilybot_id_rsa
+

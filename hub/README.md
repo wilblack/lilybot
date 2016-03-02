@@ -1,3 +1,8 @@
+# Lilybot Hub
+
+The hub runs a message passing server (MQtt), hosts the system control web app, stores all sensor data locally, and can sync up to the cloud.
+
+
 ## Web App
 
 **http://192.168.0.105:9093/index.html**
@@ -52,3 +57,4 @@ To view all threads where <PID> is gotten from the above command.
 ```
 ps -e -T | grep <PID>
 ```
+

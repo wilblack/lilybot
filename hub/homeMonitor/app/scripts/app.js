@@ -19,7 +19,8 @@ angular
         'ngSanitize',
         'ngTouch',
         'ardyhServices',
-        'mockServices'
+        'mockServices',
+        'nvd3',
     ])
     .config(function ($routeProvider) {
         $routeProvider

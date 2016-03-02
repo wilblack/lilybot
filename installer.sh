@@ -76,9 +76,6 @@ cd projects
 
 
 
-
-
-
 echo "\n\n*****************************\n"
 echo "Installing lilybot pip requirements"
 echo "\n*****************************\n"

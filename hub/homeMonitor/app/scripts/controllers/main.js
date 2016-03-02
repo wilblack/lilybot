@@ -8,12 +8,26 @@
  * Controller of the webappApp
  */
 angular.module('homeMonitor')
-  .controller('MainCtrl', function ($scope, $mockArdyh) {
-    $scope.page = 'main';
-    $scope.messages = [];
-    $scope.wtf = {'data': null};
+  .controller('MainCtrl', function ($scope, $ardyh) {
+      $scope.page = 'main';
+      $scope.messages = [];
+      $scope.wtf = {'data': null};
 
+      $scope.groveBots = [
+          {
+              "name": "ardyh/bots/rpi1",
+              "values": {}
+          },
+          {
+              "name": "ardyh/bots/rpi2",
+              "values": {}
+          },
+          {
+              "name": "ardyh/bots/rpi3",
+              "values": {}
+          }
+      ]
 
-
+      $scope.rpi1 = {'values': $ardyh.bots.rpi1.values};
 
   });
