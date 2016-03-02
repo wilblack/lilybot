@@ -1,3 +1,12 @@
-<div grovebot-panel bot-name="'arydh/solalla/rpi3'" values="wtf.data"></div>
+<div>
+    <div ng-repeat="bot in groveBots track by $index">
+         <div grovebot-panel bot-name="bot.name" values="bot.values"></div>
+         <div bot-graphs bot-name="bot.name" values="rpi1.values" show-filters="false" ></div>
+    </div>
 
-scope.wtf.data {{wtf.data}}
+    <h2>RPI 1</h2>
+
+
+
+</div>
+
