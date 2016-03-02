@@ -3,8 +3,17 @@
 **http://192.168.0.105:9093/index.html**
 
 This is the homeMonitor web app server from `hub/homeMonitor/`
+For developement you should run this server on your local machine. 
+
 
 ## Set up
+
+## Mosiqutto
+RPI Clients will publish to the channel `ardyh/bots/BOT_NAME`
+
+mosquitto_sub -t "ardyh/bots/rpi1"
+
+
 
 ### Start Hub on Boot
 

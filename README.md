@@ -50,17 +50,29 @@ If you have problems see [troublshooting](#GrovePi Troubleshooting)
 
 # Getting Started
 
-## 0. TL;DR
-Download and run the installer script. Grab some coffee this takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
+## 1. Download and run the installer script 
+Grab some coffee this takes awhile. This will make a directory `/home/pi/projects/` and put the github repos in there. 
 
 ```
 source <(curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh)
+
+```
+
+or manually
+
+```
+curl -s https://raw.githubusercontent.com/wilblack/lilybot/master/installer.sh >> installer.sh
+chmod 755 installer.sh
+./installer.sh
 ```
 
 Then if you are setting up a client, see the [Rpi Client README](rpi/client/bot_roles/README.md)
 
 If you are setting up a hub, see the [Hub README](hub/README.md)
 
+
+
+# Dveloper Setup
 
 ## 1. Install the Raspbian Operating System
 If you already have a Raspberry Pi up and running you can skip to step 2. It is best to start with a freshly installed version of Rasbian.
