@@ -3,6 +3,7 @@ from datetime import datetime as dt
 
 from settings import SENSORS, ISO_FORMAT
 from bot_roles.core import Core
+from lib import digital_light_sensor as dls
 
 sys.path.append("/home/pi/projects/GrovePi/Software/Python")
 
@@ -45,6 +46,13 @@ class GrovePiSensorValues:
                 self.light = raw
             else:
                 self.light = None
+
+        # This is the digital light sensor v1.1
+        if 'lux' in self.sensors_types:
+
+            raw = dls.read()
+            self.lux = raw["lux"]
+
 
         # This is the slider switch sensor
         if 'slider' in self.sensors_types:

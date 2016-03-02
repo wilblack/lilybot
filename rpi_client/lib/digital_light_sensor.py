@@ -1,8 +1,11 @@
-from grovepi.grove_i2c_digital_light_sensor.grove_i2c_digital_light_sensor import Tsl2561, I2C_SMBUS, I2C_ADDRESS
+import sys 
+
+sys.path.append("/home/pi/projects/GrovePi/Software/Python/grove_i2c_digital_light_sensor")
+import grove_i2c_digital_light_sensor as dls
 
 print "Hello"
-TSL2561 = Tsl2561()
-TSL2561._init__(I2C_SMBUS, I2C_ADDRESS)
+TSL2561 = dls.Tsl2561()
+TSL2561._init__(dls.I2C_SMBUS, dls.I2C_ADDRESS)
 gain=0
 
 def read():
@@ -13,9 +16,9 @@ def read():
         "IR": val[1],
         "_ambient": val[2],
         "_IR": val[3],
-        "_LUX": val[4]
+        "lux": val[4]
     }
-    TSL2561._control(_POWER_DOWN)
+    TSL2561._control(dls._POWER_DOWN)
     print out
     return out
 
