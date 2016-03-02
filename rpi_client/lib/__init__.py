@@ -334,38 +334,16 @@ class Tsl2561(object):
 
 TSL2561 = Tsl2561()
 TSL2561._init__(I2C_SMBUS, I2C_ADDRESS)
-
+gain=0
 def read():
-    gain=0
+    
     val = TSL2561.readLux(gain)
-    ambient = val[0]
-    IR = val[1]
-    _ambient = val[2]
-    _IR = val[3]
-    _LUX = val[4]
-    if (ambient == 0xffff or IR == 0xffff):
-        print ("\nSensor is saturated, no lux value can be achieved:")
-        print ("ambient = " + ambient)
-        print ("IR = " + IR)
-        print ("light = " + _LUX)
-    elif (_ambient == 0):
-        print ("\nIt's dark:")
-        print ("ambient = " + str(ambient))
-        print ("IR = " + str(IR))
-        print ("_ambient = " + str(_ambient))
-        print ("_IR = " + str(_IR))
-        print ("Light = " + str(_LUX) + " lux.")
-    else:
-        print ("\nThere is light:")
-        print ("ambient = " + str(ambient))
-        print ("IR = " + str(IR))
-        print ("_ambient = " + str(_ambient))
-        print ("_IR = " + str(_IR))
-        print ("Light = " + str(_LUX) + " lux.")
-    time.sleep(1)
-    ambient  = None
-    IR       = None
-    _ambient = 0
-    _IR      = 0
-    _LUX     = None
+    out = {
+        "ambient": val[0],
+        "IR": val[1],
+        "_ambient": val[2],
+        "_IR": val[3],
+        "_LUX": val[4]
+    }
     TSL2561._control(_POWER_DOWN)
+    return out
