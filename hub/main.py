@@ -33,6 +33,8 @@ import tornado.web
 import tornado.websocket
 import tornado.template
 
+from sensor_db import Db
+db = Db()
 
 # Settings
 VERBOSE = True
@@ -63,7 +65,12 @@ def start_mqtt_cient(socket):
     # The callback for when a PUBLISH message is received from the server.
     def on_message(client, userdata, msg):
         print(msg.topic+" "+str(msg.payload))
+        
+        # send messages over web socket
         socket.write_message({"topic": msg.topic, "payload": json.loads(msg.payload)})
+
+        # log message data to rrd
+        db.update(msg.topic, msg.payload['temp'] )
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -187,8 +194,6 @@ application = tornado.web.Application([
 
 if __name__ == "__main__":
     #r = redis.StrictRedis(host='localhost', port=6379, db=0)
-
-    
 
     print "Starting HTTP server at %s:%s" %(IP, PORT) 
     # http_server = tornado.httpserver.HTTPServer(application)

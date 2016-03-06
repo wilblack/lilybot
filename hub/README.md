@@ -11,8 +11,13 @@ This is the homeMonitor web app server from `hub/homeMonitor/`
 For developement you should run this server on your local machine. 
 
 
-
 ## Set up
+
+## Mosiqutto
+RPI Clients will publish to the channel `ardyh/bots/BOT_NAME`
+
+mosquitto_sub -t "ardyh/bots/rpi1"
+
 
 
 ### Start Hub on Boot
@@ -35,7 +40,7 @@ You may need to do a `chmod 775` to make these executable. You can then start an
 `sudo /etc/init.d/ardyh_hub stop`
 
 
-Once the deamon starts it ties up the port. You can see what ports are currently being used with
+Once the deamon starts it ties up the port. You can see what ports are currently being used with the commands beloew. Once you find the PID, you shuold kill it. 
 
 ```
 sudo netstat -lptu
@@ -53,11 +58,3 @@ To view all threads where <PID> is gotten from the above command.
 ps -e -T | grep <PID>
 ```
 
-## Mosquitto Stuff
-RPI Clients will publish to the channel `ardyh/bots/BOT_NAME`
-
-Examples of mosquitto_sub
-
-    mosquitto_sub -t "ardyh/bots/rpi1"
-    mosquitto_sub -t "ardyh/bots/+"
-    mosquitto_sub -v -t \$SYS/#
