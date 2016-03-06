@@ -31,20 +31,24 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
+from tornado.websocket import WebSocketClosedError
 import tornado.template
 
-from sensor_db import Db
-db = Db()
 
 # Settings
 VERBOSE = True
 PORT = 9093
-LOG_DTFORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+ISO_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 IP = "192.168.0.105"
 ARDYH_MONITOR = 'monitor.solalla.ardyh'
 
 MQTT_BROKER_URL = "192.168.0.105"
 PATH = os.path.dirname(os.path.abspath(__file__))
+# End Settings
+
+
+from sensor_db import Db
+db = Db()
 
 
 
@@ -67,10 +71,19 @@ def start_mqtt_cient(socket):
         print(msg.topic+" "+str(msg.payload))
         msgObj = json.loads(msg.payload)
         # send messages over web socket
-        socket.write_message({"topic": msg.topic, "payload": msgObj})
+        try:
+            socket.write_message({"topic": msg.topic, "payload": msgObj})
+        except WebSocketClosedError:
+            print "Web socket was closed."
 
-        # log message data to rrd
-        db.update(msg.topic, msgObj['temp'] )
+        
+        if not 'handshake' in msgObj.keys():
+            db.update(msg.topic, msgObj['temp'] ) # DEPRCATED log message data to rrd
+            lux = msgObj.get('lux', None)
+            light = msgObj.get('light', None)
+            vals = [msgObj['temp'], msgObj['humidity'], light, lux]
+            db.update2(msg.topic, vals)
+
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -102,29 +115,28 @@ class MainHandler(HubWebRequestHandler):
 
         Endpoints
 
-          /api/sensors/BOT-NAME/VARIABLE/?start=START-TS&end=END-TS
+          /api/sensors/BOT.NAME/?start=START-TS&end=END-TS
         """
 
         pieces = action.strip("/").split("/")
         
         if pieces[0] == 'sensors':
 
-            assert len(pieces) == 3, "Invalid url, sensor endpoit is /api/sensors/BOT-NAME/VARIABLE"
+            assert len(pieces) == 2, "Invalid url, sensor endpoit is /api/sensors/BOT-NAME"
             
             # Get start and end date filters and convert datetime objects
             start = None; end = None
             ts = self.get_argument('start', None)
             if ts:
-                start = dt.strptime(ts, LOG_DTFORMAT)
+                start = dt.strptime(ts, ISO_FORMAT)
             
             ts = self.get_argument('end', None)
             if ts:
-                end = dt.strptime(ts, LOG_DTFORMAT)
+                end = dt.strptime(ts, ISO_FORMAT)
 
 
             bot = pieces[1]
-            variable = pieces[2]
-            rs = db.fetch(bot, variable, start, end)
+            rs = db.fetch2(bot)
             #out = json.dumps(rs)
             out = {'results':rs}
             self.write(out)
@@ -187,6 +199,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print 'Lost a %s. connection closed.'
+        self.mqtt.disconnect()
 
 
 
