@@ -11,12 +11,28 @@ angular.module('homeMonitor')
         controller: function($scope, $ardyh){
             $scope.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
 
-            $scope.fetchValues = function(){
+            $scope.onMessageListner = null;
+            $scope.onMessageCallback = function(e, data){
+                console.log("[botGraphs controller ardyh-onmessage]", data);
+                if (data.topic !== $scope.botName) return;
+                //$rootScope.$apply(function(){
+                    //obj.bots.rpi.values.push(data.payload);
+                //});
+                $scope.newValueCallback('rpi1', data.payload);
+            }
 
-                start =
+            $scope.fetchValues = function(){
                 $ardyh.fetchValues($scope.botName)
                     .then(function(data, status){
-                        $scope.loadValues(data.results);
+                        var results = data.results;
+                        $scope.loadValues(results);
+                        $scope.numValues = results.length;
+                        $scope.start = results[0][0] * 1000;
+                        $scope.end = results[$scope.numValues-1][0] * 1000;
+
+                        if (!$scope.onMessageListener){
+                            $scope.onMessageListener = $rootScope.$on('ardyh-onmessage', $scope.onMessageCallback);
+                        }
                     }, function(data, status){
                         console.log("fail");
                     });
@@ -25,31 +41,20 @@ angular.module('homeMonitor')
                 $scope.fetchValues();
             }
 
-
-            $scope.newValListener = $rootScope.$on('ardyh-onmessage', function(e, data){
-                console.log("[botGraphs controller ardyh-onmessage]", data);
-                if (data.topic !== $scope.botName) return;
-                //$rootScope.$apply(function(){
-                    //obj.bots.rpi.values.push(data.payload);
-                //});
-                $scope.newValueCallback('rpi1', data.payload);
-            });
-
-
-
+            
             $scope.loadValues = function(values){
                 angular.forEach(values, function(row){
+                    if (row[1] === null) return;
                     out = {
                         temp:row[1],
                         humidity: null,
                         light: null,
-                        timestamp: new Date(row[0])
+                        timestamp: row[0] * 1000 // Need to multi by 1000 to get milliseconds
                     }
                     $scope.newValueCallback(self.botName, out);
-                })
+                });
+                //console.table($scope.wtf.multiChart[0].values);
             };
-
-
 
             $scope.newValueCallback = function(bot, values){
                // This cleans the data and pushes it to the list.
@@ -58,6 +63,7 @@ angular.module('homeMonitor')
                current.humidity = !isNaN(values.humidity) ? values.humidity : null;
                current.light = !isNaN(values.light) ? values.light : null;
                current.lux = !isNaN(values.lux) ? values.lux : null;
+               console.log("Converting from ", values.timestamp.toString());
                current.timestamp = new Date(values.timestamp);//.toString($scope.dtFormat);
 
                // Process temp
@@ -128,29 +134,31 @@ angular.module('homeMonitor')
 
             scope.multiChartOptions = {
                 chart: {
-                    type: 'multiChart',
-                    height: 350,
-                    margin : {
+                    'type': 'multiChart',
+                    'height': 350,
+                    'margin' : {
                         top: 30,
                         right: 40,
                         bottom: 50,
                         left: 40
                     },
-                    color: d3.scale.category10().range(),
+                    'color': d3.scale.category10().range(),
                     //useInteractiveGuideline: true,
-                    transitionDuration: 500,
-                    xAxis: {
+                    'transitionDuration': 500,
+                    'interpolate': 'linear',
+                    'xScale' : d3.time.scale(),
+                    'xAxis': {
                         tickFormat: function(d){
                             return scope.xAxisTickFormatFunction()(d);
                         }
                     },
-                    yAxis1: {
+                    'yAxis1': {
                         tickFormat: function(d){
                             return d3.format(',.1f')(d);
                         }
                     },
-                    yDomain1: [0, 100],
-                    yAxis2: {
+                    'yDomain1': [0, 100],
+                    'yAxis2': {
                         tickFormat: function(d){
                             return d3.format(',.1f')(d);
                         }

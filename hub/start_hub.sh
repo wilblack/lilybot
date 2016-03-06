@@ -8,6 +8,9 @@ export PYTHONPATH=$PYTHONPATH:/home/pi/projects/RPi-LPD8806:/home/pi/projects/Br
 cd  /home/pi/projects/lilybot/hub
 #sudo chmod 755 RPi_Server_Code.py
 
+echo "Killing and previous instances"
+sudo kill $(ps -e | sudo netstat -tlnp | awk '/:9093 */ {split($NF,a,"/"); print a[1]}')
+
 NOW=$(date +"%Y-%m-%dT%T %Z")
 echo "[$NOW] Starting and ardyh hub"
 

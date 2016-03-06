@@ -26,9 +26,6 @@ class Api(ApiClientBase):
         super(Api, self).__init__()
 
 
-
-
-
     def get(self, resource, filters):
         """
 

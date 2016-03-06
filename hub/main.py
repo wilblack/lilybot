@@ -33,6 +33,8 @@ import tornado.web
 import tornado.websocket
 import tornado.template
 
+from sensor_db import Db
+db = Db()
 
 # Settings
 VERBOSE = True
@@ -63,7 +65,12 @@ def start_mqtt_cient(socket):
     # The callback for when a PUBLISH message is received from the server.
     def on_message(client, userdata, msg):
         print(msg.topic+" "+str(msg.payload))
-        socket.write_message({"topic": msg.topic, "payload": json.loads(msg.payload)})
+        msgObj = json.loads(msg.payload)
+        # send messages over web socket
+        socket.write_message({"topic": msg.topic, "payload": msgObj})
+
+        # log message data to rrd
+        db.update(msg.topic, msgObj['temp'] )
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -88,36 +95,43 @@ class HubWebRequestHandler(tornado.web.RequestHandler):
 
 class MainHandler(HubWebRequestHandler):
 
-    # def set_default_headers(self):
-    #     self.set_header("Access-Control-Allow-Origin", "http://ardyh.solalla.com")
-    #     self.set_header("Access-Control-Allow-Origin", "http://ctenophore.solalla.com")
 
-    def get(self, action=None):
+    def get(self, action=None, *args, **kwargs):
         """
         Displays the webpage.
+
+        Endpoints
+
+          /api/sensors/BOT-NAME/VARIABLE/?start=START-TS&end=END-TS
         """
-        self.set_allow_origin(self.request)
 
-        if action == "bots-list":
-            # out = [ {'bot_name':l['bot_name'], 'subscriptions':l['subscriptions']} for l in listeners]
-            temp = []
-            for l in listeners:
-                row = {
-                    'bot_name': l['bot_name'],
-                    'bot_roles': l['bot_roles'],
-                    'mac': l.get('mac', ''),
-                    'local_ip': l.get('local_ip', ''),
-                    'subscriptions': l.get('subscriptions', ''),
-                    'sensors': l.get('sensors', []),
-                }
-                temp.append(row)
+        pieces = action.strip("/").split("/")
+        
+        if pieces[0] == 'sensors':
 
-            out = json.dumps(temp)
+            assert len(pieces) == 3, "Invalid url, sensor endpoit is /api/sensors/BOT-NAME/VARIABLE"
+            
+            # Get start and end date filters and convert datetime objects
+            start = None; end = None
+            ts = self.get_argument('start', None)
+            if ts:
+                start = dt.strptime(ts, LOG_DTFORMAT)
+            
+            ts = self.get_argument('end', None)
+            if ts:
+                end = dt.strptime(ts, LOG_DTFORMAT)
+
+
+            bot = pieces[1]
+            variable = pieces[2]
+            rs = db.fetch(bot, variable, start, end)
+            #out = json.dumps(rs)
+            out = {'results':rs}
             self.write(out)
+
         else:
             loader = tornado.template.Loader(".")
             self.write(loader.load("templates/index.html").generate())
-
 
 
 
@@ -180,7 +194,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 application = tornado.web.Application([
       (r'/ws', WSHandler),
       #(r'/', MainHandler),
-      (r'/(bots-list)', MainHandler),
+      (r'/api/(.*)', MainHandler),
       (r"/(.*)", tornado.web.StaticFileHandler, {'path':os.path.join(PATH, 'homeMonitor/dist')}),
     ])
 
@@ -188,13 +202,11 @@ application = tornado.web.Application([
 if __name__ == "__main__":
     #r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
-    
-
     print "Starting HTTP server at %s:%s" %(IP, PORT) 
     # http_server = tornado.httpserver.HTTPServer(application)
     # http_server.listen(PORT) 
     application.listen(PORT)
-    
+
     print "Starting Websocket server at ws://%s:%s" %(IP, PORT)          #starts the websockets connection
     tornado.ioloop.IOLoop.instance().start()
-  
+

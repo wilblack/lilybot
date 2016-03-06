@@ -12,8 +12,14 @@ This is the homeMonitor web app server from `hub/homeMonitor/`
 For developement you should run this server on your local machine. 
 
 
-
 ## Set up
+
+## Mosiqutto
+RPI Clients will publish to the channel `ardyh/bots/BOT_NAME`
+
+mosquitto_sub -t "ardyh/bots/rpi1"
+mosquitto_sub -t "ardyh/bots/+"
+
 
 
 ### Start Hub on Boot
@@ -36,11 +42,12 @@ You may need to do a `chmod 775` to make these executable. You can then start an
 `sudo /etc/init.d/ardyh_hub stop`
 
 
-Once the deamon starts it ties up the port. You can see what ports are currently being used with
+Once the deamon starts it ties up the port. You can see what ports are currently being used with the commands beloew. Once you find the PID, you shuold kill it. 
 
 ```
 sudo netstat -lptu
-sudo netstat -tulpn
+sudo netstat -tulpn | grep 9093 
+sudo netstat -tlnp | awk '/:9093 */ {split($NF,a,"/"); print a[1]}'
 ```
 
 
@@ -60,7 +67,6 @@ It i snot enough to just run `/etc/init.d/ardyh_hubd stop` to stop the Hub. You 
 ```
 sudo fuser 9093/tcp
 ```
-
 
 
 
@@ -101,7 +107,4 @@ but still didn't work. Should see [https://github.com/pbanaszkiewicz/python-rrdt
 
   you have not installed libxml-2.0, you can get it either from its original home on
 ```
-
-
-
 
