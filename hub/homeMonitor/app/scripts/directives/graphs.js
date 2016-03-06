@@ -1,17 +1,32 @@
 'user strict';
 
 angular.module('homeMonitor')
-.directive('botGraphs', function($rootScope){
+.directive('botGraphs', function($rootScope, $ardyh){
     return{
         scope:{
             botName: "=",
             values: "=",
             showFilters: "=?"
         },
-        controller: function($scope){
+        controller: function($scope, $ardyh){
             $scope.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
 
-            $rootScope.$on('ardyh-onmessage', function(e, data){
+            $scope.fetchValues = function(){
+
+                start =
+                $ardyh.fetchValues($scope.botName)
+                    .then(function(data, status){
+                        $scope.loadValues(data.results);
+                    }, function(data, status){
+                        console.log("fail");
+                    });
+            };
+            if ($scope.botName === 'ardyh/bots/rpi1') {
+                $scope.fetchValues();
+            }
+
+
+            $scope.newValListener = $rootScope.$on('ardyh-onmessage', function(e, data){
                 console.log("[botGraphs controller ardyh-onmessage]", data);
                 if (data.topic !== $scope.botName) return;
                 //$rootScope.$apply(function(){
@@ -19,6 +34,22 @@ angular.module('homeMonitor')
                 //});
                 $scope.newValueCallback('rpi1', data.payload);
             });
+
+
+
+            $scope.loadValues = function(values){
+                angular.forEach(values, function(row){
+                    out = {
+                        temp:row[1],
+                        humidity: null,
+                        light: null,
+                        timestamp: new Date(row[0])
+                    }
+                    $scope.newValueCallback(self.botName, out);
+                })
+            };
+
+
 
             $scope.newValueCallback = function(bot, values){
                // This cleans the data and pushes it to the list.
@@ -39,7 +70,6 @@ angular.module('homeMonitor')
                 // Process humidity
                 if (current.humidity !== null) $scope.wtf.multiChart[1].values.push({x:current.timestamp, y:current.humidity});
 
-
                 // Process light
                 if ( current.light !== null ) {
                     console.log("[botGraphs] "+ $scope.botName +" we have light", current.light )
@@ -48,15 +78,10 @@ angular.module('homeMonitor')
                     console.log("[botGraphs] "+ $scope.botName +" we have lux", current.lux )
                     $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.lux});
                 }
+                //$scope.api.refresh();
 
-
-               //$scope.api.refresh();
-
-               //obj.bots[bot].values.push(entity);
-               console.log("newValueCallback: ", bot);
-               console.table($scope.wtf.multiChart[0].values);
-                console.table($scope.wtf.multiChart[1].values);
-                console.table($scope.wtf.multiChart[2].values);
+                //obj.bots[bot].values.push(entity);
+                console.log("newValueCallback: ", bot);
                 //$sensorValues.updateGraphs(entity);
             }
 
@@ -116,7 +141,6 @@ angular.module('homeMonitor')
                     transitionDuration: 500,
                     xAxis: {
                         tickFormat: function(d){
-
                             return scope.xAxisTickFormatFunction()(d);
                         }
                     },
