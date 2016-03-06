@@ -17,6 +17,7 @@ For developement you should run this server on your local machine.
 RPI Clients will publish to the channel `ardyh/bots/BOT_NAME`
 
 mosquitto_sub -t "ardyh/bots/rpi1"
+mosquitto_sub -t "ardyh/bots/+"
 
 
 
@@ -44,7 +45,8 @@ Once the deamon starts it ties up the port. You can see what ports are currently
 
 ```
 sudo netstat -lptu
-sudo netstat -tulpn
+sudo netstat -tulpn | grep 9093 
+sudo netstat -tlnp | awk '/:9093 */ {split($NF,a,"/"); print a[1]}'
 ```
 
 

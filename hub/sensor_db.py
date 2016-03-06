@@ -4,6 +4,7 @@ from datetime import datetime as dt
 from datetime import timedelta
 import time
 import subprocess
+import math
 
 class Db(object):
     
@@ -47,30 +48,46 @@ class Db(object):
             subprocess.call(cmd, shell=True)
 
 
-    def fetch(self, start=None, end=None):
+    def fetch(self, bot=None, variable=None, start=None, end=None):
         """
+
+        start and end should be datetime objects
+
         rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200
+        
         """
 
 
         cmd = "rrdtool fetch %s AVERAGE" %(self.filename)
         if start:
-            tt = dt.timetuple(start)
-            epoch = int(time.mktime(tt))
-            cmd = cmd + ' --start %s' %(epoch)
+            cmd = cmd + ' --start %s' %(self.utc(start))
 
         if end:
-            tt = dt.timetuple(end)
-            epoch = int(time.mktime(tt))
-            cmd = cmd + ' --end %s' %(epoch)
+            cmd = cmd + ' --end %s' %(self.utc(end))
 
         print cmd
         rs = subprocess.check_output(cmd, shell=True)
-        out  = [(int(item.split(": ")[0]), float(item.split(": ")[1])) 
-                    for item in  rs.strip().split('\n')[3:] ]
+        # out  = [(int(item.split(": ")[0]), float(item.split(": ")[1])) 
+        #             for item in  rs.strip().split('\n')[3:] ]
+        out = []
+        for row  in rs.strip().split('\n')[3:]:
+            ts, val = row.split(": ")
+            if val == 'nan':
+                val = None
+            else:
+                val = round(float(val), 2)
+            
+            out.append([int(ts), val])
 
         return out
 
+    def utc(self, dt_obj):
+        tt = dt.timetuple(dt_obj)
+        return int(time.mktime(tt))
+
+    def utc_now(self):
+        now = dt.now()
+        return self.utc(now)
 
 if __name__ == "__main__":
     db = Db()
