@@ -8,7 +8,7 @@
  * Service in the webappApp.
  */
 angular.module('ardyhServices', [])
-  .service('$ardyh', function ($rootScope) {
+.service('$ardyh', function ($rootScope, $q, $http) {
     // AngularJS will instantiate a singleton by calling "new" on this function
 
     console.log('[ardyhServices]');
@@ -78,41 +78,27 @@ angular.module('ardyhServices', [])
 
 
 
-
-
-
-
     obj.bots = {};
 
     obj.bots.rpi1 = {
         botName: "ardyh/bots/rpi1",
         values: [],
     };
-    //$rootScope.$on('ardyh-onmessage', function(e, data){
-    //
-    //    if (data.topic !== obj.bots.rpi1.botName) return;
-    //    //$rootScope.$apply(function(){
-    //        //obj.bots.rpi.values.push(data.payload);
-    //    //});
-    //    obj.newValueCallback('rpi1', data.payload);
-    //
-    //});
 
-   obj.newValueCallback = function(bot, values){
-       // This cleans the data and pushes it to the list.
-       var current = {};
-       current.temp = values.temp;
-       current.humidity = values.humidity;
-       current.light = values.light || values.lux;
+    obj.fetchValues = function(botName, start, end){
+        var defer = $q.defer();
+        botName = angular.copy(botName).replace( new RegExp("/", 'g'), ".");
 
-       current.timestamp = new Date(values.timestamp).toString(obj.dtFormat);
+        var url = "http://" + DOMAIN + "/api/sensors/" + botName + "/temp";
 
-       var entity = {
-           timestamp: current.timestamp,
-           data: current
-       };
-       obj.bots[bot].values.push(entity);
-
+        $http.get(url, {})
+            .then(function(data, status){
+                defer.resolve(data.data, status);
+            }, function(data, status){
+                console.log(status);
+                console.log(data);
+                defer.reject(data, status);
+            });
+        return defer.promise;
     }
-
-  });
+});
