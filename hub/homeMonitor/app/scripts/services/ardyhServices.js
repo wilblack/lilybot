@@ -89,7 +89,7 @@ angular.module('ardyhServices', [])
         var defer = $q.defer();
         botName = angular.copy(botName).replace( new RegExp("/", 'g'), ".");
 
-        var url = "http://" + DOMAIN + "/api/sensors/" + botName + "/temp";
+        var url = "http://" + DOMAIN + "/api/sensors/" + botName;
 
         $http.get(url, {})
             .then(function(data, status){

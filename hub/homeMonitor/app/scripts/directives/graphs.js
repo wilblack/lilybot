@@ -41,14 +41,14 @@ angular.module('homeMonitor')
                 $scope.fetchValues();
             }
 
-            
+
             $scope.loadValues = function(values){
                 angular.forEach(values, function(row){
                     if (row[1] === null) return;
                     out = {
                         temp:row[1],
-                        humidity: null,
-                        light: null,
+                        humidity: row[2],
+                        light: row[3],
                         timestamp: row[0] * 1000 // Need to multi by 1000 to get milliseconds
                     }
                     $scope.newValueCallback(self.botName, out);
