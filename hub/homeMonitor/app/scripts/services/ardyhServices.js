@@ -76,8 +76,6 @@ angular.module('ardyhServices', [])
         obj.send({'command':command, 'kwargs':kwargs});
     }
 
-
-
     obj.bots = {};
 
     obj.bots.rpi1 = {
@@ -91,7 +89,17 @@ angular.module('ardyhServices', [])
 
         var url = "http://" + DOMAIN + "/api/sensors/" + botName;
 
-        $http.get(url, {})
+        if (end){
+            url += "?end=" + end;
+        } else {
+            url += "?end=-120";
+        }
+
+        if (start){
+            url += "&start=" + start;
+        };
+
+        $http.get(url)
             .then(function(data, status){
                 defer.resolve(data.data, status);
             }, function(data, status){
