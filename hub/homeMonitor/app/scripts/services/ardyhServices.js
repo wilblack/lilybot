@@ -18,7 +18,7 @@ angular.module('ardyhServices', [])
     var SOCKET_URL = "ws://" + DOMAIN + "/ws";
     obj.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
 
-    console.log("opening socket connection to " + SOCKET_URL);
+    console.log("opening socket connection to " + SOCKET_URL + "?homeMonitor");
 
     obj.socket = new WebSocket(SOCKET_URL);
 
