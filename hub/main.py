@@ -43,12 +43,17 @@ IP = "192.168.0.105"
 ARDYH_MONITOR = 'monitor.solalla.ardyh'
 
 MQTT_BROKER_URL = "192.168.0.105"
+MQTT_BROKER_PORT = 1883
+
 PATH = os.path.dirname(os.path.abspath(__file__))
 # End Settings
 
 
 from sensor_db import Db
 db = Db()
+
+from mqtt_client import MqttLogger
+mqtt_logger = MqttLogger(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
 
 
@@ -76,14 +81,6 @@ def start_mqtt_cient(socket):
         except WebSocketClosedError:
             print "Web socket was closed."
 
-        
-        if not 'handshake' in msgObj.keys():
-            db.update(msg.topic, msgObj['temp'] ) # DEPRCATED log message data to rrd
-            lux = msgObj.get('lux', None)
-            light = msgObj.get('light', None)
-            vals = [msgObj['temp'], msgObj['humidity'], light, lux]
-            db.update2(msg.topic, vals)
-
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -94,6 +91,14 @@ def start_mqtt_cient(socket):
     print "Starting mqtt client"
     client.loop_start()
     return client
+
+
+
+# This stores the socket connections
+listeners = []
+def get_bot_listener(bot_name):
+    return next( ([i,bot] for i, bot in enumerate(listeners) if bot['bot_name'] == bot_name), [None, None] )
+
 
 
 class HubWebRequestHandler(tornado.web.RequestHandler):
@@ -115,30 +120,43 @@ class MainHandler(HubWebRequestHandler):
 
         Endpoints
 
-          /api/sensors/BOT.NAME/?start=START-TS&end=END-TS
+          **/api/sensors/BOT.NAME/?start=START-TS&end=END-TS**
+          
+          **/api/bot/**
+          This endpoint lists all bots connected to via web socket.
         """
 
         pieces = action.strip("/").split("/")
-        
-        if pieces[0] == 'sensors':
 
+        if pieces[0] == 'sensors':
             assert len(pieces) == 2, "Invalid url, sensor endpoit is /api/sensors/BOT-NAME"
             
             # Get start and end date filters and convert datetime objects
             start = None; end = None
-            ts = self.get_argument('start', None)
-            if ts:
-                start = dt.strptime(ts, ISO_FORMAT)
+            start = self.get_argument('start', None)
+            end = self.get_argument('end', None)
             
-            ts = self.get_argument('end', None)
-            if ts:
-                end = dt.strptime(ts, ISO_FORMAT)
-
 
             bot = pieces[1]
-            rs = db.fetch2(bot)
+            rs = db.fetch2(bot, start, end)
             #out = json.dumps(rs)
             out = {'results':rs}
+            self.write(out)
+
+        elif action == "bot":
+            temp = []
+            for l in listeners:
+                row = {
+                    'bot_name': l.get('bot_name', None),
+                    'bot_roles': l.get('bot_roles', None),
+                    'mac': l.get('mac', ''),
+                    'local_ip': l.get('local_ip', ''),
+                    'subscriptions': l.get('subscriptions', ''),
+                    'sensors': l.get('sensors', []),
+                }
+                temp.append(row)
+
+            out = json.dumps(temp)
             self.write(out)
 
         else:
@@ -148,19 +166,48 @@ class MainHandler(HubWebRequestHandler):
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
+
     def __init__(self, application, request, **kwargs):
         super(WSHandler, self).__init__(application, request, **kwargs)
 
-        # Start listening to rpi here
+        # Set attach the sokcet to the mqqt client
         self.mqtt = start_mqtt_cient(self)
 
     def check_origin(self, origin):
         return True
 
     def open(self):
-        print "Connection opened..."
-        print 'Sucessfully established socket connection'
+        """
+        Bots should connect with a query string containing the bot name
 
+        i.e. ws://IP-ADDRESS:PORT/?ardyh.bots.rpi1
+
+        It will than append or update the bot in the listeners array
+
+        """
+
+        print "Connection opened..."
+
+        try:
+            bot_name = self.request.uri.split("?")[1]
+        except:
+            bot_name = ""
+        print "Hello from %s" %bot_name
+
+
+        self.bot_name = bot_name
+        i, old_socket = get_bot_listener(bot_name)
+        if old_socket:
+            old_socket.update({'socket':self})
+        else:
+            bot = {
+                "socket": self,
+                "subscriptions": [],
+                "bot_name": bot_name
+            }
+
+            listeners.append( bot )
+            self.log('Sucessfully established socket connection')
 
 
     def on_message(self, message):
@@ -198,9 +245,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
     def on_close(self):
-        print 'Lost a %s. connection closed.'
+        print 'Lost connection closed.'
         self.mqtt.disconnect()
-
 
 
 

@@ -136,10 +136,10 @@ class Db(object):
 
         cmd = "rrdtool fetch %s AVERAGE" %(self.get_filename(bot))
         if start:
-            cmd = cmd + ' --start %s' %(self.utc(start))
+            cmd = cmd + ' --start %s' %(start)
 
         if end:
-            cmd = cmd + ' --end %s' %(self.utc(end))
+            cmd = cmd + ' --end %s' %(end)
 
         print cmd
         rs = subprocess.check_output(cmd, shell=True)
