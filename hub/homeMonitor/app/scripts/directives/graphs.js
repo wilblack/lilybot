@@ -7,6 +7,7 @@ angular.module('homeMonitor')
             botName: "=",
             values: "=",
             showFilters: "=?"
+
         },
         controller: function($scope, $ardyh){
             $scope.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
@@ -15,21 +16,26 @@ angular.module('homeMonitor')
             $scope.onMessageCallback = function(e, data){
                 console.log("[botGraphs controller ardyh-onmessage]", data);
                 if (data.topic !== $scope.botName) return;
-                //$rootScope.$apply(function(){
-                    //obj.bots.rpi.values.push(data.payload);
-                //});
-                $scope.newValueCallback('rpi1', data.payload);
+                $scope.newValueCallback(data.payload);
             }
 
-            $scope.fetchValues = function(){
-                $ardyh.fetchValues($scope.botName)
+            $scope.fetchValues = function(start){
+
+                $ardyh.fetchValues($scope.botName, start)
                     .then(function(data, status){
+                        // Turn off the onMessage listener while loading data
+                        if ($scope.onMessageListener) {
+                            $scope.onMessageListener();
+                            $scope.onMessageListerner = null;
+                        }
                         var results = data.results;
-                        $scope.loadValues(results);
+
                         $scope.numValues = results.length;
                         $scope.start = results[0][0] * 1000;
                         $scope.end = results[$scope.numValues-1][0] * 1000;
+                        $scope.loadValues(results);
 
+                        // Turn on the onMessage listener again
                         if (!$scope.onMessageListener){
                             $scope.onMessageListener = $rootScope.$on('ardyh-onmessage', $scope.onMessageCallback);
                         }
@@ -37,26 +43,31 @@ angular.module('homeMonitor')
                         console.log("fail");
                     });
             };
-            if ($scope.botName === 'ardyh/bots/rpi1') {
-                $scope.fetchValues();
-            }
 
 
             $scope.loadValues = function(values){
+                $scope.wtf.multiChart = angular.copy($scope.emptyMultiChart);
                 angular.forEach(values, function(row){
-                    if (row[1] === null) return;
+                    //if (row[1] === null) return;
                     out = {
-                        temp:row[1],
-                        humidity: row[2],
-                        light: row[3],
+                        temp:row[1] || undefined,
+                        humidity: row[2] || undefined,
+                        light: row[3] | undefined,
+                        lux: row[4] || undefined,
                         timestamp: row[0] * 1000 // Need to multi by 1000 to get milliseconds
                     }
-                    $scope.newValueCallback(self.botName, out);
+                    $scope.newValueCallback(out);
                 });
+
+                $scope.wtf.multiChartOptions.chart.xDomain = [$scope.start, $scope.end];
+                $scope.wtf.multiChartOptions.chart.forceX = [$scope.start, $scope.end];
+                $scope.api.refresh();
                 //console.table($scope.wtf.multiChart[0].values);
+                //$scope.api.clearElement();
+
             };
 
-            $scope.newValueCallback = function(bot, values){
+            $scope.newValueCallback = function(values){
                // This cleans the data and pushes it to the list.
                var current = {};
                current.temp = !isNaN(values.temp) ? values.temp : null;
@@ -71,10 +82,16 @@ angular.module('homeMonitor')
                     var temp = parseFloat(current.temp, 10);
                     if (isNaN(temp)) console.log("NaN",current.temp);
                     $scope.wtf.multiChart[0].values.push({x:current.timestamp, y:temp});
+               } else {
+                   $scope.wtf.multiChart[0].values.push({x:current.timestamp, y:0});
                };
 
                 // Process humidity
-                if (current.humidity !== null) $scope.wtf.multiChart[1].values.push({x:current.timestamp, y:current.humidity});
+                if (current.humidity !== null) {
+                    $scope.wtf.multiChart[1].values.push({x:current.timestamp, y:current.humidity});
+                } else {
+                   $scope.wtf.multiChart[1].values.push({x:current.timestamp, y:0});
+               };
 
                 // Process light
                 if ( current.light !== null ) {
@@ -83,12 +100,11 @@ angular.module('homeMonitor')
                 } else if (current.lux !== null) {
                     console.log("[botGraphs] "+ $scope.botName +" we have lux", current.lux )
                     $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.lux});
+                } else {
+                     $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:0});
                 }
-                //$scope.api.refresh();
 
-                //obj.bots[bot].values.push(entity);
-                console.log("newValueCallback: ", bot);
-                //$sensorValues.updateGraphs(entity);
+                console.log("newValueCallback: ");
             }
 
         },
@@ -111,7 +127,7 @@ angular.module('homeMonitor')
                 }]
             };
 
-            var emptyMultiChart = [
+            scope.emptyMultiChart = [
                 {
                     'key':'Temp (F)',
                     'type': 'line',
@@ -131,8 +147,13 @@ angular.module('homeMonitor')
                     'values': []
                 }
             ];
-
-            scope.multiChartOptions = {
+            scope.wtf = {};
+            scope.config = {
+                refreshDataOnly: true, // default: true
+                deepWatchOptions: true, // default: true
+                deepWatchData: true, // default: true
+              };
+            scope.wtf.multiChartOptions = {
                 chart: {
                     'type': 'multiChart',
                     'height': 350,
@@ -147,11 +168,15 @@ angular.module('homeMonitor')
                     'transitionDuration': 500,
                     'interpolate': 'linear',
                     'xScale' : d3.time.scale(),
+                    'xDomain': [1456802842000, 1457321265000 ],
+                    'forceX': [1456802842000, 1457321265000 ],
                     'xAxis': {
-                        tickFormat: function(d){
+                        'showMaxMin': true,
+                        'tickFormat': function(d){
                             return scope.xAxisTickFormatFunction()(d);
                         }
                     },
+                    'xRange': null,
                     'yAxis1': {
                         tickFormat: function(d){
                             return d3.format(',.1f')(d);
@@ -168,7 +193,7 @@ angular.module('homeMonitor')
 
 
             scope.graphs = emptyGraphs;
-            scope.wtf = {multiChart: emptyMultiChart};
+            scope.wtf.multiChart = scope.emptyMultiChart;
             //Grab archived data
 
             scope.tempColor = function(){
@@ -186,51 +211,19 @@ angular.module('homeMonitor')
             };
 
 
-
-
-
-
             scope.timeFilterCallback = function(value) {
                 scope.timestampFilter = value;
                 var now = new Date();
-                var days = value.split("-")[1];
-                var then = now.addDays(-parseInt(days, 10)).addHours(-7);
-                console.log("then: ", then.toISOString());
-                var filters = {
-                    "timestamp_gte":then.toISOString()
-                };
-
-                //$sensorValues.fetch(filters)
-                //.then(function(data, status){
-                //    console.log("successly fetch sensorValues: ", $sensorValues.graphs.temp[0].values.length);
-                //    scope.graphs = emptyGraphs;
-                //    scope.graphs = $sensorValues.graphs;
-                //
-                //    scope.wtf.multiChart[0].values = [];
-                //    scope.wtf.multiChart[1].values = [];
-                //    scope.wtf.multiChart[2].values = [];
-                //
-                //    _.each($sensorValues.graphs.temp[0].values, function(val){
-                //        if (val[1] !== null) {
-                //            var y = parseFloat(val[1], 10);
-                //            if (isNaN(y)) console.log("NaN",val)
-                //            scope.wtf.multiChart[0].values.push({x:val[0], y:val[1]});
-                //        }
-                //    })
-                //    _.each($sensorValues.graphs.humidity[0].values, function(val){
-                //        if (val[1] !== null) scope.wtf.multiChart[1].values.push({x:val[0], y:val[1]});
-                //    })
-                //    _.each($sensorValues.graphs.light[0].values, function(val){
-                //        if (val[1] !== null) scope.wtf.multiChart[2].values.push({x:val[0], y:val[1]});
-                //    })
-                //    $rootScope.$broadcast('sensorvalues-updated');
-                //    // scope.MultiGraphs[2].value = scope.graphs.light.values;
-                //},function(data, status) {
-                //    console.log("failed to fetch sensorValues");
-                //});
+                if (value === 'recent') {
+                    var start = -6 * 60 * 60; // 6 hours
+                } else {
+                    var days = value.split("-")[1];
+                    var start = -days * 24 * 60 * 60;
+                }
+                scope.fetchValues(start);
             };
 
-            scope.timeFilterCallback('last-3-days');
+            scope.timeFilterCallback('recent');
         }
     };
 })
