@@ -47,6 +47,7 @@ angular.module('homeMonitor')
 
             $scope.loadValues = function(values){
                 $scope.wtf.multiChart = angular.copy($scope.emptyMultiChart);
+                var out;
                 angular.forEach(values, function(row){
                     //if (row[1] === null) return;
                     out = {
