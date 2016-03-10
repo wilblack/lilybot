@@ -30,7 +30,7 @@ def on_message(client, userdata, msg):
         lux = msgObj.get('lux', None)
         light = msgObj.get('light', None)
         vals = [msgObj['temp'], msgObj['humidity'], light, lux]
-        db.update2(msg.topic, vals)
+        db.update(msg.topic, vals)
 
 
 class MqttLogger(object):
