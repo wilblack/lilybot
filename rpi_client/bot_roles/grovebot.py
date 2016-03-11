@@ -3,10 +3,10 @@ from datetime import datetime as dt
 
 from settings import SENSORS, ISO_FORMAT
 from bot_roles.core import Core
-from lib import digital_light_sensor as dls
+# from lib import digital_light_sensor as dls
+from lib import TSL2561 as tsl
 
 sys.path.append("/home/pi/projects/GrovePi/Software/Python")
-
 from grovepi import *
 
 
@@ -15,6 +15,7 @@ class GrovePiSensorValues:
     def __init__(self):
         self.sensors = SENSORS
         self.sensors_types = [sens['type'] for sens in SENSORS]
+        tsl.init()
 
         for sensor in self.sensors:
             setattr(self, sensor['type'], sensor['default'])
@@ -49,9 +50,15 @@ class GrovePiSensorValues:
 
         # This is the digital light sensor v1.1
         if 'lux' in self.sensors_types:
+            self.lux = tsl.readVisibleLux()
+            #print "Lux: %i [vis+ir=%i, ir=%i @ gain=%ix, timing=%.1fms]" % (self.lux, tsl.channel0, tsl.channel1, tsl.gain_m, tsl.timing_ms)
+            self.channel0 = tsl.channel0
+            self.channel1 = tsl.channel1
+            self.gain_m = tsl.gain_m
+            self.timing_ms = tsl.timing_ms
 
-            raw = dls.read()
-            self.lux = raw["lux"]
+            #raw = dls.read()
+            #self.lux = raw["lux"]
 
 
         # This is the slider switch sensor
@@ -126,13 +133,9 @@ class GrovePiSensorValues:
         out = {}
         for sensor in self.sensors:
             val = getattr(self, sensor['type'])
-            print "********************"
-            print sensor
-            print val
-            
             out.update({sensor['type']: val})
 
-        # print "toDict: ", out
+        print out
         return out
 
 
@@ -140,7 +143,11 @@ grovePiSensorValues = GrovePiSensorValues()
 
 
 class Grovebot(Core):
+    """
+    This is the cammand handler.
 
+    """
+    
     def __init__(self, socket):
         super(Grovebot, self).__init__(socket)
         self.commands.append('read_sensors')
