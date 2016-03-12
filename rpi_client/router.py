@@ -5,7 +5,7 @@ various bot_roles and defined in bot_roles/.
 """
 
 import json, ast
-from settings import VERBOSE, settings
+from settings import VERBOSE, BOT_PACKAGES
 
 from bot_roles.core import Core
 
@@ -19,7 +19,7 @@ class Router(object):
         self.jjbot = False
         self.magic_mushroom = False
         self.grovebot = False
-        bot_packages = settings['bot_packages']
+        bot_packages = BOT_PACKAGES
 
         self.core = Core(self.socket)
         if 'ctenophore' in bot_packages:

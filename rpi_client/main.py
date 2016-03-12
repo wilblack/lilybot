@@ -6,8 +6,9 @@ import threading, commands, json
 import time
 from datetime import datetime as dt
 
-from settings import settings, URI, VERBOSE, SENSORS, UPDATE_SENSOR_DT, \
-                     LOOP_CALLBACK_DT, BOT_SUBSCRIPTIONS, BOT_CHANNEL, BOT_ROLES, \
+from settings import URI, VERBOSE, SENSORS, UPDATE_SENSOR_DT, \
+                     LOOP_CALLBACK_DT, \
+                     BOT_SUBSCRIPTIONS, BOT_CHANNEL, BOT_ROLES, BOT_NAME, BOT_PACKAGES, \
                      LOG_DTFORMAT, SENSOR_PUBLISH_DT
 from router import Router
 from bot_roles.core import Core
@@ -17,11 +18,11 @@ import paho.mqtt.client as mqtt
 
 MY_CHANNEL = "ardyh/bots/rpi3"
 
-if "jjbot" in settings["bot_packages"]:
+if "jjbot" in BOT_PACKAGES:
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
 
 
-if 'grovebot' in settings["bot_packages"]:
+if 'grovebot' in BOT_PACKAGES:
     from bot_roles.grovebot import grovePiSensorValues
 
 
@@ -71,11 +72,11 @@ class ArdyhClient(object):
 
             message = {
                 'bot_channel':self.bot_channel,
-                'bot_name': settings['bot_name'],
+                'bot_name': BOT_NAME,
                 'bot_roles': self.bot_roles,
                 'mac': get_mac_address(),
                 'handshake': True,
-                'subscriptions': settings['subscriptions'],
+                'subscriptions': BOT_SUBSCRIPTIONS,
                 'sensors': SENSORS,
                 'local_ip': local_ip
             }
@@ -125,9 +126,9 @@ class SensorThread (threading.Thread):
     def run(self):
         print "Starting thread %s" %(self.threadID)
         while not self.stoprequest.isSet():
-            if 'jjbot' in settings['bot_packages']:
+            if 'jjbot' in BOT_PACKAGES:
                 result = BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
-            if 'grovebot' in settings['bot_packages']:
+            if 'grovebot' in BOT_PACKAGES:
                 grovePiSensorValues.update()
 
             time.sleep(UPDATE_SENSOR_DT)
@@ -139,7 +140,7 @@ class SensorThread (threading.Thread):
 if __name__ == "__main__":
     
 
-    if "jjbot" in settings["bot_packages"]:
+    if "jjbot" in BOT_PACKAGES:
         BrickPiSetup()  # setup the serial port for communication
         BrickPi.MotorEnable[PORT_A] = 1 #Enable the Motor A
         BrickPi.MotorEnable[PORT_B] = 1 #Enable the Motor A
@@ -154,7 +155,7 @@ if __name__ == "__main__":
         print "Starting BrickPi sensors"
         thread1.start()
 
-    if "grovebot" in settings["bot_packages"]:
+    if "grovebot" in BOT_PACKAGES:
         grovebot_thread = SensorThread(2, 'Grovebot Thread')
         grovebot_thread.setDaemon(True)
         print "Starting GroveBot sensors"
