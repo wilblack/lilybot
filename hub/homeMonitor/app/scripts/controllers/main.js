@@ -16,7 +16,7 @@ angular.module('homeMonitor')
       $scope.groveBots = [
           {
               "name": "ardyh/bots/rpi1",
-              "location": "Dinning Room",
+              "location": "Bloom Chamber",
               "values": {}
           },
           //{
@@ -25,7 +25,7 @@ angular.module('homeMonitor')
           //},
           {
               "name": "ardyh/bots/rpi3",
-              "location": "Bloom Chamber",
+              "location": "Dinning Room",
               "values": {}
           }
       ]

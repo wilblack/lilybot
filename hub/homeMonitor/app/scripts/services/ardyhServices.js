@@ -37,9 +37,15 @@ angular.module('ardyhServices', [])
 
             data should have keywords 'topic' and 'payload'
         */
+        try {
+            var data = JSON.parse(msg.data);
+        } catch(e) {
 
-        var data = JSON.parse(msg.data);
-        console.log("['onmessage'] ", msg);
+            console.log("['onmessage'] Could parse, gonna try replacing NaN's", msg);
+            var tmp = msg.data.replace(/NaN/g, 'null');
+            var data = JSON.parse(tmp);
+        }
+
         $rootScope.$broadcast('ardyh-onmessage', data);
     };
 
