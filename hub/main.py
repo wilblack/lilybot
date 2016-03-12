@@ -75,8 +75,12 @@ def start_mqtt_cient(socket):
         print(msg.topic+" "+str(msg.payload))
         msgObj = json.loads(msg.payload)
         # TODO Clean out NaN's here.
-
         # send messages over web socket
+        try:
+            json.dumps(msgObj, allow_nan=False)
+        except ValueError:
+            print "****  MESSAGE HAS NAN's", msg.payload
+
         try:
             socket.write_message({"topic": msg.topic, "payload": msgObj})
         except WebSocketClosedError:
@@ -235,7 +239,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         If it has a command, it will look for a 'botName', in kwargs. The botName should
         be the mqtt channel and it will be used to publish an object containing
         the a command, kwargs key/val pairs. These should be picked up in rpi_client.
-
 
 
         """
