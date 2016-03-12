@@ -107,6 +107,7 @@ sudo cp interfaces.lilybot /etc/network/interfaces
 if [ "$botPackage" == "hub" ] ; then
     echo "Install Hub specific packages"
     sudo apt-get install mosquitto mosquitto-clients -y
+    sudo apt-get install nmap - y
 fi 
 
 

@@ -14,7 +14,6 @@ angular.module('homeMonitor')
 
             $scope.onMessageListner = null;
             $scope.onMessageCallback = function(e, data){
-                console.log("[botGraphs controller ardyh-onmessage]", data);
                 if (data.topic !== $scope.botName) return;
                 $scope.newValueCallback(data.payload);
             }
@@ -51,10 +50,10 @@ angular.module('homeMonitor')
                 angular.forEach(values, function(row){
                     //if (row[1] === null) return;
                     out = {
-                        temp:row[1] || undefined,
-                        humidity: row[2] || undefined,
-                        light: row[3] | undefined,
-                        lux: row[4] || undefined,
+                        temp:row[1] || null,
+                        humidity: row[2] || null,
+                        light: row[3] || null,
+                        lux: row[4] || null,
                         timestamp: row[0] * 1000 // Need to multi by 1000 to get milliseconds
                     }
                     $scope.newValueCallback(out);
@@ -63,9 +62,6 @@ angular.module('homeMonitor')
                 $scope.wtf.multiChartOptions.chart.xDomain = [$scope.start, $scope.end];
                 $scope.wtf.multiChartOptions.chart.forceX = [$scope.start, $scope.end];
                 $scope.api.refresh();
-                //console.table($scope.wtf.multiChart[0].values);
-                //$scope.api.clearElement();
-
             };
 
             $scope.newValueCallback = function(values){
@@ -75,37 +71,31 @@ angular.module('homeMonitor')
                current.humidity = !isNaN(values.humidity) ? values.humidity : null;
                current.light = !isNaN(values.light) ? values.light : null;
                current.lux = !isNaN(values.lux) ? values.lux : null;
-               console.log("Converting from ", values.timestamp.toString());
                current.timestamp = new Date(values.timestamp);//.toString($scope.dtFormat);
 
                // Process temp
                if (current.temp !== null) {
+
                     var temp = parseFloat(current.temp, 10);
+                    temp = temp * (9/5) + 32;
                     if (isNaN(temp)) console.log("NaN",current.temp);
                     $scope.wtf.multiChart[0].values.push({x:current.timestamp, y:temp});
-               } else {
-                   $scope.wtf.multiChart[0].values.push({x:current.timestamp, y:0});
-               };
+               }
 
                 // Process humidity
                 if (current.humidity !== null) {
                     $scope.wtf.multiChart[1].values.push({x:current.timestamp, y:current.humidity});
-                } else {
-                   $scope.wtf.multiChart[1].values.push({x:current.timestamp, y:0});
-               };
+                }
 
                 // Process light
                 if ( current.light !== null ) {
-                    console.log("[botGraphs] "+ $scope.botName +" we have light", current.light )
+
                     $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.light});
                 } else if (current.lux !== null) {
-                    console.log("[botGraphs] "+ $scope.botName +" we have lux", current.lux )
-                    $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.lux});
-                } else {
-                     $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:0});
-                }
 
-                console.log("newValueCallback: ");
+                    $scope.wtf.multiChart[2].values.push({x:current.timestamp, y:current.lux});
+                }
+                console.log("[newValueCallback()] added newVal");
             }
 
         },
@@ -204,13 +194,11 @@ angular.module('homeMonitor')
                 }
             };
 
-
             scope.xAxisTickFormatFunction = function(){
                 return function(d){
                     return new Date(d).toString("ddd hh:mmt");
                 };
             };
-
 
             scope.timeFilterCallback = function(value) {
                 scope.timestampFilter = value;
