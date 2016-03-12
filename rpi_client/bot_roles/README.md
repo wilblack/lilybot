@@ -45,9 +45,7 @@ Run `sudo raspi-config` then in Advanced Setting enable I2C and load the I2C ker
 
 ### 1. Configure the rpi_client with the bot package you are using
 
-* Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
-
-TODO Show Example.
+Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
 
 This is an example local_settings.py file. It is the bare minimum required. Besure and change the BOT_CHANNEL to
 an appropriate unqiue channel name (this is used for MQTT messaging).
