@@ -25,18 +25,28 @@ class Db(object):
     bots = ['ardyh.bots.rpi1', 'ardyh.bots.rpi3']
 
     archive2 = [
-            'DS:temp:GAUGE:30:0:100',
-            'DS:humidity:GAUGE:30:0:100',
-            'DS:light:GAUGE:30:0:1200',
-            'DS:lux:GAUGE:30:0:1200',
-            'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
-            'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
-            'RRA:AVERAGE:0.5:10:1440',  # 10 minute averge for 7 days
-            'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
+        'DS:temp:GAUGE:30:0:100',
+        'DS:humidity:GAUGE:30:0:100',
+        'DS:light:GAUGE:30:0:1200',
+        'DS:lux:GAUGE:30:0:1200',
+        'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
+        'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
+        'RRA:AVERAGE:0.5:20:1440',  # 10 minute averge for 7 days
+        'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
+        'RRA:AVERAGE:0.5:360:1480',  # 3 hrs averge for 185 days
         ]
 
+    device_archive = [
+        'DS:present:GAUGE:60:0:1',
+        'RRA:AVERAGE:0.5:1:1440',  # 1 minute average for 24 hours
+        'RRA:AVERAGE:0.5:5:1440',  # 5 minute averge for 3 days
+        'RRA:AVERAGE:0.5:10:1440',  # 10 minute averge for 7 days
+        'RRA:AVERAGE:0.5:30:1488',  # 30 minute averge for 31 days
+        'RRA:AVERAGE:0.5:180:1480',  # 3 hrs averge for 185 days
+    ]
 
-    def create(self, filename, archive):
+
+    def create(self, filename=None, archive=None, step=None, no_overwrite=True):
         """
 
         rrdtool create target.rrd --start 1023654125 --step 300 DS:mem:GAUGE:600:0:671744 RRA:AVERAGE:0.5:12:24 RRA:AVERAGE:0.5:288:31
@@ -46,85 +56,54 @@ class Db(object):
         
         if not filename: filename = self.filename
         if not archive: archive = self.archive
+        if not step: step = self.step
         
-        cmd = "rrdtool create %s --step %s" %(filename, self.step)
+        cmd = "rrdtool create %s --step %s" %(filename, step)
+        if no_overwrite:
+            cmd = cmd + " --no-overwrite"
         cmd = cmd + ' ' + ' '.join(archive)
         print cmd
         subprocess.call(cmd, shell=True)
 
-    def update(self, bot, val):
-        """
-            rrdtool update target.rrd N:$total_mem
-        
-        """
-        print "Trying to update %s with %s" %(bot, val)
-        
-
-        if bot == 'ardyh/bots/rpi1':
-            cmd = "rrdtool update %s N:%s" %(self.filename, val)
-            print cmd
-            subprocess.call(cmd, shell=True)
-
-
-    def fetch(self, bot=None, variable=None, start=None, end=None):
-        """
-
-        start and end should be datetime objects
-
-        rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200
-
-        """
-
-
-        cmd = "rrdtool fetch %s AVERAGE" %(self.filename)
-        if start:
-            cmd = cmd + ' --start %s' %(self.utc(start))
-
-        if end:
-            cmd = cmd + ' --end %s' %(self.utc(end))
-
-        print cmd
-        rs = subprocess.check_output(cmd, shell=True)
-        # out  = [(int(item.split(": ")[0]), float(item.split(": ")[1])) 
-        #             for item in  rs.strip().split('\n')[3:] ]
-        out = []
-        for row  in rs.strip().split('\n')[3:]:
-            ts, val = row.split(": ")
-            ts_verbose = dt.fromtimestamp(int(ts)).strftime(self.ISO_FORMAT)
-            
-            if val == 'nan':
-                val = None
-            else:
-                val = round(float(val), 2)
-            
-            out.append([int(ts), val, ts_verbose])
-
-
-        print "%s entries, starting %s and on %s" %(len(out),out[0][2], out[-1][2])
-        return out
-
-
-    def create2(self):
+    def create_bots(self):
         for bot in self.bots:
             self.create(self.get_filename(bot), self.archive2)
 
 
-    def update2(self, bot, vals):
+    def create_device(self, mac):
         """
-            rrdtool update target.rrd N:$total_mem
-        
+        This create a db for device logging by mac address.
         """
-        bot = bot.replace("/", ".")
-        print "Trying to update %s with %s" %(bot, vals)
-        val = ":".join([str(v) for v in vals]).replace("None", "U")
+        fname = mac.replace(":","_") + ".rrd"
+        self.create(fname, self.device_archive, 60, True)
 
-        cmd = "rrdtool update %s N:%s" %(self.get_filename(bot), val)
+
+    def update_device(self, mac, val):
+        """
+        This create a db for device logging by mac address.
+        """
+        fname = mac.replace(":","_") + ".rrd"
+        cmd = "rrdtool update %s N:%s" %(fname, val)
         print cmd
         subprocess.call(cmd, shell=True)
 
 
+    def fetch_device(self, mac, start=None, end=None):
+        fname = "jobs/" + mac.replace(":","_") + ".rrd"
+        rs = self._fetch(fname, start, end)
+        out = []
+        print rs
+        for row  in rs.strip().split('\n')[3:]:
+            ts, val = row.split(": ")
+            ts_verbose = dt.fromtimestamp(int(ts)).strftime(self.ISO_FORMAT)
+            if val == 'nan':
+                val = 0
+            out.append([int(ts), val])
+        return out
 
-    def fetch2(self, bot=None, start=None, end=None):
+
+
+    def _fetch(self, fname, start=None, end=None):
         """
 
         start and end should be datetime objects
@@ -134,7 +113,7 @@ class Db(object):
         """
 
 
-        cmd = "rrdtool fetch %s AVERAGE" %(self.get_filename(bot))
+        cmd = "rrdtool fetch %s AVERAGE" %(fname)
         if start:
             cmd = cmd + ' --start %s' %(start)
 
@@ -143,8 +122,44 @@ class Db(object):
 
         print cmd
         rs = subprocess.check_output(cmd, shell=True)
-        # out  = [(int(item.split(": ")[0]), float(item.split(": ")[1])) 
-        #             for item in  rs.strip().split('\n')[3:] ]
+        return rs
+
+
+    def update(self, bot, vals):
+        """
+            rrdtool update target.rrd N:$total_mem
+        
+        """
+        bot = bot.replace("/", ".")
+        val = ":".join([str(v) for v in vals]).replace("None", "U")
+        cmd = "rrdtool update %s N:%s" %(self.get_filename(bot), val)
+        print cmd
+        subprocess.call(cmd, shell=True)
+
+
+
+    def fetch(self, bot=None, start=None, end=None):
+        """
+
+        start and end should be datetime objects
+
+        rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200
+
+        """
+
+
+        # cmd = "rrdtool fetch %s AVERAGE" %(self.get_filename(bot))
+        # if start:
+        #     cmd = cmd + ' --start %s' %(start)
+
+        # if end:
+        #     cmd = cmd + ' --end %s' %(end)
+
+        # print cmd
+        # rs = subprocess.check_output(cmd, shell=True)
+        # # out  = [(int(item.split(": ")[0]), float(item.split(": ")[1])) 
+        # #             for item in  rs.strip().split('\n')[3:] ]
+        rs = self._fetch(self.get_filename(bot), start, end)
         out = []
         for row  in rs.strip().split('\n')[3:]:
             ts, vals = row.split(": ")

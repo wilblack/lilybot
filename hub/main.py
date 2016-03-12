@@ -56,7 +56,6 @@ from mqtt_client import MqttLogger
 mqtt_logger = MqttLogger(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
 
-
 def start_mqtt_cient(socket):
 
     # The callback for when the client receives a CONNACK response from the server.
@@ -75,6 +74,8 @@ def start_mqtt_cient(socket):
     def on_message(client, userdata, msg):
         print(msg.topic+" "+str(msg.payload))
         msgObj = json.loads(msg.payload)
+        # TODO Clean out NaN's here.
+
         # send messages over web socket
         try:
             socket.write_message({"topic": msg.topic, "payload": msgObj})
@@ -132,18 +133,17 @@ class MainHandler(HubWebRequestHandler):
             assert len(pieces) == 2, "Invalid url, sensor endpoit is /api/sensors/BOT-NAME"
             
             # Get start and end date filters and convert datetime objects
-            start = None; end = None
             start = self.get_argument('start', None)
             end = self.get_argument('end', None)
             
 
             bot = pieces[1]
-            rs = db.fetch2(bot, start, end)
+            rs = db.fetch(bot, start, end)
             #out = json.dumps(rs)
             out = {'results':rs}
             self.write(out)
 
-        elif action == "bot":
+        elif pieces[0] == "bot":
             temp = []
             for l in listeners:
                 row = {
@@ -157,6 +157,22 @@ class MainHandler(HubWebRequestHandler):
                 temp.append(row)
 
             out = json.dumps(temp)
+            self.write(out)
+
+        elif pieces[0] == "device":
+            """
+            Endpoint 
+
+            /api/device/MAC-ADDRESS/
+
+            """
+            mac = pieces[1]
+
+            start = self.get_argument('start', None)
+            end = self.get_argument('end', None)
+
+            rs = db.fetch_device(mac, start, end)
+            out = {'results':rs}
             self.write(out)
 
         else:
@@ -193,7 +209,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         except:
             bot_name = ""
         print "Hello from %s" %bot_name
-
 
         self.bot_name = bot_name
         i, old_socket = get_bot_listener(bot_name)
