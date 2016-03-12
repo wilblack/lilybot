@@ -22,7 +22,7 @@ GrovePi uses Seeed sensors, below are the sensors I have currelty tested with Li
 Run `sudo raspi-config` then in Advanced Setting enable I2C and load the I2C kernal module.
 
 
-### 2. Install and Update the GrovePi Firmware.
+### 3. Install and Update the GrovePi Firmware.
 
 **Install GrovePi.** After install the system will reboot.
 
@@ -31,7 +31,7 @@ Run `sudo raspi-config` then in Advanced Setting enable I2C and load the I2C ker
     git clone https://github.com/DexterInd/GrovePi.git
     cd GrovePi
     sudo chmod 755 install Scripts/install.sh
-    Scripts/install.sh
+    sudo Scripts/install.sh
 
 **Update Firmware**
 
@@ -43,7 +43,7 @@ Run `sudo raspi-config` then in Advanced Setting enable I2C and load the I2C ker
 
 
 
-### 1. Configure the rpi_client with the bot package you are using
+### 4. Configure the rpi_client with the bot package you are using
 
 Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
 
@@ -84,6 +84,18 @@ an appropriate unqiue channel name (this is used for MQTT messaging).
 
 ```
 
+### 5. Test the RPI
+Trying running lilybot
+
+    rpi_client/start_lilybot.sh
+
+
+### 6. Config lilybot to start on start-up
+
+
+    sudo cp rpi_client/lilybotd /etc/init.d/.
+    sudo update-rc.d lilybotd defaults
+
 
 Then restart `lilybotd`
 
@@ -96,14 +108,19 @@ If the service won't start, you can troubleshoot with
 
 
 
-## Troubleshooting
+### Troubleshooting
 
-*On Grovebot the PIR sensor does not work.*
+**Get error `Error accessing 0x29: Check your I2C address`**
+You can check what going on by using `sudo i2cdetect y- 1`. Make sure you have all the sensor plugged in. I was missing the digital light sensor.
+
+**On Grovebot the PIR sensor does not work.**
 If you are having trouble with the SMBus (for the light sensor on Grovebot for instance) you can user `i2cdetect` to debug.
 
 ```
 # Query for the device. You may need to check 0 also. 
+
 sudo i2cdetect 1
+
 ```
 
 You should get something that looks like below, if you don't, try a different device number.
