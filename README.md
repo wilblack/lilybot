@@ -26,25 +26,16 @@ To configure a hardware package you need to edit `rpi_client/local_settings.py`
 A Libaray to control Lego Mindsorm sensors and motors (EV3 Sensors 
 are not currenlt supported by brick BrickPi, but EV3 motors do work fine) connected to a BrickPi.  
 
+
 ### Ctenophore
 An LED Strip controller. This exposes a web api to control these https://www.adafruit.com/products/306
+
 
 ### GroveBot
 *bot_package*: groverbot
 
 A lilbary to interface with the GrovePi and its sensors. You will need a GrovePi and various sensors for this.
-
-| Curently supported sensors   |
-| Sensor                | Port |
-|-----------------------|------|
-| Temp and Humidity Pro | D4   |
-| Light                 | A2   |
-| Sound                 | A1   |
-| Touch                 | D7   |
-| PIR                   | D3   |
-
-For set instructions see [Grovebot Setup](rpi_client/bot_roles/grovebot.md).
-
+For set instructions see [Grovebot Setup](rpi_client/bot_roles/README.md).
 If you have problems see [troublshooting](#GrovePi Troubleshooting)
 
 
