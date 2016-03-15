@@ -69,7 +69,7 @@ echo "\n\n*****************************\n"
 echo "Creating ~/projects/ and ~/.ssh/"
 echo "\n*****************************\n"
 
-mkdir ~/,ssh
+mkdir ~/.ssh
 cd /home/pi
 mkdir projects
 cd projects
