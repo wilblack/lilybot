@@ -19,10 +19,11 @@ angular.module('homeMonitor')
               "location": "Bloom Chamber",
               "values": {}
           },
-          //{
-          //    "name": "ardyh/bots/rpi2",
-          //    "values": {}
-          //},
+          {
+              "name": "ardyh/bots/rpi2",
+              "location": "Dinning Room",
+              "values": {}
+          },
           {
               "name": "ardyh/bots/rpi3",
               "location": "Dinning Room",
