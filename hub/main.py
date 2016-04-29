@@ -75,8 +75,12 @@ def start_mqtt_cient(socket):
         print(msg.topic+" "+str(msg.payload))
         msgObj = json.loads(msg.payload)
         # TODO Clean out NaN's here.
-
         # send messages over web socket
+        try:
+            json.dumps(msgObj, allow_nan=False)
+        except ValueError:
+            print "****  MESSAGE HAS NAN's", msg.payload
+
         try:
             socket.write_message({"topic": msg.topic, "payload": msgObj})
         except WebSocketClosedError:
@@ -101,18 +105,20 @@ def get_bot_listener(bot_name):
     return next( ([i,bot] for i, bot in enumerate(listeners) if bot['bot_name'] == bot_name), [None, None] )
 
 
-
 class HubWebRequestHandler(tornado.web.RequestHandler):
 
-    def set_allow_origin(self, request):
-        origin_domain = self.request.headers.get("Origin", None)
+    def set_default_headers(self):
 
-        if origin_domain:
-            self.set_header("Access-Control-Allow-Origin", origin_domain)
-        else:
-            self.set_header("Access-Control-Allow-Origin", "*")
+        print "setting headers"
+        self.set_header("Access-Control-Allow-Origin", "*")
+
 
 class MainHandler(HubWebRequestHandler):
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
 
 
     def get(self, action=None, *args, **kwargs):
@@ -127,6 +133,7 @@ class MainHandler(HubWebRequestHandler):
           This endpoint lists all bots connected to via web socket.
         """
 
+        print "In MainHandler"
         pieces = action.strip("/").split("/")
 
         if pieces[0] == 'sensors':
@@ -235,7 +242,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         If it has a command, it will look for a 'botName', in kwargs. The botName should
         be the mqtt channel and it will be used to publish an object containing
         the a command, kwargs key/val pairs. These should be picked up in rpi_client.
-
 
 
         """
