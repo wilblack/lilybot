@@ -13,7 +13,7 @@ db = Db()
 fname = "lan_status.txt"
 ISO_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-cmd = "sudo nmap -sn 192.168.0.0-150"
+cmd = "sudo nmap -sn 192.168.1.0-150"
 rs = subprocess.check_output(cmd, shell=True)
 
 lines = rs.split("\n")
