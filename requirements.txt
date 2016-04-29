@@ -2,7 +2,6 @@ Pygments==1.6
 RPi.GPIO==0.5.4
 argparse==1.2.1
 backports.ssl-match-hostname==3.4.0.2
-bpython==0.12
 ## FIXME: could not find svn URL in dependency_links for this package:
 distribute==0.6.24dev-r0
 numpy==1.6.2

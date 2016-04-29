@@ -14,12 +14,12 @@ class Db(object):
     filename = '/home/pi/projects/lilybot/hub/sensors.rrd'
 
     archive = [
-            'DS:temp:GAUGE:30:0:100',
-            'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
-            'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
-            'RRA:AVERAGE:0.5:10:1440',  # 10 minute averge for 7 days
-            'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
-        ]
+        'DS:temp:GAUGE:30:0:100',
+        'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
+        'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
+        'RRA:AVERAGE:0.5:10:1440',  # 10 minute averge for 7 days
+        'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
+    ]
 
     # Archives hould be name with boit name in decimal form.
     bots = ['ardyh.bots.rpi1', 'ardyh.bots.rpi3']
