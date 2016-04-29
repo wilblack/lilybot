@@ -8,13 +8,13 @@
  * Service in the webappApp.
  */
 angular.module('ardyhServices', [])
-.service('$ardyh', function ($rootScope, $q, $http) {
+.service('$ardyh', function ($rootScope, $q, $http, config) {
     // AngularJS will instantiate a singleton by calling "new" on this function
 
     console.log('[ardyhServices]');
 
     var obj = this;
-    var DOMAIN = "192.168.0.105:9093";
+    var DOMAIN = config.hubDomain;
     var SOCKET_URL = "ws://" + DOMAIN + "/ws";
     obj.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
 

@@ -22,6 +22,10 @@ angular
         'mockServices',
         'nvd3',
     ])
+    .constant('config', {
+        "hubDomain": "192.168.0.106:9093"
+    })
+
     .config(function ($routeProvider) {
         $routeProvider
         .when('/', {

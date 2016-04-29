@@ -7,19 +7,19 @@ import subprocess
 import math
 
 class Db(object):
-    
+
     conn = None;
     step = 30
     ISO_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
     filename = '/home/pi/projects/lilybot/hub/sensors.rrd'
 
     archive = [
-        'DS:temp:GAUGE:30:0:100',
-        'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
-        'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
-        'RRA:AVERAGE:0.5:10:1440',  # 10 minute averge for 7 days
-        'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
-    ]
+            'DS:temp:GAUGE:30:0:100',
+            'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
+            'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
+            'RRA:AVERAGE:0.5:10:1440',  # 10 minute averge for 7 days
+            'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
+        ]
 
     # Archives hould be name with boit name in decimal form.
     bots = ['ardyh.bots.rpi1', 'ardyh.bots.rpi3']
@@ -56,6 +56,10 @@ class Db(object):
         'RRA:AVERAGE:0.5:180:1480',  # 3 hrs averge for 185 days
     ]
 
+
+    def __init__(self):
+        self.create_bots()
+        
 
     def create(self, filename=None, archive=None, step=None, no_overwrite=True):
         """
