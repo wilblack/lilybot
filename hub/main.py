@@ -105,18 +105,20 @@ def get_bot_listener(bot_name):
     return next( ([i,bot] for i, bot in enumerate(listeners) if bot['bot_name'] == bot_name), [None, None] )
 
 
-
 class HubWebRequestHandler(tornado.web.RequestHandler):
 
-    def set_allow_origin(self, request):
-        origin_domain = self.request.headers.get("Origin", None)
+    def set_default_headers(self):
 
-        if origin_domain:
-            self.set_header("Access-Control-Allow-Origin", origin_domain)
-        else:
-            self.set_header("Access-Control-Allow-Origin", "*")
+        print "setting headers"
+        self.set_header("Access-Control-Allow-Origin", "*")
+
 
 class MainHandler(HubWebRequestHandler):
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
 
 
     def get(self, action=None, *args, **kwargs):
@@ -131,6 +133,7 @@ class MainHandler(HubWebRequestHandler):
           This endpoint lists all bots connected to via web socket.
         """
 
+        print "In MainHandler"
         pieces = action.strip("/").split("/")
 
         if pieces[0] == 'sensors':
