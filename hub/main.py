@@ -39,10 +39,10 @@ import tornado.template
 VERBOSE = True
 PORT = 9093
 ISO_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-IP = "192.168.0.105"
+IP = "192.168.0.106"
 ARDYH_MONITOR = 'monitor.solalla.ardyh'
 
-MQTT_BROKER_URL = "192.168.0.105"
+MQTT_BROKER_URL = "192.168.0.106"
 MQTT_BROKER_PORT = 1883
 
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -75,8 +75,12 @@ def start_mqtt_cient(socket):
         print(msg.topic+" "+str(msg.payload))
         msgObj = json.loads(msg.payload)
         # TODO Clean out NaN's here.
-
         # send messages over web socket
+        try:
+            json.dumps(msgObj, allow_nan=False)
+        except ValueError:
+            print "****  MESSAGE HAS NAN's", msg.payload
+
         try:
             socket.write_message({"topic": msg.topic, "payload": msgObj})
         except WebSocketClosedError:
@@ -235,7 +239,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         If it has a command, it will look for a 'botName', in kwargs. The botName should
         be the mqtt channel and it will be used to publish an object containing
         the a command, kwargs key/val pairs. These should be picked up in rpi_client.
-
 
 
         """

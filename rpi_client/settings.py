@@ -15,4 +15,4 @@ try:
 except:
     print "Could not import local_settings"
 
-URI = "%s?%s" %(URI_BASE, settings['bot_name'])  # This is only used for the ardyh connection, not for skynet
+URI = "%s?%s" %(URI_BASE, BOT_CHANNEL)  # This is only used for the ardyh connection, not for skynet

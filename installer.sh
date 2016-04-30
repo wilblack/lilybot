@@ -69,7 +69,7 @@ echo "\n\n*****************************\n"
 echo "Creating ~/projects/ and ~/.ssh/"
 echo "\n*****************************\n"
 
-mkdir ~/,ssh
+mkdir ~/.ssh
 cd /home/pi
 mkdir projects
 cd projects
@@ -107,6 +107,7 @@ sudo cp interfaces.lilybot /etc/network/interfaces
 if [ "$botPackage" == "hub" ] ; then
     echo "Install Hub specific packages"
     sudo apt-get install mosquitto mosquitto-clients -y
+    sudo apt-get install nmap - y
 fi 
 
 

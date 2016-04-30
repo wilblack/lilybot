@@ -8,13 +8,13 @@
  * Service in the webappApp.
  */
 angular.module('ardyhServices', [])
-.service('$ardyh', function ($rootScope, $q, $http) {
+.service('$ardyh', function ($rootScope, $q, $http, config) {
     // AngularJS will instantiate a singleton by calling "new" on this function
 
     console.log('[ardyhServices]');
 
     var obj = this;
-    var DOMAIN = "192.168.0.105:9093";
+    var DOMAIN = config.hubDomain;
     var SOCKET_URL = "ws://" + DOMAIN + "/ws";
     obj.dtFormat = 'hh:mm:ss tt, ddd MMM dd, yyyy';
 
@@ -37,9 +37,15 @@ angular.module('ardyhServices', [])
 
             data should have keywords 'topic' and 'payload'
         */
+        try {
+            var data = JSON.parse(msg.data);
+        } catch(e) {
 
-        var data = JSON.parse(msg.data);
-        console.log("['onmessage'] ", msg);
+            console.log("['onmessage'] Could parse, gonna try replacing NaN's", msg);
+            var tmp = msg.data.replace(/NaN/g, 'null');
+            var data = JSON.parse(tmp);
+        }
+
         $rootScope.$broadcast('ardyh-onmessage', data);
     };
 

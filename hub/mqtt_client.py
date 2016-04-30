@@ -41,6 +41,7 @@ class MqttLogger(object):
         self.client.on_connect = on_connect
         self.client.on_message = on_message
 
+        print "MgttLogger.__init__() Trying to connect to %s" %(broker_url)
         self.client.connect(broker_url, 1883, 60)
 
         print "Starting mqtt self.client"

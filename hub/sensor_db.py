@@ -7,7 +7,7 @@ import subprocess
 import math
 
 class Db(object):
-    
+
     conn = None;
     step = 30
     ISO_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -23,6 +23,17 @@ class Db(object):
 
     # Archives hould be name with boit name in decimal form.
     bots = ['ardyh.bots.rpi1', 'ardyh.bots.rpi3']
+    grovebot_archive = [
+        'DS:temp:GAUGE:30:0:100',
+        'DS:humidity:GAUGE:30:0:100',
+        'DS:light:GAUGE:30:0:1200',
+        'DS:lux:GAUGE:30:0:1200',
+        'RRA:AVERAGE:0.5:2:1440',  # 1 minute average for 24 hours
+        'RRA:AVERAGE:0.5:10:1440',  # 5 minute averge for 3 days
+        'RRA:AVERAGE:0.5:20:1440',  # 10 minute averge for 7 days
+        'RRA:AVERAGE:0.5:60:1488',  # 30 minute averge for 31 days
+        'RRA:AVERAGE:0.5:360:1480',  # 3 hrs averge for 185 days
+    ]
 
     archive2 = [
         'DS:temp:GAUGE:30:0:100',
@@ -46,6 +57,10 @@ class Db(object):
     ]
 
 
+    def __init__(self):
+        self.create_bots()
+        
+
     def create(self, filename=None, archive=None, step=None, no_overwrite=True):
         """
 
@@ -65,42 +80,24 @@ class Db(object):
         print cmd
         subprocess.call(cmd, shell=True)
 
+
+    def create_grovebot(self, bot):
+        """
+        Creates a new Grovebot archive. It will NOT overwrite an existing archive.
+
+        Args:
+            bot: [String] the unique name of the bot, e.g. "ardyh/bots/rpi2". This will
+                 be used to create file for the db, the file name will replce the "/" with a "."
+
+        Returns: None
+
+        """
+        self.create(self.get_filename(bot), self.grovebot_archive)
+
+
     def create_bots(self):
         for bot in self.bots:
             self.create(self.get_filename(bot), self.archive2)
-
-
-    def create_device(self, mac):
-        """
-        This create a db for device logging by mac address.
-        """
-        fname = mac.replace(":","_") + ".rrd"
-        self.create(fname, self.device_archive, 60, True)
-
-
-    def update_device(self, mac, val):
-        """
-        This create a db for device logging by mac address.
-        """
-        fname = mac.replace(":","_") + ".rrd"
-        cmd = "rrdtool update %s N:%s" %(fname, val)
-        print cmd
-        subprocess.call(cmd, shell=True)
-
-
-    def fetch_device(self, mac, start=None, end=None):
-        fname = "jobs/" + mac.replace(":","_") + ".rrd"
-        rs = self._fetch(fname, start, end)
-        out = []
-        print rs
-        for row  in rs.strip().split('\n')[3:]:
-            ts, val = row.split(": ")
-            ts_verbose = dt.fromtimestamp(int(ts)).strftime(self.ISO_FORMAT)
-            if val == 'nan':
-                val = 0
-            out.append([int(ts), val])
-        return out
-
 
 
     def _fetch(self, fname, start=None, end=None):
@@ -127,7 +124,14 @@ class Db(object):
 
     def update(self, bot, vals):
         """
-            rrdtool update target.rrd N:$total_mem
+        This should be renamed to the update_grovebot.
+        Args:
+            bot: [String] the unique name of the bot, e.g. "ardyh/bots/rpi2". This will
+                 be used to create file for the db, the file name will replce the "/" with a "."
+
+            vals: [Dict] Keyword: 'light', 'lux', 'timestamp', 'temp', 'humidity'
+
+        rrdtool update target.rrd N:$total_mem
         
         """
         bot = bot.replace("/", ".")
@@ -137,13 +141,19 @@ class Db(object):
         subprocess.call(cmd, shell=True)
 
 
-
     def fetch(self, bot=None, start=None, end=None):
         """
 
-        start and end should be datetime objects
+        This should be renamed to the update_grovebot.
+        Args:
+            bot: [String] the unique name of the bot, e.g. "ardyh/bots/rpi2". This will
+                 be used to create file for the db, the file name will replce the "/" with a "."
 
-        rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200
+            start: [Integer] Seconds since Unix Epoch (negative values are allowed)
+            start: [Integer] Seconds since Unix Epoch (negative values are allowed)
+
+        Example Command:
+            rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200
 
         """
 
@@ -178,6 +188,39 @@ class Db(object):
         print "%s entries, starting %s and on %s" %(len(out),out[0][2], out[-1][2])
         return out
 
+    def create_device(self, mac):
+        """
+        This create a db for device logging by mac address.
+        """
+        fname = mac.replace(":","_") + ".rrd"
+        self.create(fname, self.device_archive, 60, True)
+
+
+    def update_device(self, mac, val):
+        """
+        This create a db for device logging by mac address.
+        """
+        fname = mac.replace(":","_") + ".rrd"
+        cmd = "rrdtool update %s N:%s" %(fname, val)
+        print cmd
+        subprocess.call(cmd, shell=True)
+
+
+    def fetch_device(self, mac, start=None, end=None):
+        fname = "jobs/" + mac.replace(":","_") + ".rrd"
+        rs = self._fetch(fname, start, end)
+        out = []
+        print rs
+        for row  in rs.strip().split('\n')[3:]:
+            ts, val = row.split(": ")
+            ts_verbose = dt.fromtimestamp(int(ts)).strftime(self.ISO_FORMAT)
+            if val == 'nan':
+                val = 0
+            out.append([int(ts), val])
+        return out
+
+
+
     def utc(self, dt_obj):
         tt = dt.timetuple(dt_obj)
         return int(time.mktime(tt))
@@ -191,10 +234,10 @@ class Db(object):
 
 if __name__ == "__main__":
     db = Db()
-    #db.create2()
-    db.update2(db.bots[1], [23, 75, 1000, 1200])
-    rs = db.fetch2(db.bots[1])
-    print rs
+    # db.create2()
+    # db.update2(db.bots[1], [23, 75, 1000, 1200])
+    # rs = db.fetch2(db.bots[1])
+    # print rs
 
     # now = dt.now()
     # start = now - timedelta(minutes=30)
@@ -203,12 +246,12 @@ if __name__ == "__main__":
     # print rs
     # import pdb; pdb.set_trace()
 
-    while True:
-        vals = [randint(10,50)]*4
-        db.update2(db.bots[0], vals)
-        db.update2(db.bots[1], vals)
-        print "Added value %s" %vals
-        sleep(5)
+    # while True:
+    #     vals = [randint(10,50)]*4
+    #     db.update2(db.bots[0], vals)
+    #     db.update2(db.bots[1], vals)
+    #     print "Added value %s" %vals
+    #     sleep(5)
 
 
 

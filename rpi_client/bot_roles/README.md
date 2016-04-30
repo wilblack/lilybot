@@ -1,26 +1,54 @@
-
 # 1. Grovebot Instructions
 
 ## Initial Setup
 You can use the seeed light sensor on port A2, or the digital light sensor on port I2C - 2.
 
-### 1. Enable I2C
+### 1. Attach GrovePi and Sensors
+Attac the BrovePi and sensors to the Pi. Then boot the Pi.
+GrovePi uses Seeed sensors, below are the sensors I have currelty tested with Lilybot.
 
-Run `sudo raspi-config` then in Advanced Setting enable I2C.
+    | Curently supported sensors    |
+    | Sensor                | Port  |
+    |-----------------------|-------|
+    | Temp and Humidity Pro | D4    |
+    | Analog Light          | A2    |
+    | Digital Light         | I2C-2 |
+    | Sound                 | A1    |
+    | Touch                 | D7    |
+    | PIR                   | D3    |
 
-### 2. Update the GrovePi Firmware.
+
+### 2. Enable I2C
+Run `sudo raspi-config` then in Advanced Setting enable I2C and load the I2C kernal module.
+
+
+### 3. Install and Update the GrovePi Firmware.
+
+**Install GrovePi.** After install the system will reboot.
+
+
+    cd /home/pi/projects/
+    git clone https://github.com/DexterInd/GrovePi.git
+    cd GrovePi
+    sudo chmod 755 install Scripts/install.sh
+    sudo Scripts/install.sh
+
+**Update Firmware**
+
 
     cd /home/pi/projects/GrovePi/Firmware
     sudo chmod +x firmware_update.sh
     sudo ./firmware_update.sh
 
-### 1. Configure the rpi_client with the bot package you are using
 
-* Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
 
-TODO Show Example.
 
-This is an example local_settings.py file. It is the bare minimum required.
+### 4. Configure the rpi_client with the bot package you are using
+
+Copy a local setting file from `rpi_client/bot_roles/` into rpi_client/local_settings.py. Edit that file appropriately.
+
+This is an example local_settings.py file. It is the bare minimum required. Besure and change the BOT_CHANNEL to
+an appropriate unqiue channel name (this is used for MQTT messaging).
 
 ```#python
 
@@ -47,13 +75,26 @@ This is an example local_settings.py file. It is the bare minimum required.
             'default':0,
            },
 
-           {'type':'light',
+           # Use this if you are using the TSL2561
+           {'type':'lux',
              'default':0,
            },
 
     ]
 
 ```
+
+### 5. Test the RPI
+Trying running lilybot
+
+    rpi_client/start_lilybot.sh
+
+
+### 6. Config lilybot to start on start-up
+
+
+    sudo cp rpi_client/lilybotd /etc/init.d/.
+    sudo update-rc.d lilybotd defaults
 
 
 Then restart `lilybotd`
@@ -67,14 +108,19 @@ If the service won't start, you can troubleshoot with
 
 
 
-## Troubleshooting
+### Troubleshooting
 
-*On Grovebot the PIR sensor does not work.*
+**Get error `Error accessing 0x29: Check your I2C address`**
+You can check what going on by using `sudo i2cdetect y- 1`. Make sure you have all the sensor plugged in. I was missing the digital light sensor.
+
+**On Grovebot the PIR sensor does not work.**
 If you are having trouble with the SMBus (for the light sensor on Grovebot for instance) you can user `i2cdetect` to debug.
 
 ```
 # Query for the device. You may need to check 0 also. 
+
 sudo i2cdetect 1
+
 ```
 
 You should get something that looks like below, if you don't, try a different device number.
