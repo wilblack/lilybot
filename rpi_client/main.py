@@ -9,7 +9,7 @@ from datetime import datetime as dt
 from settings import URI, VERBOSE, SENSORS, UPDATE_SENSOR_DT, \
                      LOOP_CALLBACK_DT, \
                      BOT_SUBSCRIPTIONS, BOT_CHANNEL, BOT_ROLES, BOT_NAME, BOT_PACKAGES, \
-                     LOG_DTFORMAT, SENSOR_PUBLISH_DT
+                     LOG_DTFORMAT, SENSOR_PUBLISH_DT, HUB_IP
 from router import Router
 from bot_roles.core import Core
 from utils import get_mac_address
@@ -38,7 +38,7 @@ class ArdyhClient(object):
         self.conn.on_connect = self.on_connect
         self.conn.on_message = self.on_message
 
-        self.conn.connect("192.168.0.105", 1883, 60)
+        self.conn.connect(HUB_IP, 1883, 60)
         
 
         self.conn.loop_start()
