@@ -32,7 +32,7 @@ def forward(x):
     print "forwarding running  motor "
     time.sleep(x)
     GPIO.output(aForward, GPIO.LOW)
-    GPIO.output(aForward, GPIO.LOW)
+    GPIO.output(bForward, GPIO.LOW)
 
 def reverse(x):
     GPIO.output(aBackward, GPIO.HIGH)
