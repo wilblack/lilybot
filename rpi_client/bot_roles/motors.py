@@ -14,8 +14,8 @@ aBackward=16 # In 1
 aForward=18 # In 2
 
 # Pins for Motor B (front right)
-bBackward=13 # In 3
-bForward=15 # In 4
+bBackward=15 # In 3
+bForward=13 # In 4
 
 
 
