@@ -11,7 +11,7 @@ GPIO.cleanup()
 
 # Pins for Motor A (front left)
 aBackward=16 # In 1
-aForward=28 # In 2
+aForward=18 # In 2
 
 # Pins for Motor B (front right)
 bBackward=13 # In 3
