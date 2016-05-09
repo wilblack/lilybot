@@ -10,12 +10,12 @@ GPIO.cleanup()
 # GPIO17,GPIO22,GPIO23,GPIO24
 
 # Pins for Motor A (front left)
-aBackward=16 # In 1
-aForward=18 # In 2
+aBackward=18 # In 1
+aForward=16 # In 2
 
 # Pins for Motor B (front right)
-bBackward=15 # In 3
-bForward=13 # In 4
+bBackward=13 # In 3
+bForward=15 # In 4
 
 
 
