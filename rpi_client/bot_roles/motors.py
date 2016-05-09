@@ -44,6 +44,7 @@ def reverse(x):
 
 print "forward motor "
 forward(3)
+time.sleep(1)
 print "reverse motor"
 reverse(3)
 
