@@ -20,8 +20,11 @@ bForward=15 # In 4
 
 
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(StepPinForward, GPIO.OUT)
-GPIO.setup(StepPinBackward, GPIO.OUT)
+GPIO.setup(aForward, GPIO.OUT)
+GPIO.setup(aBackward, GPIO.OUT)
+
+GPIO.setup(bForward, GPIO.OUT)
+GPIO.setup(bBackward, GPIO.OUT)
 
 def forward(x):
     GPIO.output(aForward, GPIO.HIGH)
