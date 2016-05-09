@@ -136,8 +136,15 @@ To fix this, on the machine you are ssh'ing from (i.e. not the rPi) edit the `~/
 
 ### (Optional) Set up vim for python editing
 
+
 ```
+# Try 
+sudo apt-get install vim
+
+# If that does not fix vim, try 
 sudo apt-get install vim-gui-common
+
+
 ```
 
 Then create or edit `~/.vimrc` to look like
