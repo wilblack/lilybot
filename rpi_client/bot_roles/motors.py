@@ -1,3 +1,5 @@
+import time
+import RPi.GPIO as GPIO
 #GPIO.setmode(GPIO.BCM)
 mode=GPIO.getmode()
 print " mode ="+str(mode)
@@ -7,8 +9,8 @@ GPIO.cleanup()
 # Physical pins 11,15,16,18
 # GPIO17,GPIO22,GPIO23,GPIO24
 
-StepPinForward=16
-StepPinBackward=18
+StepPinForward=13
+StepPinBackward=15
 sleeptime=1
 
 GPIO.setmode(GPIO.BOARD)
