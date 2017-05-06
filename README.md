@@ -39,6 +39,8 @@ For set instructions see [Grovebot Setup](rpi_client/bot_roles/README.md).
 If you have problems see [troublshooting](#GrovePi Troubleshooting)
 
 
+
+
 # Getting Started
 
 ## 1. Download and run the installer script 
