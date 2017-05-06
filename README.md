@@ -1,4 +1,6 @@
-
+#
+# MAY 5, 2017 - DO NOT USE THE HUB. USE  https://github.com/wilblack/ardyh-hub instead.
+#
 
 #lilybot
 

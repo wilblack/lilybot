@@ -1,3 +1,6 @@
+
+# MAY 5, 2017 - DO NOT USE. USE  https://github.com/wilblack/ardyh-hub instead.
+
 # Lilybot Hub
 
 The hub runs a message passing server (MQTT), hosts the system control web app (Yeoman and AngularJS), stores all sensor data locally (RRDTool), and can sync up to the cloud.

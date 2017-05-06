@@ -3,6 +3,8 @@
 .DS_Store
 local_settings.py
 *.db
-.idea
+*.idea
 
 *.rrd
+
+*.iml
