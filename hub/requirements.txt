@@ -1,2 +1,0 @@
-paho-mqtt
-tornado==4.3
