@@ -1,0 +1,16 @@
+
+- hosts: lilybots
+  remote_user: pi
+
+  vars:
+    git_repo: https://github.com/wilblack/lilybot.git
+    project_path: /home/pi/projects/lilybot
+    bot_name: rpi1
+
+  tasks:
+  - name: Checking lilybotd status
+    command: /etc/init.d/lilybotd status
+    register: status
+
+  - name: Status
+    debug: var=status.stdout

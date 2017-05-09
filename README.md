@@ -19,7 +19,7 @@ The software components of lilybot consist of three main functions.
 3. Web application clients. 
 
 
-## 1. Hardware Packages
+## 1. Clients
 
 To configure a hardware package you need to edit `rpi_client/local_settings.py`
 
@@ -37,10 +37,13 @@ An LED Strip controller. This exposes a web api to control these https://www.ada
 *bot_package*: groverbot
 
 A lilbary to interface with the GrovePi and its sensors. You will need a GrovePi and various sensors for this.
-For set instructions see [Grovebot Setup](rpi_client/bot_roles/README.md).
+For set instructions see [Grovebot Setup](rpi_client/README.md).
 If you have problems see [troublshooting](#GrovePi Troubleshooting)
 
+### MiniMe
+A telepresence robot
 
+*bot_package* mini-me
 
 
 # Getting Started
@@ -603,6 +606,8 @@ You should now be able to ssh in over Wi-Fi. Note you may need to reboot before 
 
 
 ----
+
+
 ## Ansible
 
 You can keep and inventory of your Raspberry Pi robots in the `hosts` file in the project root. 
@@ -611,39 +616,39 @@ Test the inventory file with `--list-tasks` and `--list-hosts`.
 
 Check connection
 
-     ansible -i hosts bot1 -m shell -a 'ls'
+     ansible -i ansible/hosts bot1 -m shell -a 'ls'
 
 Check disk usage
 
-    ansible -i hosts bots -m shell -a 'df -h | grep rootfs'
+    ansible -i ansible/hosts bots -m shell -a 'df -h | grep rootfs'
 
 
 Ping all bots
 
-    ansible -i hosts bots -m ping -u pi
+    ansible -i ansible/hosts bots -m ping -u pi
 
 
 
 Check the status of all the ardyh_cliend deamons. 
 
-    ansible -i hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
+    ansible -i ansible/hosts rpi_bots -u pi -m shell -a '/etc/init.d/ardyh_clientd status' 
 
 
 Restart all Raspberry Pi's
 ```
 
-ansible -i hosts rpi_bots -u pi -m shell -a 'shutdown -r now' --sudo
+ansible -i ansible/hosts rpi_bots -u pi -m shell -a 'shutdown -r now' --sudo
 ```
 
 Shutdown a single bot
 ```
-ansible -i hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
+ansible -i ansible/hosts rp1 -u pi --sudo -m shell -a 'shutdown -h now' --sudo
 ```
 
 Check which hosts areaffected by a playbook
 
 ```
-ansible-playbook -i hosts ansible/hub.yml --list-hosts
+ansible-playbook -i ansible/hosts ansible/hub.yml --list-hosts
 ```
 
 

@@ -1,0 +1,28 @@
+
+- hosts: lilybots
+  remote_user: pi
+
+  vars:
+    git_repo: https://github.com/wilblack/lilybot.git
+    project_path: /home/pi/projects/lilybot
+
+
+  tasks:
+
+    - name: Pulling GitHub repo
+      git: repo={{ git_repo }} dest={{ project_path }} version=master
+
+    - name: Copy local_settings
+      copy:
+        src: ./files/{{ name }}_local_settings.py
+        dest: "{{ project_path }}/rpi_client/test_local_settings.py"
+        owner: pi
+        group: pi
+        mode: 0644
+      notify:
+        - restart lilybotd
+
+  handlers:
+    - name: restart lilybotd
+      service: name=lilybotd state=restarted
+

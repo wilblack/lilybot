@@ -1,0 +1,22 @@
+bot1 name=rpi1 ansible_ssh_host=192.168.0.101 ansible_ssh_user=pi
+bot2 name=rpi2 ansible_ssh_host=192.168.0.102 ansible_ssh_user=pi
+bot3 name=rpi3 ansible_ssh_host=192.168.0.103 ansible_ssh_user=pi
+bot4 name=rpi4 ansible_ssh_host=192.168.0.104 ansible_ssh_user=pi
+bot5 name=rpi5 ansible_ssh_host=192.168.0.105 ansible_ssh_user=pi
+bot6 name=rpi6 ansible_ssh_host=192.168.0.106 ansible_ssh_user=pi
+
+[ardyh]
+ardyh.solalla.com
+
+[hub]
+ardyh
+bot6
+
+[lilybots]
+bot1
+bot2
+# bot3
+bot4
+# bot5
+
+
